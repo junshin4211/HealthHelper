@@ -18,6 +18,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.ui.theme.HealthHelperTheme
@@ -29,8 +31,8 @@ fun Main(tabViewModel: TabViewModel = viewModel()){
 
     val tabs = listOf(
         stringResource(id = R.string.management),
-        stringResource(id = R.string.diary),
         stringResource(id = R.string.community),
+        stringResource(id = R.string.diary),
         stringResource(id = R.string.plan),
         stringResource(id = R.string.map)
     )
@@ -53,36 +55,37 @@ fun Main(tabViewModel: TabViewModel = viewModel()){
         if(tabVisibility.value){
             TabRow(
                 selectedTabIndex = tabIndex,
-                containerColor = colorResource(id = R.color.blue),
+                containerColor = colorResource(id = R.color.blue01),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             ){
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        text = { Text(title) },
+                        text = { Text(title
+                        , fontSize = 10.sp) },
                         selected = tabIndex == index,
                         onClick = { tabIndex = index },
                         selectedContentColor = colorResource(id = R.color.white),
                         icon = {
                             when(index){
                                 0 -> Icon(
-                                    painter = painterResource(R.drawable.baseline_people_24),
+                                    painter = painterResource(R.drawable.management),
                                     contentDescription = title
                                 )
                                 1 -> Icon(
-                                    painter = painterResource(R.drawable.baseline_menu_book_24),
+                                    painter = painterResource(R.drawable.community),
                                     contentDescription = title
                                 )
                                 2 -> Icon(
-                                    painter = painterResource(R.drawable.baseline_menu_book_24),
+                                    painter = painterResource(R.drawable.diary),
                                     contentDescription = title
                                 )
                                 3 -> Icon(
-                                    painter = painterResource(R.drawable.baseline_people_24),
+                                    painter = painterResource(R.drawable.plan),
                                     contentDescription = title
                                 )
                                 4 -> Icon(
-                                    painter = painterResource(R.drawable.baseline_menu_book_24),
+                                    painter = painterResource(R.drawable.map),
                                     contentDescription = title
                                 )
 
