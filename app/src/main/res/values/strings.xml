@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">HealthHelper</string>
+    <string name="management">個人管理</string>
+    <string name="diary">飲食日記</string>
+    <string name="community">飲食社群</string>
+    <string name="plan">飲食計畫</string>
+    <string name="map">飲食地圖</string>
+</resources>
