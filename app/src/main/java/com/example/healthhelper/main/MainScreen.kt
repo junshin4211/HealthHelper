@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+import com.example.healthhelper.plan.PlanMain
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 @Composable
@@ -41,13 +42,13 @@ fun Main(tabViewModel: TabViewModel = viewModel()){
                 .fillMaxSize()
                 .weight(1f)
         ){
-//            when (tabIndex) {
+            when (tabIndex) {
 //                0 -> Management()
 //                1 -> Diary()
 //                2 -> Community()
-//                3 -> Plan()
+                3 -> PlanMain()
 //                4 -> Map()
-//            }
+            }
         }
 
         if(tabVisibility.value){
