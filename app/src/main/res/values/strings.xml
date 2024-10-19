@@ -62,4 +62,5 @@
     <string name="member_signup_title">Member signup</string>
     <string name="hide_password">hide password</string>
     <string name="show_password">show password</string>
+    <string name="login_button">Login</string>
 </resources>

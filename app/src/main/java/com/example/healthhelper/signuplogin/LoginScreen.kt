@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -136,7 +137,7 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
                         .clip(RoundedCornerShape(14.dp)),
                     colors = ButtonDefaults.buttonColors(Color(0xFF9BDEF8))
                 ) {
-                    Text(text = "註冊", fontSize = 18.sp, color = Color(0xFF0174DB))
+                    Text(text = stringResource(R.string.signup_button), fontSize = 18.sp, color = Color(0xFF0174DB))
                 }
                 Button(
                     onClick = { /* 這裡可以放登入按鈕 */ },
@@ -146,7 +147,7 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
                         .clip(RoundedCornerShape(14.dp)),
                     colors = ButtonDefaults.buttonColors(Color.White)
                 ) {
-                    Text(text = "登入", fontSize = 18.sp, color = Color(0xFF0174DB))
+                    Text(text = stringResource(R.string.login_button), fontSize = 18.sp, color = Color(0xFF0174DB))
                 }
 
 
