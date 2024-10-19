@@ -5,4 +5,14 @@
     <string name="community">飲食社群</string>
     <string name="plan">飲食計畫</string>
     <string name="map">飲食地圖</string>
+    <string name="myplan">我的計畫</string>
+    <string name="completedplan">已完成</string>
+    <string name="highprotein">高蛋白</string>
+    <string name="lowcarb">低碳水</string>
+    <string name="ketone">生酮</string>
+    <string name="mediterra">地中海</string>
+    <string name="custom">自訂</string>
+    <string name="editplan">EditPlan</string>
+    <string name="manageplan">ManagePlan</string>
+    <string name="checkedit">CheckEdit</string>
 </resources>

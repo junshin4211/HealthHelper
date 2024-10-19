@@ -12,4 +12,17 @@
     <color name="blue02">#B2D5F4</color>
     <color name="blue04">#E6EEFF</color>
     <color name="red01">#FE1010</color>
+    <color name="darkgray">#9F9BAA</color>
+    //主題一 橘色
+    <color name="backgroundcolor">#FFFEED</color>
+    <color name="primarycolor">#F19204</color>
+    <color name="footerselect">#D75813</color>
+    <color name="footericon">#FFFFFFFF</color>
+    <color name="footer">#EDB86A</color>
+    //主題二 藍色
+<!--    <color name="backgroundcolor">#FFFFFFFF</color>-->
+<!--    <color name="primarycolor">#FFFFFFFF</color>-->
+<!--    <color name="footerselect">#FFFFFFFF</color>-->
+<!--    <color name="footericon">#FFFFFFFF</color>-->
+<!--    <color name="footer">#0174DB</color>-->
 </resources>
