@@ -1,9 +1,6 @@
 package com.example.healthhelper.plan
 
-import java.security.Timestamp
-import java.util.Date
-
-data class Plan(
+data class PlanProperty(
     var planId: Int,
     var categoryId: Int,
     var categoryName: String,
@@ -15,7 +12,7 @@ data class Plan(
     var calorieGoal: Float,
 ) {
     override fun equals(other: Any?): Boolean {
-        return this.planId == (other as Plan).planId
+        return this.planId == (other as PlanProperty).planId
     }
 
     override fun hashCode(): Int {
