@@ -50,7 +50,14 @@ android {
 }
 
 dependencies {
-
+    implementation("androidx.compose.material3:material3:1.0.0-alpha10")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
+    implementation ("androidx.navigation:navigation-compose:2.5.3")
+    implementation ("mysql:mysql-connector-java:8.0.33")
+    implementation("androidx.compose.ui:ui:1.5.1")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.material:material:1.5.1")
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
