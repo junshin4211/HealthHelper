@@ -52,7 +52,7 @@ import kotlin.io.path.Path
 
 const val TAG = "DietDiaryMainFrame"
 
-@RequiresApi(Build.VERSION_CODES.R)
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun DietDiaryMainFrame(
@@ -196,7 +196,7 @@ fun DietDiaryMainFrame(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.R)
+@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Preview(showBackground = true)
 @Composable
 fun aPreview() {
