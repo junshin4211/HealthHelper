@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -78,42 +79,51 @@ fun Main(tabViewModel: TabViewModel = viewModel()){
             ){
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        text = { Text(
-                            title,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight(600),
-                            modifier = Modifier.scale(1.4f)
-                        ) },
+                        text = {
+                                Text(
+                                    title,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight(600),
+                                    modifier = Modifier
+                                        .scale(1.4f)
+                                        .padding(top = 20.dp),
+                                )
+                             },
                         selected = tabIndex == index,
                         onClick = { tabIndex = index },
+                        unselectedContentColor = colorResource(id = R.color.footericon),
                         selectedContentColor = colorResource(id = R.color.footerselect),
                         icon = {
                             when(index){
                                 0 -> Icon(
                                     painter = painterResource(R.drawable.management),
                                     contentDescription = title,
-                                    tint = colorResource(R.color.footericon),
-                                    modifier = Modifier.scale(1.2f)
+                                    modifier = Modifier
+                                        .scale(1.2f)
                                 )
                                 1 -> Icon(
                                     painter = painterResource(R.drawable.community),
                                     contentDescription = title,
-                                    tint = colorResource(R.color.footericon)
+                                    modifier = Modifier
+                                        .scale(1.2f)
                                 )
                                 2 -> Icon(
                                     painter = painterResource(R.drawable.diary),
                                     contentDescription = title,
-                                    tint = colorResource(R.color.footericon)
+                                    modifier = Modifier
+                                        .scale(1.2f)
                                 )
                                 3 -> Icon(
                                     painter = painterResource(R.drawable.plan),
                                     contentDescription = title,
-                                    tint = colorResource(R.color.footericon)
+                                    modifier = Modifier
+                                        .scale(1.2f)
                                 )
                                 4 -> Icon(
                                     painter = painterResource(R.drawable.map),
                                     contentDescription = title,
-                                    tint = colorResource(R.color.footericon)
+                                    modifier = Modifier
+                                        .scale(1.2f)
                                 )
 
                             }
