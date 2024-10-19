@@ -110,9 +110,7 @@ fun DietDiaryMainFrame(
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxHeight()
-                            //.weight(0.5f)
-                            .border(4.dp, Color.Red)
+                            .fillMaxHeight().border(4.dp, Color.Red)
                     ) {
                         Column(
                             modifier = Modifier
