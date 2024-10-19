@@ -5,4 +5,46 @@
     <string name="community">飲食社群</string>
     <string name="plan">飲食計畫</string>
     <string name="map">飲食地圖</string>
+
+    <string name="search_icon">Search Icon</string>
+    <string name="share_icon">Share Icon</string>
+    <string name="add_new_item_icon">Add new item</string>
+    <string name="delete_an_item_icon">Delete an item</string>
+    <string name="hamburger_icon">Hamburger Icon</string>
+    <string name="diet_app_title">Diet App</string>
+    <string name="search_label">Query</string>
+    <string name="clear_icon">Clear icon</string>
+    <string name="diary_diet_name_label">Name of diary diet</string>
+    <string name="diary_diet_date_label">Date of diary diet</string>
+    <string name="diary_diet_time_label">Time of diary diet</string>
+    <string name="diary_diet_food_label">Food of diary diet</string>
+    <string name="ok_option_text">OK</string>
+    <string name="cancel_option_text">Cancel</string>
+    <string name="diary_diet_main_frame">Diary Diet Main Frame</string>
+    <string name="diet_diary_main_frame">Diet Diary Main Frame</string>
+    <string name="add_new_diet_diary_item_frame">Add New Diet Diary Item Frame</string>
+    <string name="date_picker_frame">Date Picker Frame</string>
+    <string name="time_picker_frame">Time Picker Frame</string>
+    <string name="back_button">Back</string>
+    <string name="confirm_option_text">Confirm</string>
+    <string name="dismiss_option_text">Dismiss</string>
+    <string name="error_invalid_input">Error!!! Invalid Input!!!</string>
+    <string name="invalid_textfield_value_for_name_and_date_and_time">Invalid textfield value for either name, date, and time.</string>
+    <string name="search_hint_frame">Search Hint Frame</string>
+    <string name="info_icon">Info icon</string>
+    <string name="search_hint_title">Search Hint:</string>
+    <string name="search_algorithm_name">Query Language</string>
+    <string name="search_algorithm_intro">1. Key and value must be separated by semicolon.\n2. Each key-value pair must separated by ampersand.\n3. Key and value can only consist of digit and letter, and it must start with letter.\n</string>
+    <string name="sharable_app_title">Sharable App</string>
+    <string name="fb_icon">FB Icon</string>
+    <string name="messager_icon">Messenger Icon</string>
+    <string name="messenger_icon">Messenger Icon</string>
+    <string name="ig_icon">IG Icon</string>
+    <string name="twitter_icon">Twitter Icon</string>
+    <string name="discord_icon">Discord Icon</string>
+    <string name="sharable_app_frame">Sharable App Frame</string>
+    <string name="draw_piechart_frame">Draw Pie Chart Frame</string>
+    <string name="account_icon">Account Icon</string>
+    <string name="home_page">Home Page</string>
+
 </resources>
