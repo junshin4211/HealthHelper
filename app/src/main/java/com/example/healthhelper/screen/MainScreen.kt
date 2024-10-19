@@ -19,8 +19,6 @@ import com.example.healthhelper.dietary.frame.SearchHintFrame
 import com.example.healthhelper.enumclass.ScreenEnum
 import com.example.healthhelper.main.TabViewModel
 
-
-
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun MainScreen(
@@ -40,7 +38,7 @@ fun MainScreen(
             composable(
                 route = ScreenEnum.HomePage.name
             ){
-                TabScreen(navController)
+                Main()
             }
 
             composable(
