@@ -54,4 +54,5 @@
     <string name="diary">diary</string>
     <string name="plan">plan</string>
     <string name="map">map</string>
+    <string name="download_icon">Download icon</string>
 </resources>

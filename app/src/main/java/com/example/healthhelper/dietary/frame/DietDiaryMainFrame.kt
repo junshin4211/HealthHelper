@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import android.os.Environment
-import android.view.WindowMetrics
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -46,7 +45,7 @@ import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.gson.toJson
 import com.example.healthhelper.dietary.util.file.savingfile.saveEternal
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.screen.TabScreen
+import com.example.healthhelper.screen.Main
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import java.io.File
 import kotlin.io.path.Path
@@ -60,12 +59,6 @@ fun DietDiaryMainFrame(
     navController: NavHostController = rememberNavController(),
 ) {
     val currentContext = LocalContext.current
-    val currentActivity = currentContext as Activity
-    val currentWindowMetrics: WindowMetrics = currentActivity.windowManager.currentWindowMetrics
-
-    val currentWindowHeight = currentWindowMetrics.bounds.height()
-    val currentWindowWidth = currentWindowMetrics.bounds.width()
-
     val toastMessage by remember { mutableStateOf("") }
     var savingFileFlag by remember { mutableStateOf(false) }
     val verticalScrollState = rememberScrollState()
@@ -75,7 +68,7 @@ fun DietDiaryMainFrame(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            TabScreen(navController)
+            Main()
         },
         content = { innerPadding ->
             Column(
@@ -130,10 +123,8 @@ fun DietDiaryMainFrame(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        //.fillMaxHeight()
                                         .fillMaxSize()
                                         .weight(1f)
-                                        //.align(Alignment.CenterVertically)
                                         .border(12.dp, Color.Black),
                                     contentAlignment = Alignment.Center,
                                 ) {
@@ -148,15 +139,13 @@ fun DietDiaryMainFrame(
                                         }) {
                                         Image(
                                             painter = painterResource(R.drawable.download),
-                                            contentDescription = "",
+                                            contentDescription = stringResource(R.string.download_icon),
                                         )
                                     }
                                 }
                                 Box(
                                     modifier = Modifier
-                                        //.fillMaxHeight()
                                         .fillMaxSize()
-                                        //.align(Alignment.CenterVertically)
                                         .weight(1f)
                                         .border(12.dp, Color.Black),
                                     contentAlignment = Alignment.Center,
@@ -172,7 +161,7 @@ fun DietDiaryMainFrame(
                                         }) {
                                         Image(
                                             imageVector = Icons.Default.Add,
-                                            contentDescription = "",
+                                            contentDescription = stringResource(R.string.add_new_item_icon),
                                         )
                                     }
                                 }

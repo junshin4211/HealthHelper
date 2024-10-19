@@ -32,7 +32,7 @@ fun SearchHintFrame(
             )
         },
         bottomBar = {
-            TabScreen(navController)
+            Main(navController)
         },
         content = { innerPadding ->
             Column(

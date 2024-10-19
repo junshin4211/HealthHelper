@@ -37,7 +37,7 @@ import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.F
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.NameTextField
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.screen.TabScreen
+import com.example.healthhelper.screen.Main
 import com.tibame.tip101.group_02.healthhelp_v2.components.textfield.outlinedtextfield.TimeTextField
 
 @RequiresApi(Build.VERSION_CODES.R)
@@ -69,7 +69,7 @@ fun AddNewDietDiaryItemFrame(
             )
         },
         bottomBar = {
-            TabScreen(navController)
+            Main(navController)
         },
         floatingActionButton = {
             FloatingActionButton(

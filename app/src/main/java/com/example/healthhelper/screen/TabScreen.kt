@@ -1,5 +1,7 @@
 package com.example.healthhelper.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
@@ -25,6 +27,7 @@ import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.main.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()
