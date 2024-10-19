@@ -55,4 +55,11 @@
     <string name="plan">plan</string>
     <string name="map">map</string>
     <string name="download_icon">Download icon</string>
+    <string name="not_provided">Not provided</string>
+    <string name="male">male</string>
+    <string name="female">female</string>
+    <string name="signup_button">Signup</string>
+    <string name="member_signup_title">Member signup</string>
+    <string name="hide_password">hide password</string>
+    <string name="show_password">show password</string>
 </resources>
