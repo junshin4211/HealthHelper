@@ -69,7 +69,7 @@ fun AddNewDietDiaryItemFrame(
             )
         },
         bottomBar = {
-            Main(navController)
+            Main()
         },
         floatingActionButton = {
             FloatingActionButton(
