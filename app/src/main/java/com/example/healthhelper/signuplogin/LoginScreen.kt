@@ -66,7 +66,7 @@ fun LoginScreen(navController: NavHostController= rememberNavController()) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(150.dp))
+            Spacer(modifier = Modifier.height(2000.dp))
             Text(
                 text = "會員註冊",
                 fontSize = 28.sp,
