@@ -1,11 +1,5 @@
 <resources>
     <string name="app_name">HealthHelper</string>
-    <string name="management">個人管理</string>
-    <string name="diary">飲食日記</string>
-    <string name="community">飲食社群</string>
-    <string name="plan">飲食計畫</string>
-    <string name="map">飲食地圖</string>
-
     <string name="search_icon">Search Icon</string>
     <string name="share_icon">Share Icon</string>
     <string name="add_new_item_icon">Add new item</string>
@@ -46,5 +40,14 @@
     <string name="draw_piechart_frame">Draw Pie Chart Frame</string>
     <string name="account_icon">Account Icon</string>
     <string name="home_page">Home Page</string>
-
+    <string name="myplan">我的計畫</string>
+    <string name="completedplan">已完成</string>
+    <string name="highprotein">高蛋白</string>
+    <string name="lowcarb">低碳水</string>
+    <string name="ketone">生酮</string>
+    <string name="mediterra">地中海</string>
+    <string name="custom">自訂</string>
+    <string name="editplan">EditPlan</string>
+    <string name="manageplan">ManagePlan</string>
+    <string name="checkedit">CheckEdit</string>
 </resources>

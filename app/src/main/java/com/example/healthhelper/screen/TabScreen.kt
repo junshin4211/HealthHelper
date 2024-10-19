@@ -1,14 +1,10 @@
-package com.example.healthhelper.screen
+package com.example.healthhelper.main
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,25 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
-import com.example.healthhelper.main.TabViewModel
+import com.example.healthhelper.ui.theme.HealthHelperTheme
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
-fun TabScreen(
-    navController: NavHostController,
-    tabViewModel: TabViewModel = viewModel()
-) {
-    val TAG = "tag_TabScreen"
-
+fun Main(tabViewModel: TabViewModel = viewModel()){
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()
     var tabIndex by remember { mutableIntStateOf(0) }
-
-    var shouldNavigateToOtherPage by remember { mutableStateOf(false) }
 
     val tabs = listOf(
         stringResource(id = R.string.management),
@@ -49,69 +37,74 @@ fun TabScreen(
         stringResource(id = R.string.map)
     )
 
-    Column(
-        verticalArrangement = Arrangement.Bottom,
-    ) {
-        when (tabIndex) {
-            //0 -> Management()
-            // 1 -> Community()
-            2 -> {
-                DietDiaryMainFrame(navController)
-            }
-            //3 -> Plan()
-            //4 -> Map()
+    Column (modifier = Modifier.fillMaxSize()){
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+        ){
+//            when (tabIndex) {
+//                0 -> Management()
+//                1 -> Diary()
+//                2 -> Community()
+//                3 -> Plan()
+//                4 -> Map()
+//            }
         }
 
-        if (tabVisibility.value) {
+        if(tabVisibility.value){
             TabRow(
                 selectedTabIndex = tabIndex,
                 containerColor = colorResource(id = R.color.blue01),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-            ) {
+            ){
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        text = {
-                            Text(
-                                title, fontSize = 10.sp
-                            )
-                        },
+                        text = { Text(title
+                        , fontSize = 10.sp) },
                         selected = tabIndex == index,
-                        onClick = {
-                            tabIndex = index
-                        },
+                        onClick = { tabIndex = index },
                         selectedContentColor = colorResource(id = R.color.white),
                         icon = {
-                            when (index) {
+                            when(index){
                                 0 -> Icon(
                                     painter = painterResource(R.drawable.management),
                                     contentDescription = title
                                 )
-
                                 1 -> Icon(
                                     painter = painterResource(R.drawable.community),
                                     contentDescription = title
                                 )
-
                                 2 -> Icon(
                                     painter = painterResource(R.drawable.diary),
                                     contentDescription = title
                                 )
-
                                 3 -> Icon(
                                     painter = painterResource(R.drawable.plan),
                                     contentDescription = title
                                 )
-
                                 4 -> Icon(
                                     painter = painterResource(R.drawable.map),
                                     contentDescription = title
                                 )
+
                             }
                         }
                     )
                 }
+
             }
         }
+
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    HealthHelperTheme {
+        Main()
     }
 }
