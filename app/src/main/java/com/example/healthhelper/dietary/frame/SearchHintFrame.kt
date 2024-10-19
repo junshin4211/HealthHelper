@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
-import com.example.healthhelper.screen.TabScreen
+import com.example.healthhelper.screen.Main
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
