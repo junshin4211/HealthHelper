@@ -28,7 +28,6 @@ import com.example.healthhelper.main.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.example.ihealth.MainMapSearchScreen
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()

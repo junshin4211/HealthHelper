@@ -57,11 +57,11 @@
     <string name="threemonth">三個月</string>
     <string name="sixmonth">半年</string>
     <string name="startdate">開始日期</string>
-    <string name="management">management</string>
-    <string name="community">community</string>
-    <string name="diary">diary</string>
-    <string name="plan">plan</string>
-    <string name="map">map</string>
+    <string name="management">個人管理</string>
+    <string name="community">飲食社群</string>
+    <string name="diary">飲食日記</string>
+    <string name="plan">飲食計畫</string>
+    <string name="map">飲食地圖</string>
     <string name="download_icon">Download icon</string>
     <string name="not_provided">Not provided</string>
     <string name="male">male</string>

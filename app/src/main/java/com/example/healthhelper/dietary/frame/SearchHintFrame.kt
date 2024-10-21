@@ -1,7 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,7 +16,6 @@ import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
 import com.example.healthhelper.screen.Main
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun SearchHintFrame(
