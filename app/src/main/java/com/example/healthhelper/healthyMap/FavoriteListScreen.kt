@@ -1,4 +1,4 @@
-package com.example.ihealth
+package com.example.healthhelper.healthyMap
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -24,8 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
-import com.example.ihealth.model.ResturantsFavorList
-import com.example.ihealth.viewModelScreen.FavorListViewModel
+import com.example.healthhelper.healthyMap.model.ResturantsFavorList
+import com.example.healthhelper.healthyMap.viewModelScreen.FavorListViewModel
 import kotlinx.coroutines.launch
 
 

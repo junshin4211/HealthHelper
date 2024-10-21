@@ -1,8 +1,8 @@
-package com.example.ihealth.viewModelScreen
+package com.example.healthhelper.healthyMap.viewModelScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ihealth.model.RestaurantInfo
+import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

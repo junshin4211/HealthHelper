@@ -1,7 +1,5 @@
 package com.example.healthhelper.screen
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
@@ -23,10 +21,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
-import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.main.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
-import com.example.ihealth.MainMapSearchScreen
+import com.example.healthhelper.healthyMap.MainMapSearchScreen
 
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {

@@ -1,8 +1,8 @@
-package com.example.ihealth.source
+package com.example.healthhelper.healthyMap.source
 
 import android.content.Context
 import androidx.annotation.RawRes
-import com.example.ihealth.model.City
+import com.example.healthhelper.healthyMap.model.City
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.InputStreamReader

@@ -1,4 +1,4 @@
-package com.example.ihealth.model
+package com.example.healthhelper.healthyMap.model
 
 data class LatLngRange (
     val minLat: Double,

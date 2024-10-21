@@ -1,3 +1,4 @@
+
 import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.ihealth.model.RestaurantInfo
+import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

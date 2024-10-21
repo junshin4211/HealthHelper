@@ -78,13 +78,13 @@ dependencies {
 
     // Google Maps SDK -- these are here for the data model.  Remove these dependencies and replace
     // with the compose versions.
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
     // KTX for the Maps SDK for Android library
-    implementation("com.google.maps.android:maps-ktx:5.0.0")
+    implementation("com.google.maps.android:maps-ktx:5.1.1")
     // KTX for the Maps SDK for Android Utility Library
-    implementation("com.google.maps.android:maps-utils-ktx:5.0.0")
+    implementation("com.google.maps.android:maps-utils-ktx:5.1.1")
     // Google Maps Compose library
-    val mapsComposeVersion = "4.4.1"
+    val mapsComposeVersion = "6.1.2"
     implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
     // Google Maps Compose utility library
     implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")

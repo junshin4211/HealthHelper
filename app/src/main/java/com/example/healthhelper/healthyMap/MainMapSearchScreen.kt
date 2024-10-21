@@ -1,4 +1,4 @@
-package com.example.ihealth
+package com.example.healthhelper.healthyMap
 
 import GoogleMapScreen
 import android.Manifest
@@ -48,7 +48,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.ihealth.viewModelScreen.RestaurantViewModel
+import com.example.healthhelper.healthyMap.viewModelScreen.RestaurantViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

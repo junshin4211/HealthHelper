@@ -1,4 +1,4 @@
-package com.example.ihealth
+package com.example.healthhelper.healthyMap
 
 
 enum class Screen() {

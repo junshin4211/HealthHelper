@@ -1,4 +1,4 @@
-package com.example.ihealth.model
+package com.example.healthhelper.healthyMap.model
 
 import com.google.gson.annotations.SerializedName
 

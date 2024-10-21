@@ -1,4 +1,4 @@
-package com.example.ihealth
+package com.example.healthhelper.healthyMap
 
 import android.location.Location
 import androidx.compose.foundation.BorderStroke
@@ -44,12 +44,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.ihealth.model.City
-import com.example.ihealth.model.District
-import com.example.ihealth.model.LatLngRange
-import com.example.ihealth.model.RestaurantInfo
-import com.example.ihealth.source.CityDistrictsLoader
-import com.example.ihealth.viewModelScreen.RestaurantViewModel
+import com.example.healthhelper.healthyMap.model.City
+import com.example.healthhelper.healthyMap.model.District
+import com.example.healthhelper.healthyMap.model.LatLngRange
+import com.example.healthhelper.healthyMap.model.RestaurantInfo
+import com.example.healthhelper.healthyMap.source.CityDistrictsLoader
+import com.example.healthhelper.healthyMap.viewModelScreen.RestaurantViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 
