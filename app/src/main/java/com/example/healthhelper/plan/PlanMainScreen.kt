@@ -46,7 +46,7 @@ fun PlanMain(context: Context = LocalContext.current,
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 10.dp, bottom = 10.dp, start = 5.dp, end = 5.dp)
-            .background(color = colorResource(id = R.color.white))
+            .background(color = colorResource(id = R.color.backgroundcolor))
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
@@ -60,7 +60,7 @@ fun PlanMain(context: Context = LocalContext.current,
                     fontSize = 40.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = colorResource(id = R.color.black),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -97,7 +97,7 @@ fun PlanMain(context: Context = LocalContext.current,
                     fontSize = 32.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = Color(0xFF000000),
+                    color = colorResource(R.color.black),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -119,7 +119,7 @@ fun PlanMain(context: Context = LocalContext.current,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.myplanimg),
-                contentDescription = "image description",
+                contentDescription = "myplanimg",
                 modifier = Modifier
                     .width(350.dp)
                     .height(188.dp)
@@ -143,7 +143,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         lineHeight = 24.sp,
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight(600),
-                        color = colorResource(R.color.black),
+                        color = colorResource(R.color.primarycolor),
                     ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
@@ -159,7 +159,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         lineHeight = 24.sp,
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight(600),
-                        color = colorResource(R.color.black),
+                        color = colorResource(R.color.primarycolor),
                     ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
@@ -237,7 +237,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         lineHeight = 24.sp,
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight(600),
-                        color = colorResource(R.color.black),
+                        color = colorResource(R.color.primarycolor),
                     ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
@@ -253,7 +253,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         lineHeight = 24.sp,
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight(600),
-                        color = colorResource(R.color.black),
+                        color = colorResource(R.color.primarycolor),
                     ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
@@ -272,7 +272,7 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
     var tabindex by remember { mutableIntStateOf(0) }
     TabRow(
         selectedTabIndex = tabindex,
-        containerColor = colorResource(id = R.color.white),
+        containerColor = colorResource(id = R.color.backgroundcolor),
         divider = {
             HorizontalDivider(
                 color = colorResource(R.color.darkgray), thickness = 2.dp
@@ -284,7 +284,7 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
                 text = {
                     Text(
                         text = description.getbar(context),
-                        color = colorResource(id = R.color.black),
+                        color = colorResource(id = R.color.primarycolor),
                         fontWeight = FontWeight(600)
                     )
                 },
@@ -292,37 +292,37 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
                 onClick = {
                     tabindex = index
                     navcontroller.navigate(description.name)
-                          },
+                },
                 icon = {
                     when (index) {
                         0 -> Icon(
                             painter = painterResource(R.drawable.protein),
                             contentDescription = description.getbar(context),
-                            tint = colorResource(id = R.color.black)
+                            tint = colorResource(id = R.color.primarycolor)
                         )
 
                         1 -> Icon(
                             painter = painterResource(R.drawable.lowcarb),
                             contentDescription = description.getbar(context),
-                            tint = colorResource(id = R.color.black)
+                            tint = colorResource(id = R.color.primarycolor)
                         )
 
                         2 -> Icon(
                             painter = painterResource(R.drawable.ketone),
                             contentDescription = description.getbar(context),
-                            tint = colorResource(id = R.color.black)
+                            tint = colorResource(id = R.color.primarycolor)
                         )
 
                         3 -> Icon(
                             painter = painterResource(R.drawable.mediterra),
                             contentDescription = description.getbar(context),
-                            tint = colorResource(id = R.color.black)
+                            tint = colorResource(id = R.color.primarycolor)
                         )
 
                         4 -> Icon(
                             painter = painterResource(R.drawable.custom),
                             contentDescription = description.getbar(context),
-                            tint = colorResource(id = R.color.black)
+                            tint = colorResource(id = R.color.primarycolor)
                         )
                     }
                 }

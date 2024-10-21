@@ -49,6 +49,14 @@
     <string name="editplan">EditPlan</string>
     <string name="manageplan">ManagePlan</string>
     <string name="checkedit">CheckEdit</string>
+    <string name="setplantime">設定你的週期</string>
+    <string name="pickdaterange">選擇週期</string>
+    <string name="aweek">一周</string>
+    <string name="halfmonth">半個月</string>
+    <string name="amonth">一個月</string>
+    <string name="threemonth">三個月</string>
+    <string name="sixmonth">半年</string>
+    <string name="startdate">開始日期</string>
     <string name="management">management</string>
     <string name="community">community</string>
     <string name="diary">diary</string>
