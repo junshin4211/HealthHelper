@@ -52,7 +52,6 @@ import kotlin.io.path.Path
 
 const val TAG = "DietDiaryMainFrame"
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun DietDiaryMainFrame(
@@ -90,7 +89,7 @@ fun DietDiaryMainFrame(
                     )
 
                     DietDiaryCards(
-                        currentContext = currentContext,
+                        context = currentContext,
                         cards = diaries,
                         modifier = Modifier.fillMaxWidth(),
                     )

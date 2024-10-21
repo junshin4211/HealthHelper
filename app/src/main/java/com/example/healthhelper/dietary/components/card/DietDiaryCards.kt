@@ -3,6 +3,7 @@ package com.example.healthhelper.dietary.components.card
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -30,17 +31,16 @@ import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 
 const val TAG = "DietDiaryCards"
 
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun <T : Any> DietDiaryCards(
-    currentContext: Context,
+    context: Context,
     cards: List<T>,
     modifier: Modifier = Modifier,
-): String {
+){
     var deleteSuccessfully by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
 
-    cards.forEach { card: T ->
+    cards.forEachIndexed { index, card: T ->
         val cls = card.javaClass
         val classInspector = ClassInspector(cls)
         val fieldsName = classInspector.getFieldsName()
@@ -64,12 +64,12 @@ fun <T : Any> DietDiaryCards(
                 }
                 IconButton(
                     onClick = {
-                        try {
-                            DiaryViewModel.diaries.removeLast()
-                            deleteSuccessfully = true
-                        }catch (ex:Exception){
-                            Log.d(TAG,"exception:${ex.message},stacktrace:${ex.stackTrace}")
-                        }
+                        DiaryViewModel.diaries.removeAt(index)
+                        toastMessage = if(deleteSuccessfully)
+                            "Item deleted successfully."
+                        else
+                            "Item deleted failed."
+                        Toast.makeText(context,toastMessage,Toast.LENGTH_LONG).show()
                     }
                 ) {
                     Image(
@@ -80,10 +80,5 @@ fun <T : Any> DietDiaryCards(
                 }
             }
         }
-        toastMessage = if(deleteSuccessfully)
-            "Item deleted successfully."
-        else
-            "Item deleted failed."
     }
-    return toastMessage
 }

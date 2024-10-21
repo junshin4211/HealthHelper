@@ -27,7 +27,6 @@ import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.main.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()

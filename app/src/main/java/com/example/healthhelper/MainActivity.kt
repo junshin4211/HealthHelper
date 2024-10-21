@@ -12,7 +12,6 @@ import com.example.healthhelper.screen.MainScreen
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -24,14 +23,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun Main()
 {
     MainScreen()
 }
 
-@RequiresApi(Build.VERSION_CODES.R)
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
