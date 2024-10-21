@@ -292,7 +292,7 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
                 onClick = {
                     tabindex = index
                     navcontroller.navigate(description.name)
-                          },
+                },
                 icon = {
                     when (index) {
                         0 -> Icon(

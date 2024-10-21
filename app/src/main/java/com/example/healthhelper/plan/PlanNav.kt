@@ -24,7 +24,7 @@ fun Plan(){
         }
         composable(route = Bar.Ketone.name) {
             //EditPlan()
-            }
+        }
         composable(route = Bar.Mediterra.name) {
             //EditPlan()
         }
