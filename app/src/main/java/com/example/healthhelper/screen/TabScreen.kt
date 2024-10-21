@@ -26,6 +26,7 @@ import com.example.healthhelper.R
 import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.main.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
+import com.example.ihealth.MainMapSearchScreen
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable
@@ -49,10 +50,10 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
         ) {
             when (tabIndex) {
 //                0 -> Management()
-                1 -> DietDiaryMainFrame()
+//                1 -> DietDiaryMainFrame()
 //                2 -> Community()
 //                3 -> Plan()
-//                4 -> Map()
+                4 -> MainMapSearchScreen()
 //            }
             }
 
