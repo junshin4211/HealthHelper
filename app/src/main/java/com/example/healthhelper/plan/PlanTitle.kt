@@ -2,7 +2,6 @@ package com.example.healthhelper.plan
 
 import android.content.Context
 import androidx.annotation.StringRes
-import androidx.compose.ui.platform.LocalContext
 import com.example.healthhelper.R
 
 enum class PlanPage(@StringRes val title: Int) {
@@ -28,13 +27,3 @@ enum class Bar(@StringRes val title: Int){
         return context.getString(title)
     }
 }
-
-enum class DateRange(@StringRes val title: Int){
-    AWeek(title = R.string.aweek),
-    HalfMonth(title = R.string.halfmonth),
-    AMonth(title = R.string.amonth),
-    ThreeMonth(title = R.string.threemonth),
-    SixMonth(title = R.string.sixmonth);
-
-}
-
