@@ -97,4 +97,6 @@
     <string name="editPhoto">編輯頭相照片</string>
     <string name="takePicture">拍攝照片</string>
     <string name="choosePicture">選擇照片</string>
+    <string name="save">儲存</string>
+    <string name="historyRecord">歷史紀錄</string>
 </resources>
