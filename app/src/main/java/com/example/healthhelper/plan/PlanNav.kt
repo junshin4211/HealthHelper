@@ -1,6 +1,7 @@
 package com.example.healthhelper.plan
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun Plan(){
     val navController :NavHostController= rememberNavController()
+    val context = LocalContext.current
     NavHost(
         navController = navController,
         startDestination = PlanPage.DietPlan.name,
@@ -17,7 +19,7 @@ fun Plan(){
             PlanMain(navcontroller = navController)
         }
         composable(route = Bar.HighProtein.name) {
-            EditPlan(Bar.HighProtein.name)
+            EditPlan(Bar.HighProtein.getbar(context), navcontroller = navController)
         }
         composable(route = Bar.LowCarb.name) {
             //EditPlan()
