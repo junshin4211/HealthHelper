@@ -17,7 +17,6 @@ import com.example.healthhelper.dietary.frame.AddNewDietDiaryItemFrame
 import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.dietary.frame.SearchHintFrame
 import com.example.healthhelper.enumclass.ScreenEnum
-import com.example.healthhelper.main.TabViewModel
 
 @RequiresApi(Build.VERSION_CODES.R)
 @Composable

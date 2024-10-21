@@ -1,4 +1,4 @@
-package com.example.healthhelper.main
+package com.example.healthhelper.screen
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
