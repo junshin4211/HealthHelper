@@ -1,6 +1,7 @@
-package com.example.healthhelper.plan
+package com.example.healthhelper.plan.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.healthhelper.plan.model.PlanProperty
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

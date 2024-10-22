@@ -97,4 +97,5 @@
     <string name="editPhoto">編輯頭相照片</string>
     <string name="takePicture">拍攝照片</string>
     <string name="choosePicture">選擇照片</string>
+    <string name="enddate">結束日期</string>
 </resources>
