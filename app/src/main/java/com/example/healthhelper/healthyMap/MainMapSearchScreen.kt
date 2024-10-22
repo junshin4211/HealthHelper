@@ -1,6 +1,5 @@
 package com.example.healthhelper.healthyMap
 
-import GoogleMapScreen
 import android.Manifest
 import android.content.Context
 import android.location.Geocoder
@@ -132,7 +131,9 @@ fun MainMapSearchScreen(
                 GoogleMapScreen(
                     restaurantId = restaurantId,
                     restaurants = restaurants.values.flatten(),
-                    navController = navController
+                    navController = navController,
+                    userLat = userLat,
+                    userLng = userLng
                 )
             }
             composable(
