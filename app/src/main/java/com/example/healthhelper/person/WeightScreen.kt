@@ -259,7 +259,6 @@ val historyItems = listOf(
 @Preview(showBackground = true)
 @Composable
 fun WeightPreview() {
-
         WeightScreen()
 
 }
