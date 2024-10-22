@@ -2,29 +2,34 @@ package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.os.Build
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,97 +39,122 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.healthhelper.dietary.components.card.DietDiaryCards
-import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextField
+import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTopAppBar
+import com.example.healthhelper.dietary.components.button.DateButton
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.gson.toJson
 import com.example.healthhelper.dietary.util.file.savingfile.saveEternal
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.screen.Main
-import com.example.healthhelper.ui.theme.HealthHelperTheme
+import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import java.io.File
+import java.util.Date
 import kotlin.io.path.Path
 
-const val TAG = "DietDiaryMainFrame"
-
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun DietDiaryMainFrame(
-    navController: NavHostController = rememberNavController(),
+    navController: NavHostController,
+    diaryViewModel: DiaryViewModel = viewModel(),
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
-    val currentContext = LocalContext.current
-    val toastMessage by remember { mutableStateOf("") }
+    val TAG = "tag_DietDiaryMainFrame"
+
+    val selectedDate = remember { mutableStateOf((Date(System.currentTimeMillis()).toString())) }
     var savingFileFlag by remember { mutableStateOf(false) }
+    val selectedMealOptionIndex = remember { mutableIntStateOf(0) }
+
     val verticalScrollState = rememberScrollState()
 
-    val diaries by remember { mutableStateOf(DiaryViewModel.diaries) }
+    val diaries by diaryViewModel.data.collectAsState()
+    val mealsOptions by mealsOptionViewModel.data.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            Main()
+        topBar = {
+            QueryTopAppBar(
+                navController = navController,
+                title = { Text(stringResource(R.string.diet_diary_main_frame_title)) },
+                selectedMealsOptionIndex = selectedMealOptionIndex,
+            )
         },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .border(2.dp, Color.Magenta),
+                    .padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
             ) {
                 Column(
                     modifier = Modifier
-                        .weight(0.9f)
-                        .verticalScroll(verticalScrollState)
-                        .border(2.dp, Color.Blue),
+                        .weight(0.95f)
+                        .verticalScroll(verticalScrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top,
                 ) {
-                    SearchTextField(
-                        navController = navController,
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(stringResource(R.string.search_label)) },
+                    DateButton(
+                        selectedDate
                     )
 
-                    DietDiaryCards(
-                        context = currentContext,
-                        cards = diaries,
-                        modifier = Modifier.fillMaxWidth(),
+                    Spacer(
+                        modifier = Modifier
+                            .height(10.dp)
+                            .fillMaxWidth()
                     )
+
+                    mealsOptions.forEachIndexed { index, mealsOption ->
+                        val textColor = if (index == selectedMealOptionIndex.intValue) {
+                            Color.White
+                        } else {
+                            Color.Gray
+                        }
+                        Button(
+                            onClick = {
+                                Log.d(TAG,"The ${index}th button was clicked.")
+                                selectedMealOptionIndex.intValue = index
+                                Log.d(TAG,"selectedMealOptionIndex.intValue:${selectedMealOptionIndex.intValue}")
+                            }
+                        ) {
+                            Text(
+                                text = mealsOption,
+                                color = textColor
+                            )
+                        }
+                    }
                 }
+
                 Column(
                     modifier = Modifier
-                        .weight(0.1f)
+                        .weight(0.05f)
                         .fillMaxWidth()
-                        .border(2.dp, Color.Green)
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxHeight().border(4.dp, Color.Red)
+                            .fillMaxHeight()
                     ) {
                         Column(
                             modifier = Modifier
-                                .weight(0.5f)
+                                .weight(0.75f)
                         ) {
 
                         }
                         Column(
                             modifier = Modifier
-                                .weight(0.5f)
-                                .border(8.dp, Color.Yellow),
+                                .weight(0.25f)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .border(10.dp, Color.Cyan),
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .weight(1f)
-                                        .border(12.dp, Color.Black),
+                                        .weight(0.5f),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     IconButton(
@@ -145,8 +175,7 @@ fun DietDiaryMainFrame(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .weight(1f)
-                                        .border(12.dp, Color.Black),
+                                        .weight(0.5f),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     IconButton(
@@ -156,6 +185,7 @@ fun DietDiaryMainFrame(
                                             disabledContainerColor = Color.Gray,
                                             disabledContentColor = Color.Gray,
                                         ), onClick = {
+                                            Log.d(TAG, "add button was clicked.")
                                             navController.navigate(DietDiaryScreenEnum.AddNewDietDiaryItemFrame.name)
                                         }) {
                                         Image(
@@ -171,9 +201,10 @@ fun DietDiaryMainFrame(
             }
         }
     )
-    if (toastMessage.isNotBlank()) {
-        Toast.makeText(currentContext, toastMessage, Toast.LENGTH_LONG).show()
-    } else if (savingFileFlag) {
+
+    Log.d(TAG, "savingFileFlag:$savingFileFlag")
+
+    if (savingFileFlag) {
         val fileName = "download.txt"
         val jsonString = diaries.toJson()
         val folder = File(
@@ -192,14 +223,5 @@ fun DietDiaryMainFrame(
         Toast.makeText(currentActivity, toastMessage, Toast.LENGTH_LONG).show()
 
         savingFileFlag = false
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
-@Preview(showBackground = true)
-@Composable
-fun aPreview() {
-    HealthHelperTheme {
-        DietDiaryMainFrame()
     }
 }

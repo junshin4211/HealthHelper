@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.healthhelper.R
 
 import com.example.healthhelper.dietary.classhandler.ClassInspector
+import com.example.healthhelper.dietary.repository.DiaryRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 
 const val TAG = "DietDiaryCards"
@@ -64,7 +65,7 @@ fun <T : Any> DietDiaryCards(
                 }
                 IconButton(
                     onClick = {
-                        DiaryViewModel.diaries.removeAt(index)
+                        DiaryRepository.removeAt(index)
                         toastMessage = if(deleteSuccessfully)
                             "Item deleted successfully."
                         else

@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
@@ -35,12 +36,13 @@ import com.example.healthhelper.dietary.components.dialog.alertdialog.MyAlertDia
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.DateTextField
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.FoodTextField
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.NameTextField
+import com.example.healthhelper.dietary.dataclasses.dao.DiaryDao
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.repository.DiaryRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.screen.Main
 import com.tibame.tip101.group_02.healthhelp_v2.components.textfield.outlinedtextfield.TimeTextField
 
-@RequiresApi(Build.VERSION_CODES.R)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewDietDiaryItemFrame(
@@ -65,11 +67,18 @@ fun AddNewDietDiaryItemFrame(
         topBar = {
             DietAppTopBar(
                 navController = navController,
+                title = {
+                    Text(
+                        text = stringResource(R.string.diet_app_title),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
                 hasShareButton = false,
             )
         },
         bottomBar = {
-            Main()
+
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -80,12 +89,14 @@ fun AddNewDietDiaryItemFrame(
                         dateText.value.isNotBlank() &&
                         timeText.value.isNotBlank()
                     ) {
-                        DiaryViewModel.addDiary(
+                        val diary = DiaryDao(
                             name = name.value,
                             foodName = foodText.value,
                             date = dateText.value,
                             time = timeText.value,
                         )
+                        DiaryRepository.addData(diary)
+
                         navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
                         return@FloatingActionButton
                     }

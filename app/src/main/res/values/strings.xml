@@ -14,7 +14,6 @@
     <string name="diary_diet_food_label">Food of diary diet</string>
     <string name="ok_option_text">OK</string>
     <string name="cancel_option_text">Cancel</string>
-    <string name="diary_diet_main_frame">Diary Diet Main Frame</string>
     <string name="diet_diary_main_frame">Diet Diary Main Frame</string>
     <string name="add_new_diet_diary_item_frame">Add New Diet Diary Item Frame</string>
     <string name="date_picker_frame">Date Picker Frame</string>
@@ -97,4 +96,11 @@
     <string name="editPhoto">編輯頭相照片</string>
     <string name="takePicture">拍攝照片</string>
     <string name="choosePicture">選擇照片</string>
+    <string name="navigate_up_button_text">Navigate Up</string>
+    <string name="diet_diary_main_frame_title">飲食日記</string>
+    <string name="diet_diary_meal_frame">diet diary meal frame</string>
+    <string name="breakfast">breakfast</string>
+    <string name="lunch">lunch</string>
+    <string name="dinner">dinner</string>
+    <string name="supper">supper</string>
 </resources>
