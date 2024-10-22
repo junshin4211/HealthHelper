@@ -98,4 +98,6 @@
     <string name="takePicture">拍攝照片</string>
     <string name="choosePicture">選擇照片</string>
     <string name="enddate">結束日期</string>
+    <string name="save">儲存</string>
+    <string name="historyRecord">歷史紀錄</string>
 </resources>

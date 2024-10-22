@@ -1,5 +1,6 @@
 package com.example.healthhelper.screen
 
+import android.Manifest
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -10,12 +11,12 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -28,8 +29,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
-import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.example.healthhelper.healthyMap.MainMapSearchScreen
+import com.example.healthhelper.person.MainPersonScreen
+import com.example.healthhelper.plan.Plan
+import com.example.healthhelper.ui.theme.HealthHelperTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
@@ -51,11 +57,13 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
                 .weight(1f)
         ) {
             when (tabIndex) {
-//                0 -> Management()
+                0 -> MainPersonScreen()
 //                1 -> DietDiaryMainFrame()
 //                2 -> Community()
-//                3 -> Plan()
-                4 -> MainMapSearchScreen()
+                3 -> Plan()
+                4 -> RequestAccessLocationPermission(onGrant = {
+                        MainMapSearchScreen()
+                    })
 //            }
             }
         }
@@ -137,6 +145,23 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
 
     }
 
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun RequestAccessLocationPermission(
+    onGrant: @Composable () -> Unit
+) {
+    val permissionState = rememberPermissionState(
+        Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    if (permissionState.status.isGranted) {
+        onGrant()
+    } else {
+        LaunchedEffect(Unit) {
+            permissionState.launchPermissionRequest()
+        }
+    }
 }
 
 @Preview(showBackground = true)

@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.healthhelper.screen.MainScreen
+import com.example.healthhelper.screen.Main
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +29,7 @@ fun Main()
 {
     MainScreen()
 }
+
 
 @Preview(showBackground = true)
 @Composable
