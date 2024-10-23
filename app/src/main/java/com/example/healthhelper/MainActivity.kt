@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.healthhelper.dietary.test.MealsTimeRangeCategoryRepositoryTestUi
 import com.example.healthhelper.screen.Main
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
@@ -15,7 +16,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HealthHelperTheme {
-                Main()
+                //Main()
+                MealsTimeRangeCategoryRepositoryTestUi()
             }
         }
     }

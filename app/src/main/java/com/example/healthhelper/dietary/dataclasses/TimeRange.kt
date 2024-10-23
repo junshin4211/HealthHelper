@@ -1,8 +1,8 @@
 package com.example.healthhelper.dietary.dataclasses
 
-import java.sql.Time
+import java.time.LocalTime
 
 data class TimeRange(
-    val startTime: Time,
-    val endTime: Time,
+    val startTime: LocalTime,
+    val endTime: LocalTime,
 )

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import com.example.healthhelper.dietary.extension.bigdecimal.sum
+import com.example.healthhelper.dietary.extension.bigdecimalext.sum
 import java.math.BigDecimal
 
 fun calculateStartAngles(

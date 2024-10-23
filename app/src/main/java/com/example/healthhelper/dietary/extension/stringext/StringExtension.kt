@@ -1,4 +1,4 @@
-package com.example.healthhelper.dietary.extension.string
+package com.example.healthhelper.dietary.extension.stringext
 
 import com.example.healthhelper.dietary.util.querylanguage.QueryLanguageHandler
 

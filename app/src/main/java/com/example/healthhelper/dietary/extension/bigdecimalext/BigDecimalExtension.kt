@@ -1,4 +1,4 @@
-package com.example.healthhelper.dietary.extension.bigdecimal
+package com.example.healthhelper.dietary.extension.bigdecimalext
 
 import java.math.BigDecimal
 

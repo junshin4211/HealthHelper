@@ -20,7 +20,7 @@ import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.dialog.alertdialog.MyAlertDialog
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
-import com.example.healthhelper.dietary.extension.string.mightBeValidInQueryLanguage
+import com.example.healthhelper.dietary.extension.stringext.mightBeValidInQueryLanguage
 import com.example.healthhelper.dietary.util.querylanguage.QueryLanguageHandler
 
 @Composable
