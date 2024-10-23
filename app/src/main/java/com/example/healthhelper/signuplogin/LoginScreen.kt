@@ -1,8 +1,5 @@
 package com.example.healthhelper.signuplogin
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,21 +39,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 
 
 @Composable
-fun LoginScreen(navController: NavHostController= rememberNavController()) {
-    var account by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+fun LoginScreen(navController: NavHostController = rememberNavController()) {
+    // 使用 SignUpProperty 來管理表單狀態
+    val formState = remember { mutableStateOf(SignUpProperty()) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0174DB))
+            .background(Color(0xFFEDB86A))
     ) {
         Column(
             modifier = Modifier
@@ -66,40 +61,42 @@ fun LoginScreen(navController: NavHostController= rememberNavController()) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(2000.dp))
+            Spacer(modifier = Modifier.height(150.dp))
             Text(
                 text = "會員註冊",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color=Color.White,
+                color = Color.White,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
+            // 帳號輸入框
             TextField(
-                value = account,
-                onValueChange = { account = it },
+                value = formState.value.account,
+                onValueChange = { formState.value = formState.value.copy(account = it) },
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
+                    focusedLabelColor = Color(0xFFD75813),
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
                     backgroundColor = Color.White
                 )
             )
 
+            // 密碼輸入框
             TextField(
-                value = password,
-                onValueChange = { password = it },
+                value = formState.value.password,
+                onValueChange = { formState.value = formState.value.copy(password = it) },
                 label = { Text("密碼") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (formState.value.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(onClick = { formState.value = formState.value.copy(passwordVisible = !formState.value.passwordVisible) }) {
                         Icon(
-                            painter = if (passwordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
-                            contentDescription = if (passwordVisible) "隱藏密碼" else "顯示密碼",
+                            painter = if (formState.value.passwordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
+                            contentDescription = if (formState.value.passwordVisible) "隱藏密碼" else "顯示密碼",
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -108,7 +105,7 @@ fun LoginScreen(navController: NavHostController= rememberNavController()) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
+                    focusedLabelColor = Color(0xFFD75813),
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
                     backgroundColor = Color.White
@@ -117,11 +114,12 @@ fun LoginScreen(navController: NavHostController= rememberNavController()) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-
+            // 按鈕區域
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // 註冊按鈕
                 Button(
                     onClick = {
                         navController.navigate("SignUpScreen")
@@ -130,27 +128,26 @@ fun LoginScreen(navController: NavHostController= rememberNavController()) {
                         .width(150.dp)
                         .height(48.dp)
                         .clip(RoundedCornerShape(14.dp)),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF9BDEF8))
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFD75813))
                 ) {
-                    Text(text = "註冊", fontSize = 18.sp, color = Color(0xFF0174DB))
+                    Text(text = "註冊", fontSize = 18.sp, color = Color.White)
                 }
+
+                // 登入按鈕
                 Button(
-                    onClick = { /* 這裡可以放登入按鈕 */ },
+                    onClick = { /* 這裡可以放登入按鈕的邏輯 */ },
                     modifier = Modifier
                         .width(150.dp)
                         .height(48.dp)
                         .clip(RoundedCornerShape(14.dp)),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFAEAD1))
                 ) {
-                    Text(text = "登入", fontSize = 18.sp, color = Color(0xFF0174DB))
+                    Text(text = "登入", fontSize = 18.sp, color = Color(0xFFD75813))
                 }
-
-
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

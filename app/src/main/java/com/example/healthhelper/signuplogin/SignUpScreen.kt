@@ -1,4 +1,10 @@
 package com.example.healthhelper.signuplogin
+
+import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -28,9 +35,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,33 +60,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUpScreen(navController: NavHostController = rememberNavController()) {
-    var passwordErrorMessage by remember { mutableStateOf("") }
-    var account by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPassword by remember { mutableStateOf("") }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) } // 控制性別下拉選單展開狀態
-    var phone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var birthDate by remember { mutableStateOf("") }
-    var isNutritionist by remember { mutableStateOf(false) }
-    var certificate by remember { mutableStateOf("") }
+    val formState = remember { mutableStateOf(SignUpProperty()) }
     val context = LocalContext.current
-    var showDatePicker by remember { mutableStateOf(false) }
+
     val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
         backgroundColor = Color.White,
-        focusedBorderColor = Color(0xFF0174DB),
-        unfocusedBorderColor = Color(0xFF0174DB),
-        cursorColor = Color.Gray,
+        focusedBorderColor = Color(0xFFD75813),
+        unfocusedBorderColor = Color(0xFFD75813),
         focusedLabelColor = Color.Gray,
         unfocusedLabelColor = Color.Gray
     )
@@ -87,7 +81,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xFFFFFEED))
+            .offset(y = 50.dp)
     ) {
         Column(
             modifier = Modifier
@@ -101,107 +96,94 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                 text = "會員註冊",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color(0xFFD75813),
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
+            // 帳號
             TextField(
-                value = account,
-                onValueChange = { account = it },
+                value = formState.value.account,
+                onValueChange = { formState.value = formState.value.copy(account = it) },
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
-                    focusedBorderColor = Color.Transparent, // 聚焦時底線顏色
-                    unfocusedBorderColor = Color.Transparent, // 未聚焦時底線顏色
-                    backgroundColor = Color.White
-                )
-
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
             )
 
+            // 密碼
             TextField(
-                value = password,
+                value = formState.value.password,
                 onValueChange = { newPassword ->
-                    password = newPassword
-                    // 檢查確認密碼是否與密碼相同
-                    passwordErrorMessage = if (confirmPassword.isNotEmpty() && confirmPassword != password) {
-                        "密碼錯誤"
-                    } else {
-                        ""
-                    }
+                    formState.value = formState.value.copy(
+                        password = newPassword,
+                        passwordErrorMessage = if (formState.value.confirmPassword.isNotEmpty() && formState.value.confirmPassword != newPassword) {
+                            "密碼錯誤"
+                        } else {
+                            ""
+                        }
+                    )
                 },
                 label = { Text("密碼") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (formState.value.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(onClick = { formState.value = formState.value.copy(passwordVisible = !formState.value.passwordVisible) }) {
                         Icon(
-                            painter = if (passwordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
-                            contentDescription = if (passwordVisible) "隱藏密碼" else "顯示密碼",
-                            modifier = Modifier.size(20.dp) ,
+                            painter = if (formState.value.passwordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
+                            contentDescription = if (formState.value.passwordVisible) "隱藏密碼" else "顯示密碼",
+                            modifier = Modifier.size(20.dp),
                             tint = Color.Gray
                         )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
-                    backgroundColor = Color.White,
-                    unfocusedBorderColor = Color.Transparent,
-                    focusedBorderColor = Color.Transparent,
-
-                    )
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
             )
 
-            // 確認密碼輸入框
+            // 確認密碼
             TextField(
-                value = confirmPassword,
+                value = formState.value.confirmPassword,
                 onValueChange = { newConfirmPassword ->
-                    confirmPassword = newConfirmPassword
-                    passwordErrorMessage = if (confirmPassword != password) {
-                        "密碼錯誤"
-                    } else {
-                        ""
-                    }
+                    formState.value = formState.value.copy(
+                        confirmPassword = newConfirmPassword,
+                        passwordErrorMessage = if (formState.value.confirmPassword != formState.value.password) {
+                            "密碼錯誤"
+                        } else {
+                            ""
+                        }
+                    )
                 },
-                label = {
-                    Text(
-                        "確認密碼",
-
-                        )
-                },
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                label = { Text("確認密碼") },
+                visualTransformation = if (formState.value.confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                    IconButton(onClick = { formState.value = formState.value.copy(confirmPasswordVisible = !formState.value.confirmPasswordVisible) }) {
                         Icon(
-                            painter = if (confirmPasswordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
-                            contentDescription = if (confirmPasswordVisible) "隱藏密碼" else "顯示密碼",
+                            painter = if (formState.value.confirmPasswordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
+                            contentDescription = if (formState.value.confirmPasswordVisible) "隱藏密碼" else "顯示密碼",
                             modifier = Modifier.size(20.dp),
-                            tint = Color.Gray // 保持圖標顏色不變
+                            tint = Color.Gray
                         )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
-                    backgroundColor = Color.White,
-                    unfocusedBorderColor = Color.Transparent, // 設置未聚焦時底線顏色為透明
-                    focusedBorderColor = Color.Transparent,   // 設置聚焦時底線顏色為透明
-                    errorBorderColor = Color.Transparent,
-                    errorLabelColor = Color.Red
-
-                ),
-                isError = passwordErrorMessage.isNotEmpty() // 使用 `isError` 屬性來控制錯誤訊息
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors,
+                isError = formState.value.passwordErrorMessage.isNotEmpty()
             )
 
             // 密碼錯誤訊息
-            if (passwordErrorMessage.isNotEmpty()) {
+            if (formState.value.passwordErrorMessage.isNotEmpty()) {
                 Text(
-                    text = passwordErrorMessage,
+                    text = formState.value.passwordErrorMessage,
                     color = Color.Red,
                     modifier = Modifier.padding(top = 1.dp)
                 )
@@ -211,109 +193,121 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                // 姓名
                 TextField(
-                    value = name,
-                    onValueChange = { name = it },
+                    value = formState.value.username,
+                    onValueChange = { formState.value = formState.value.copy(username = it) },
                     label = { Text("姓名") },
                     modifier = Modifier
                         .weight(1f)
-                        .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp))
-                        .padding(end = 8.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color(0xFF0174DB),
-                        focusedBorderColor = Color.Transparent, // 聚焦時底線顏色
-                        unfocusedBorderColor = Color.Transparent, // 未聚焦時底線顏色
-                        backgroundColor = Color.White
-                    )
+                        .fillMaxWidth()
+                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White),
+                    colors = textFieldColors
                 )
+
                 Spacer(modifier = Modifier.width(16.dp))
-                // 性別選擇下拉式選單
+
+                // 性別下拉選單
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp))
+                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .background(Color.White)
-                        .clickable { expanded = true }
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .clickable { formState.value = formState.value.copy(expanded = true) }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
-                    Text(
-                        text = if (gender.isEmpty()) "性別" else gender,
-                        color = Color.Gray,
-                        fontSize = 16.sp
-                    )
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        DropdownMenuItem(onClick = { gender = "男"; expanded = false }) { Text("男") }
-                        DropdownMenuItem(onClick = { gender = "女"; expanded = false }) { Text("女") }
-                        DropdownMenuItem(onClick = { gender = "不提供"; expanded = false }) { Text("不提供") }
+                        Text(
+                            text = if (formState.value.gender.isEmpty()) "性別" else formState.value.gender,
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                        )
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.dropdown),
+                            contentDescription = "下拉選單",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = formState.value.expanded,
+                        onDismissRequest = { formState.value = formState.value.copy(expanded = false) }
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            formState.value = formState.value.copy(gender = "男", expanded = false)
+                        }) { Text("男") }
+                        DropdownMenuItem(onClick = {
+                            formState.value = formState.value.copy(gender = "女", expanded = false)
+                        }) { Text("女") }
+                        DropdownMenuItem(onClick = {
+                            formState.value = formState.value.copy(gender = "不提供", expanded = false)
+                        }) { Text("不提供") }
                     }
                 }
             }
 
-            var errorMessage by remember { mutableStateOf("") }
-
+            // 電話
             TextField(
-                value = phone,
+                value = formState.value.phone,
                 onValueChange = { newPhone ->
-                    // 更新 phone 狀態，並進行驗證
-                    phone = newPhone
-                    // 驗證電話格式：必須以 "09" 開頭，且長度為 10 碼
-                    errorMessage = if (newPhone.startsWith("09") && newPhone.length == 10) {
-                        ""  // 清除錯誤訊息
-                    } else if (newPhone.isNotEmpty()) {
-                        "電話號碼必須以09開頭且為10碼"
-                    } else {
-                        ""  // 當輸入框為空時清除錯誤訊息
-                    }
+                    formState.value = formState.value.copy(
+                        phone = newPhone,
+                        phoneErrorMessage = if (newPhone.startsWith("09") && newPhone.length == 10) {
+                            ""
+                        } else if (newPhone.isNotEmpty()) {
+                            "電話號碼必須以09開頭且為10碼"
+                        } else {
+                            ""
+                        }
+                    )
                 },
                 label = { Text("電話") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),   // 聚焦時標籤顏色
-                    backgroundColor = Color.White,           // 背景顏色
-                    cursorColor = Color.Black,               // 游標顏色
-                    focusedBorderColor = Color.Transparent,  // 聚焦時底線顏色（設為透明）
-                    unfocusedBorderColor = Color.Transparent, // 未聚焦時底線顏色（設為透明）
-                    errorBorderColor = Color.Transparent,    // 錯誤狀態下底線顏色（設為透明）
-                    errorLabelColor = Color.Red              // 錯誤狀態下標籤顏色
-                ),
-                isError = errorMessage.isNotEmpty()  // 根據錯誤訊息是否存在來設定輸入框的錯誤狀態
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors,
+                isError = formState.value.phoneErrorMessage.isNotEmpty()
             )
 
-            if (errorMessage.isNotEmpty()) {
+            if (formState.value.phoneErrorMessage.isNotEmpty()) {
                 Text(
-                    text = errorMessage,
-                    color = Color.Red,  // 顯示錯誤訊息為紅色
-                    modifier = Modifier.padding(top = 1.dp)  // 設置錯誤訊息與輸入框之間的間距
+                    text = formState.value.phoneErrorMessage,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 1.dp)
                 )
             }
+
+            // 信箱
             TextField(
-                value = email,
-                onValueChange = { email = it },
+                value = formState.value.email,
+                onValueChange = { formState.value = formState.value.copy(email = it) },
                 label = { Text("信箱") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
-                    focusedBorderColor = Color.Transparent, // 聚焦時底線顏色
-                    unfocusedBorderColor = Color.Transparent, // 未聚焦時底線顏色
-                    backgroundColor = Color.White
-                )
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
             )
 
+            // 生日
             TextField(
-                value = birthDate,
-                onValueChange = { birthDate = it },
+                value = formState.value.birthDate,
+                onValueChange = { formState.value = formState.value.copy(birthDate = it) },
                 label = { Text("生日") },
                 trailingIcon = {
-                    IconButton(onClick = { showDatePicker = true }) {  // 將日曆的彈出行為綁定在按鈕上
+                    IconButton(onClick = { formState.value = formState.value.copy(showDatePicker = true) }) {
                         Icon(
                             painter = painterResource(id = R.drawable.calender),
                             contentDescription = "生日",
@@ -324,77 +318,87 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFF0174DB),
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    backgroundColor = Color.White
-                )
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
             )
 
-            if (showDatePicker) {
+            if (formState.value.showDatePicker) {
                 MyDatePickerDialog(
                     onConfirm = { selectedDateMillis ->
                         selectedDateMillis?.let {
                             val selectedDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                            birthDate = selectedDate.toString()
+                            formState.value = formState.value.copy(birthDate = selectedDate.toString(), showDatePicker = false)
                         }
-                        showDatePicker = false
                     },
-                    onDismiss = { showDatePicker = false }
+                    onDismiss = { formState.value = formState.value.copy(showDatePicker = false) }
                 )
             }
 
+            // 註冊身份
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp) // 調整左右內縮距離
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
-                Text("註冊身份", fontSize = 16.sp, modifier = Modifier.padding(end = 16.dp),color = Color.Gray) // 增加右側內縮距離
+                Text("註冊身份", fontSize = 16.sp, modifier = Modifier.padding(end = 16.dp), color = Color(0xFF555555))
                 Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceAround) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         RadioButton(
-                            selected = !isNutritionist,
-                            onClick = { isNutritionist = false },
+                            selected = !formState.value.isNutritionist,
+                            onClick = { formState.value = formState.value.copy(isNutritionist = false) },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = Color.Gray, // 設置選中時的顏色
-                                unselectedColor = Color.Gray // 設置未選中時的顏色
+                                selectedColor = Color(0xFF555555),
+                                unselectedColor = Color(0xFF555555)
                             )
                         )
-                        Text("一般用戶", fontSize = 16.sp,color = Color.Gray) // 調整文字大小
+                        Text("一般用戶", fontSize = 16.sp, color = Color(0xFF555555))
                     }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         RadioButton(
-                            selected = isNutritionist,
-                            onClick = { isNutritionist = true },
+                            selected = formState.value.isNutritionist,
+                            onClick = { formState.value = formState.value.copy(isNutritionist = true) },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = Color.Gray, // 設置選中時的顏色
-                                unselectedColor = Color.Gray // 設置未選中時的顏色
+                                selectedColor = Color(0xFF555555),
+                                unselectedColor = Color(0xFF555555)
                             )
                         )
-                        Text("營養師", fontSize = 16.sp,color = Color.Gray) // 調整文字大小
+                        Text("營養師", fontSize = 16.sp, color = Color(0xFF555555))
                     }
                 }
             }
-            if (isNutritionist) {
+
+            // 營養師證書
+            if (formState.value.isNutritionist) {
+                var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+
+                // 文件選擇器啟動器，接受任何檔案類型
+                val pickFileLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent(),
+                    onResult = { uri: Uri? ->
+                        selectedFileUri = uri
+                        formState.value = formState.value.copy(certificate = uri?.lastPathSegment ?: "未選擇檔案")
+                    }
+                )
+
                 TextField(
-                    value = certificate,
-                    onValueChange = { certificate = it },
+                    value = formState.value.certificate,
+                    onValueChange = { formState.value = formState.value.copy(certificate = it) },
                     label = { Text("營養師證書") },
                     trailingIcon = {
                         IconButton(onClick = {
-                            // 處理點擊上傳事件
+                            pickFileLauncher.launch("*/*")
                         }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.upload), // 替換成實際的圖標資源
+                                painter = painterResource(id = R.drawable.upload),
                                 contentDescription = "上傳證書",
                                 modifier = Modifier.size(20.dp)
                             )
@@ -402,25 +406,23 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(3.dp, Color(0xFF0174DB), RoundedCornerShape(16.dp)),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color(0xFF0174DB),
-                        focusedBorderColor = Color.Transparent, // 聚焦時底線顏色
-                        unfocusedBorderColor = Color.Transparent, // 未聚焦時底線顏色
-                        backgroundColor = Color.White
-                    )
+                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White),
+                    colors = textFieldColors
                 )
             }
 
             Button(
-                {
-                    navController.navigate("LoginScreen")
+                onClick = {
+
+                    navController.navigate("Plan")
                 },
                 modifier = Modifier
                     .width(150.dp)
                     .padding(vertical = 16.dp)
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0174DB))
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFD75813))
             ) {
                 Text(text = "註冊", fontSize = 16.sp, color = Color.White)
             }
@@ -434,22 +436,29 @@ fun MyDatePickerDialog(
     onConfirm: (message: Long?) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val today = Instant.now().truncatedTo(ChronoUnit.DAYS).toEpochMilli()
     val datePickerState = rememberDatePickerState()
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
+            // 如果所選日期小於或等於今天，啟用「確認」按鈕
             androidx.compose.material3.Button(
                 onClick = {
                     onConfirm(datePickerState.selectedDateMillis)
                 },
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0174DB) // 更改背景顏色
-                )
+                    containerColor = if (datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! <= today) {
+                        Color(0xFFD75813)
+                    } else {
+                        Color.Gray // 禁用按鈕
+                    }
+                ),
+                enabled = datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! <= today // 禁用超過今天的日期
             ) {
                 androidx.compose.material3.Text(
                     text = "確認",
-                    color = Color.White // 更改文字顏色
+                    color = Color.White
                 )
             }
         },
@@ -457,24 +466,38 @@ fun MyDatePickerDialog(
             androidx.compose.material3.Button(
                 onClick = onDismiss,
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color.Red // 更改取消按鈕背景顏色
+                    containerColor = Color(0xFFFFFEED)
                 )
             ) {
                 androidx.compose.material3.Text(
                     text = "取消",
-                    color = Color.White // 更改文字顏色
+                    color = Color(0xFFD75813)
                 )
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFEFE9F4))
+        ) {
+            DatePicker(
+                state = datePickerState,
+                modifier = Modifier.background(Color(0xFFEFE9F4)),
+                colors = DatePickerDefaults.colors(
+                    selectedDayContentColor = Color.White,
+                    selectedDayContainerColor = Color(0xFFF19204),
+                    todayContentColor = Color(0xFFFFA500),
+                    todayDateBorderColor = Color(0xFFFFA500),
+
+                    )
+            )
+        }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignUp() {
-
     SignUpScreen()
 }
