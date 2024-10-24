@@ -1,7 +1,5 @@
 package com.example.healthhelper.dietary.frame
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -39,9 +37,7 @@ import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.N
 import com.example.healthhelper.dietary.dataclasses.dao.DiaryDao
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.DiaryRepository
-import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.screen.Main
-import com.tibame.tip101.group_02.healthhelp_v2.components.textfield.outlinedtextfield.TimeTextField
+import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TimeTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
