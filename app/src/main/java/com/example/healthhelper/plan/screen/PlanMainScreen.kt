@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,14 +43,14 @@ fun PlanMain(context: Context = LocalContext.current,
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 10.dp, bottom = 10.dp, start = 5.dp, end = 5.dp)
-            .background(color = colorResource(id = R.color.backgroundcolor))
+            .background(color = colorResource(id = R.color.backgroundcolor)),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
             verticalAlignment = Alignment.Top,
             modifier = Modifier
-                .padding(top = 20.dp, start = 10.dp, bottom = 10.dp)
+                .padding(start = 10.dp, bottom = 10.dp)
         ) {
             Text(
                 text = PlanPage.DietPlan.getPlanTitle(context),
@@ -70,21 +71,20 @@ fun PlanMain(context: Context = LocalContext.current,
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
+            horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.Start),
             verticalAlignment = Alignment.Top,
             modifier = Modifier
                 .padding(top = 5.dp, end = 5.dp)
                 .fillMaxWidth()
         ) {
-            CreateBar(context,navcontroller)
+            CreateBar(context, navcontroller)
         }
 
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(top = 15.dp, start = 10.dp, end = 5.dp)
+                .padding(top = 5.dp, start = 10.dp, end = 5.dp)
                 .fillMaxWidth()
         ) {
 
@@ -100,34 +100,27 @@ fun PlanMain(context: Context = LocalContext.current,
                 )
             )
 
-
-            Image(
-                painter = painterResource(R.drawable.arrow),
-                contentDescription = "arrow",
-                modifier = Modifier
-                    .scale(2.5f)
-            )
         }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 15.dp, bottom = 15.dp)
+                .padding(top = 5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.myplanimg),
                 contentDescription = "myplanimg",
                 modifier = Modifier
                     .width(350.dp)
-                    .height(188.dp)
-                    .align(Alignment.CenterHorizontally),
+                    .height(188.dp),
                 contentScale = ContentScale.FillBounds
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp),
+                    .padding(start = 30.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
@@ -144,7 +137,7 @@ fun PlanMain(context: Context = LocalContext.current,
                     ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
-                        .padding(start = 8.dp)
+                        //.padding(start = 15.dp)
                 )
 
                 Text(
@@ -163,22 +156,35 @@ fun PlanMain(context: Context = LocalContext.current,
                         .padding(start = 8.dp)
                 )
             }
+            TextButton(
+                onClick = {},
+                modifier = Modifier
+                    .height(40.dp)
+                    .align(Alignment.End)
+            ) {
+                Text(
+                    text = "more‧‧‧",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = FontFamily.Default,
+                        fontWeight = FontWeight(600),
+                        color = colorResource(R.color.black),
+                        letterSpacing = 0.2.sp
+                    )
+                )
+            }
 
         }
 
         HorizontalDivider(
             color = colorResource(id = R.color.darkgray),
-            thickness = 2.dp,
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()
+            thickness = 2.dp
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(15.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(top = 15.dp, start = 10.dp, end = 5.dp)
+                .padding(top = 5.dp, start = 10.dp, end = 5.dp)
                 .fillMaxWidth()
         ) {
 
@@ -188,45 +194,38 @@ fun PlanMain(context: Context = LocalContext.current,
                     fontSize = 32.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = Color(0xFF000000),
+                    color = colorResource(R.color.black),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
             )
 
-
-            Image(
-                painter = painterResource(R.drawable.arrow),
-                contentDescription = "arrow",
-                modifier = Modifier
-                    .scale(2.5f)
-            )
         }
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 15.dp, bottom = 15.dp)
+                .padding(top = 5.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.myplanimg),
-                contentDescription = "image description",
+                contentDescription = "myplanimg",
                 modifier = Modifier
                     .width(350.dp)
-                    .height(188.dp)
-                    .align(Alignment.CenterHorizontally),
+                    .height(188.dp),
                 contentScale = ContentScale.FillBounds
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, start = 20.dp),
+                    .padding(start = 30.dp),
                 horizontalArrangement = Arrangement.spacedBy(15.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    //放SQL最近已完成計畫的名稱
+                    //放SQL最新計畫的名稱
                     text = "${Bar.HighProtein.getbar(context)}飲食",
 
                     style = TextStyle(
@@ -238,11 +237,11 @@ fun PlanMain(context: Context = LocalContext.current,
                     ),
                     textAlign = TextAlign.Start,
                     modifier = Modifier
-                        .padding(start = 8.dp)
+                    //.padding(start = 15.dp)
                 )
 
                 Text(
-                    //放SQL最近已完成計畫的時間
+                    //放SQL最新計畫的時間
                     text = "2024/10/18~2024/10/31",
 
                     style = TextStyle(
@@ -257,10 +256,26 @@ fun PlanMain(context: Context = LocalContext.current,
                         .padding(start = 8.dp)
                 )
             }
+            TextButton(
+                onClick = {},
+                modifier = Modifier
+                    .height(40.dp)
+                    .align(Alignment.End)
+            ) {
+                Text(
+                    text = "more‧‧‧",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = FontFamily.Default,
+                        fontWeight = FontWeight(600),
+                        color = colorResource(R.color.black),
+                        letterSpacing = 0.2.sp
+                    )
+                )
+            }
 
         }
     }
-
 }
 
 

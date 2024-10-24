@@ -29,34 +29,55 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun CreateDatePicker(
     dateSelected: String?,
-    dateStart:Boolean = true
-){
+    dateStart: Boolean = true
+) {
     var date by remember { mutableStateOf(LocalDate.now()) }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var showDatePicker by remember { mutableStateOf(false) }
-    if(!dateStart){
+    var getdate by remember { mutableStateOf(date.format(formatter)) }
+
+    if (!dateStart) {
         date = LocalDate.now().plusWeeks(1L)
     }
 
-    dateformatter(dateSelected?:DateRange.AWeek.name,dateStart,onDateselect = {date = it})
+    dateformatter(dateSelected ?: DateRange.AWeek.name,
+        dateStart,
+        onDateselect = {
+            date = it
+            getdate = date.format(formatter)
+        }
+    )
+
     TextField(
         readOnly = true,
-        value = formatter.format(date),
-        onValueChange = {  },
+        value = getdate,
+        onValueChange = { },
         singleLine = true,
-        label = { Text(text = stringResource(R.string.pickdaterange)) },
-        trailingIcon = { Icon(
-            painter = painterResource(R.drawable.calender),
-            contentDescription = "calender",
-            modifier = Modifier
-                .scale(2.2f)
-                .clickable { showDatePicker = true }
-        ) },
+        label = {
+            Text(
+                if (dateStart) {
+                    stringResource(R.string.pickdatestart)
+                } else {
+                    stringResource(R.string.pickdateend)
+                }
+            )
+
+        },
+        trailingIcon = {
+            Icon(
+                painter = painterResource(R.drawable.calender),
+                contentDescription = "calender",
+                modifier = Modifier
+                    .scale(2.2f)
+                    .clickable { showDatePicker = true }
+            )
+        },
         modifier = Modifier
             .border(
                 width = 2.dp,
                 color = colorResource(id = R.color.primarycolor),
-                shape = RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp)
+            ),
 
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
@@ -66,14 +87,15 @@ fun CreateDatePicker(
         )
     )
 
-    if(showDatePicker){
+    if (showDatePicker) {
         CreateDatePickerDialog(
             onConfirm = { utcTimeMillis ->
-                date = utcTimeMillis?.let {
-                    Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
+                utcTimeMillis?.let {
+                    date = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
                         .toLocalDate()
-                } ?: date
+                }
                 showDatePicker = false
+                getdate = date.format(formatter)
             },
             onDismiss = {
                 showDatePicker = false
@@ -85,13 +107,12 @@ fun CreateDatePicker(
 fun dateformatter(
     dateSelected: String,
     dateStart: Boolean,
-    onDateselect:(LocalDate)->Unit
-){
+    onDateselect: (LocalDate) -> Unit
+) {
     val today = LocalDate.now()
-    if(dateStart){
+    if (dateStart) {
         onDateselect(today)
-    }
-    else {
+    } else {
         when (dateSelected) {
             DateRange.AWeek.name -> onDateselect(today.plusWeeks(1L))
 

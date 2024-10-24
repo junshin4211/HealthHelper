@@ -15,7 +15,7 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        //enableEdgeToEdge()
         setContent {
             HealthHelperTheme {
                 Main()

@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,7 +59,8 @@ fun <T> CreateDropDownMenu(
                 .border(
                     width = 2.dp,
                     color = colorResource(id = R.color.primarycolor),
-                    if (expanded) {RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)} else {RoundedCornerShape(20.dp)}),
+                    if (expanded) {RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)} else {RoundedCornerShape(20.dp)})
+                .width(200.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
