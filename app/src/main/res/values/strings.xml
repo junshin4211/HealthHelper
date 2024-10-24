@@ -92,6 +92,7 @@
     <string name="go2MapAPP">導航</string>
     <string name="personData">個人資料</string>
     <string name="weightSetting">體重設定</string>
+    <string name="myWeight">我的體重</string>
     <string name="achievement">我的成就</string>
     <string name="logout">登　　出</string>
     <string name="editPhoto">編輯頭相照片</string>
@@ -102,4 +103,15 @@
     <string name="weight">體重</string>
     <string name="BMI">BMI</string>
     <string name="fat">體脂</string>
+    <string name="LocationNone">尚未定位</string>
+    <string name="noChoose">未選擇</string>
+    <string name="centermeter">公分</string>
+    <string name="kilogram">公斤</string>
+    <string name="percentage">%</string>
+    <string name="height">身高</string>
+    <string name="revise">修改</string>
+    <string name="delete">刪除</string>
+    <string name="cancel">取消</string>
+    <string name="deleteData">刪除資料</string>
+    <string name="deleteContent">請問是否刪除該筆資料?</string>
 </resources>

@@ -53,7 +53,7 @@ import com.example.healthhelper.R
 import com.example.healthhelper.healthyMap.model.MapState
 import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import com.example.healthhelper.healthyMap.model.ResturantsFavorList
-import com.example.healthhelper.healthyMap.viewModelScreen.FavorListViewModel
+import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
 
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

@@ -1,4 +1,4 @@
-package com.example.healthhelper.healthyMap.viewModelScreen
+package com.example.healthhelper.healthyMap.mapVM
 
 import androidx.lifecycle.ViewModel
 import com.example.healthhelper.healthyMap.model.ResturantsFavorList

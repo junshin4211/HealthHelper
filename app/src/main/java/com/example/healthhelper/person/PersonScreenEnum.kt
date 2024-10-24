@@ -4,4 +4,6 @@ enum class PersonScreenEnum {
     personScreen,
     weightScreen,
     achivementScreen,
+    weightSettingScreen,
+    weightReviseScreen
 }

@@ -17,6 +17,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,85 +38,94 @@ import com.example.healthhelper.R
 
 @Composable
 fun PersonScreen(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Box(
-            modifier = Modifier.size(250.dp)
+    Scaffold(containerColor = colorResource(R.color.backgroundcolor)) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.person),
-                contentDescription = "image",
+            Column(
                 modifier = Modifier
-                    .size(250.dp),
-                contentScale = ContentScale.Fit
-            )
-            IconButton(
-                onClick = {
-                    expanded = true
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(40.dp)
+                    .fillMaxSize()
+                    .padding(48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.edit),
-                    contentDescription = stringResource(R.string.editPhoto)
-                )
-                PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false })
-            }
-        }
+                Box(
+                    modifier = Modifier.size(250.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.person),
+                        contentDescription = "image",
+                        modifier = Modifier
+                            .size(250.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                    IconButton(
+                        onClick = {
+                            expanded = true
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(40.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.edit),
+                            contentDescription = stringResource(R.string.editPhoto)
+                        )
+                        PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false })
+                    }
+                }
 
-        Button(
-            modifier = Modifier
-                .width(240.dp)
-                .height(60.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-            onClick = {}
-        ) {
-            Text(stringResource(R.string.personData), fontSize = 28.sp)
-        }
-        Button(
-            modifier = Modifier
-                .width(240.dp)
-                .height(60.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-            onClick = {
-                navController.navigate(PersonScreenEnum.weightScreen.name)
+                Button(
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                    onClick = {}
+                ) {
+                    Text(stringResource(R.string.personData), fontSize = 28.sp)
+                }
+                Button(
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                    onClick = {
+                        navController.navigate(PersonScreenEnum.weightScreen.name)
+                    }
+                ) {
+                    Text(stringResource(R.string.myWeight), fontSize = 28.sp)
+                }
+                Button(
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                    onClick = {}
+                ) {
+                    Text(stringResource(R.string.achievement), fontSize = 28.sp)
+                }
+                Button(
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                    onClick = {}
+                ) {
+                    Text(stringResource(R.string.logout), fontSize = 28.sp)
+                }
             }
-        ) {
-            Text(stringResource(R.string.weightSetting), fontSize = 28.sp)
-        }
-        Button(
-            modifier = Modifier
-                .width(240.dp)
-                .height(60.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-            onClick = {}
-        ) {
-            Text(stringResource(R.string.achievement), fontSize = 28.sp)
-        }
-        Button(
-            modifier = Modifier
-                .width(240.dp)
-                .height(60.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-            onClick = {}
-        ) {
-            Text(stringResource(R.string.logout), fontSize = 28.sp)
         }
     }
+
 }
 
 @Composable
@@ -132,7 +142,7 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
                     contentDescription = stringResource(R.string.takePicture)
                 )
             },
-            text = { Text(stringResource(R.string.takePicture))},
+            text = { Text(stringResource(R.string.takePicture)) },
             onClick = {
                 onDismiss()
             }
@@ -144,7 +154,7 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
                     contentDescription = stringResource(R.string.takePicture)
                 )
             },
-            text = { Text(stringResource(R.string.choosePicture))},
+            text = { Text(stringResource(R.string.choosePicture)) },
             onClick = {
                 onDismiss()
             }

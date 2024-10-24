@@ -22,7 +22,13 @@ fun MainPersonScreen(
             PersonScreen(navController= navController)
         }
         composable(route = PersonScreenEnum.weightScreen.name) {
-            WeightScreen()
+            WeightScreen(navController)
+        }
+        composable(route = PersonScreenEnum.weightSettingScreen.name) {
+            WeightSettingScreen(navController)
+        }
+        composable(route = PersonScreenEnum.weightReviseScreen.name) {
+            WeightReviseScreen(navController)
         }
         composable(route = PersonScreenEnum.achivementScreen.name) {
             AchievementScreen()

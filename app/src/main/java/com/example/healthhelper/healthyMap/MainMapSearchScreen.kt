@@ -47,7 +47,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.healthhelper.healthyMap.viewModelScreen.RestaurantViewModel
+import com.example.healthhelper.healthyMap.mapVM.RestaurantViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -65,13 +65,14 @@ fun MainMapSearchScreen(
     navController: NavHostController = rememberNavController(),
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = Screen.valueOf(
-        backStackEntry?.destination?.route?.split("/")?.first() ?: Screen.MapSearchScreen.name
+    val currentScreen = MapScreenEnum.valueOf(
+        backStackEntry?.destination?.route?.split("/")?.first() ?: MapScreenEnum.MapSearchScreen.name
     )
+    val destination = navController.currentBackStackEntryAsState().value?.destination
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val viewModel: RestaurantViewModel = viewModel()
     val restaurants by viewModel.restaurantsByDistrict.collectAsState()
-    val destination = navController.currentBackStackEntryAsState().value?.destination
+
 
     var userLat by remember { mutableDoubleStateOf(0.0) }
     var userLng by remember { mutableDoubleStateOf(0.0) }
@@ -104,28 +105,27 @@ fun MainMapSearchScreen(
                     scrollBehavior = scrollBehavior,
                     isFavorite = false,
                     navController = navController,
-                    userCity = if (userCity == "") "尚未定位" else userCity
+                    userCity = if (userCity == "") stringResource(R.string.LocationNone) else userCity
                 )
             }
         },
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.MapSearchScreen.name,
+            startDestination = MapScreenEnum.MapSearchScreen.name,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            composable(route = Screen.MapSearchScreen.name) {
+            composable(route = MapScreenEnum.MapSearchScreen.name) {
                 MapSearchScreen(
                     navController = navController,
                     userLat = userLat,
                     userLng = userLng
                 )
-
             }
             composable(
-                route = "${Screen.GoogleMapScreen.name}/{restaurantId}"
+                route = "${MapScreenEnum.GoogleMapScreen.name}/{restaurantId}"
             ) { backStackEntry ->
                 val restaurantId = backStackEntry.arguments?.getString("restaurantId")
                 GoogleMapScreen(
@@ -137,7 +137,7 @@ fun MainMapSearchScreen(
                 )
             }
             composable(
-                route = "${Screen.FavoriteListScreen.name}"
+                route = "${MapScreenEnum.FavoriteListScreen.name}"
             ) {
                 FavoriteListScreen(
                     isFavorite = true
@@ -186,7 +186,7 @@ fun MapSearchAppBar(
         },
         actions = {
             IconButton(onClick = {
-                navController.navigate(Screen.FavoriteListScreen.name)
+                navController.navigate(MapScreenEnum.FavoriteListScreen.name)
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_favorite_24),

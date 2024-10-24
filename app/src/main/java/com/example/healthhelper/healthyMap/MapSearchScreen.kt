@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -49,11 +48,9 @@ import com.example.healthhelper.healthyMap.model.District
 import com.example.healthhelper.healthyMap.model.LatLngRange
 import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import com.example.healthhelper.healthyMap.source.CityDistrictsLoader
-import com.example.healthhelper.healthyMap.viewModelScreen.RestaurantViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.example.healthhelper.healthyMap.mapVM.RestaurantViewModel
 
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapSearchScreen(
     navController: NavHostController,
@@ -134,7 +131,7 @@ fun MapSearchScreen(
                             R.color.white
                         )
                     ),
-                    border = BorderStroke(1.dp, Color.LightGray),
+                    border = BorderStroke(1.dp, colorResource(R.color.primarycolor)),
                     shape = RoundedCornerShape(15.dp)
                 ) {
                     Text(
@@ -294,7 +291,7 @@ fun RestaurantList(
             }
             ListItem(
                 modifier = Modifier.clickable {
-                    navController.navigate("${Screen.GoogleMapScreen.name}/${restaurant.id}")
+                    navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.id}")
                 },
                 headlineContent = { Text(restaurant.name) },
                 supportingContent = { Text(restaurant.address) },
@@ -366,7 +363,7 @@ fun RestaurantFilter(
             }
             ListItem(
                 modifier = Modifier.clickable {
-                    navController.navigate("${Screen.GoogleMapScreen.name}/${restaurant.id}")
+                    navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.id}")
                 },
                 headlineContent = { Text(restaurant.name) },
                 supportingContent = { Text(restaurant.address) },
