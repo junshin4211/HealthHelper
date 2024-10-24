@@ -44,7 +44,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTopAppBar
+import com.example.healthhelper.dietary.components.button.AddNewDietDiaryItemButton
 import com.example.healthhelper.dietary.components.button.DateButton
+import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.gson.toJson
 import com.example.healthhelper.dietary.util.file.savingfile.saveEternal
@@ -65,12 +67,10 @@ fun DietDiaryMainFrame(
     val TAG = "tag_DietDiaryMainFrame"
 
     val selectedDate = remember { mutableStateOf((Date(System.currentTimeMillis()).toString())) }
-    var savingFileFlag by remember { mutableStateOf(false) }
     val selectedMealOptionIndex = remember { mutableIntStateOf(0) }
 
     val verticalScrollState = rememberScrollState()
 
-    val diaries by diaryViewModel.data.collectAsState()
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
 
     Scaffold(
@@ -157,20 +157,7 @@ fun DietDiaryMainFrame(
                                         .weight(0.5f),
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    IconButton(
-                                        colors = IconButtonColors(
-                                            containerColor = Color.Blue,
-                                            contentColor = Color.Blue,
-                                            disabledContainerColor = Color.Gray,
-                                            disabledContentColor = Color.Gray,
-                                        ), onClick = {
-
-                                        }) {
-                                        Image(
-                                            painter = painterResource(R.drawable.download),
-                                            contentDescription = stringResource(R.string.download_icon),
-                                        )
-                                    }
+                                    DownloadButton()
                                 }
                                 Box(
                                     modifier = Modifier
@@ -178,21 +165,7 @@ fun DietDiaryMainFrame(
                                         .weight(0.5f),
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    IconButton(
-                                        colors = IconButtonColors(
-                                            containerColor = Color.Blue,
-                                            contentColor = Color.Blue,
-                                            disabledContainerColor = Color.Gray,
-                                            disabledContentColor = Color.Gray,
-                                        ), onClick = {
-                                            Log.d(TAG, "add button was clicked.")
-                                            navController.navigate(DietDiaryScreenEnum.AddNewDietDiaryItemFrame.name)
-                                        }) {
-                                        Image(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = stringResource(R.string.add_new_item_icon),
-                                        )
-                                    }
+                                    AddNewDietDiaryItemButton(navController)
                                 }
                             }
                         }
@@ -201,27 +174,4 @@ fun DietDiaryMainFrame(
             }
         }
     )
-
-    Log.d(TAG, "savingFileFlag:$savingFileFlag")
-
-    if (savingFileFlag) {
-        val fileName = "download.txt"
-        val jsonString = diaries.toJson()
-        val folder = File(
-            LocalContext.current.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-            fileName,
-        )
-        val fullFilePath = Path(folder.toPath().toString(), fileName)
-        val fullFile = fullFilePath.toFile()
-
-        val saveSuccessfully = saveEternal(fullFile, jsonString)
-
-        val currentActivity = LocalContext.current as Activity
-        val toastMessage =
-            if (saveSuccessfully) "Data saved successfully." else "Data saved failed."
-
-        Toast.makeText(currentActivity, toastMessage, Toast.LENGTH_LONG).show()
-
-        savingFileFlag = false
-    }
 }
