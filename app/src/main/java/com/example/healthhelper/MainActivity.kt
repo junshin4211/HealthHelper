@@ -16,8 +16,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HealthHelperTheme {
-                //Main()
-                MealsTimeRangeCategoryRepositoryTestUi()
+                Main()
+                //MealsTimeRangeCategoryRepositoryTestUi()
             }
         }
     }

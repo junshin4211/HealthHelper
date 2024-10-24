@@ -19,7 +19,7 @@ fun DateButton(
 ){
     var shouldShowDatePicker by remember { mutableStateOf(false) }
     if(shouldShowDatePicker){
-        DatePickerModal(
+        DatePickerModal.DatePickerDialog(
             onDateSelected = {
                 mutableStateValue.value = DateUtil.convertMillisToDate(it ?: 0)
                 shouldShowDatePicker = false

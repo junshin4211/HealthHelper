@@ -22,12 +22,7 @@ object MealsTimeRangeCategoryRepository {
     @Composable
     // return index
     fun categorizeMeal(mealTime:LocalTime):Int{
-        Log.d(TAG,"MealsTimeRangeCategoryRepository.categorizeMeal method was called.")
-
-        //val timeRanges = dataFlow.collectAsState().value
         val timeRanges = fetchMealsTimeRangeCategory()
-
-        Log.d(TAG,"timeRanges:${timeRanges}")
 
         val breakfastStartTime = timeRanges[0].startTime
         val supperEndTime = timeRanges.last().endTime
