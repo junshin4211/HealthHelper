@@ -1,5 +1,6 @@
-package com.tibame.tip101.group_02.healthhelp_v2.components.textfield.outlinedtextfield
+package com.example.healthhelper.dietary.components.textfield.outlinedtextfield
 
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.rememberTimePickerState
@@ -31,17 +32,14 @@ fun TimeTextField(
     onValueChange: ((String)-> Unit) = {},
     label: @Composable ()-> Unit,
 ) {
-    val currentTime = Calendar.getInstance()
-    val timePickerState = rememberTimePickerState(
-        initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-        initialMinute = currentTime.get(Calendar.MINUTE),
-        is24Hour = true,
-    )
     val state = rememberTimePickerState()
     var shouldShowTimePicker by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         modifier = modifier
+            .clickable {
+                shouldShowTimePicker = true
+            }
             .onFocusChanged { focusState ->
                 if (focusState.isFocused) {
                     shouldShowTimePicker = true
