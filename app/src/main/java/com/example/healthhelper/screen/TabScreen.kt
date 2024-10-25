@@ -31,7 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.healthyMap.MainMapSearchScreen
 import com.example.healthhelper.person.MainPersonScreen
-import com.example.healthhelper.plan.Plan
+import com.example.healthhelper.plan.screen.Plan
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted

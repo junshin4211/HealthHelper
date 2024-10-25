@@ -9,8 +9,8 @@ enum class PlanPage(@StringRes val title: Int) {
     DietPlan(title = R.string.plan),
     MyPlan(title = R.string.myplan),
     CompletedPlan(title = R.string.completedplan),
-    EditPlan(title = R.string.editplan),
-    CheckEdit(title = R.string.checkedit);
+    ManagePlan(title = R.string.manageplan),
+    CheckPlan(title = R.string.checkplan);
 
     fun getPlanTitle(context: Context):String{
         return context.getString(title)

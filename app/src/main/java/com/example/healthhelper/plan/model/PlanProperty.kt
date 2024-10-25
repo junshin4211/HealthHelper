@@ -1,4 +1,4 @@
-package com.example.healthhelper.plan
+package com.example.healthhelper.plan.model
 
 data class PlanProperty(
     var planId: Int,
