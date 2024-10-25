@@ -1,9 +1,12 @@
 package com.example.healthhelper.community
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,77 +37,88 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.healthhelper.R
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CmtMainScreen() {
+fun CmtMainScreen(
+    navController: NavHostController
+) {
     var inputText by remember { mutableStateOf("") }
-    val filteredPosts = fetchPosts().filter { it.name.contains(inputText, true) }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    var snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
-
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 40.dp)
     ) {
-        Text(
-            text = "navbar",
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.arrow_back_ios_new),
+                contentDescription = "arrowBack",
+                tint = colorResource(id = R.color.primarycolor)
+            )
+            Text(
+                text = "飲食社群",
+                fontSize = 24.sp,
+                color = colorResource(id = R.color.primarycolor),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight(600),
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.tabler_receipt),
+                contentDescription = "arrowBack",
+                tint = colorResource(id = R.color.primarycolor)
+            )
+        }
+        HorizontalDivider(
+            thickness = 2.dp,
+            modifier = Modifier
+                .fillMaxWidth(),
+            color = colorResource(id = R.color.primarycolor)
         )
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        OutlinedTextField(
-                            value = inputText,
-                            onValueChange = { inputText = it },
-                            placeholder = { Text(text = "請輸入關鍵字") },
-                            leadingIcon = {
-                                //icon 暫用預設
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = "search"
-                                )
-                            },
-                            trailingIcon = {
-                                //icon 暫用預設
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "clear",
-                                    modifier = Modifier.clickable {
-                                        inputText = ""
-                                    }
-                                )
-                            },
-                            maxLines = 1,
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    },
-                    scrollBehavior = scrollBehavior
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .border(4.dp, colorResource(R.color.primarycolor), shape = RoundedCornerShape(15.dp)),
+            value = inputText,
+            onValueChange = { inputText = it },
+            placeholder = { Text(text = "請輸入關鍵字") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search, contentDescription = "search",
+                    tint = colorResource(R.color.primarycolor)
                 )
             },
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            }
-        ) { innerPadding ->
-            // 每次搜尋結果變更都會使用List重新呈現
-            PostLists(filteredPosts, innerPadding) { post ->
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        "${post.name}, $${post.price}",
-                        withDismissAction = true
-                    )
-                }
-            }
-        }
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(R.string.clearSearch),
+                    modifier = Modifier.clickable { inputText = "" },
+                    tint = colorResource(R.color.primarycolor)
+                )
+            },
+            shape = RoundedCornerShape(15.dp),
+            singleLine = true,
+        )
     }
 }
 
@@ -173,6 +187,6 @@ fun fetchPosts(): List<Post> {
 @Composable
 fun CmtMainScreenPreview() {
     HealthHelperTheme {
-        CmtMainScreen()
+        CmtMainScreen(navController = rememberNavController())
     }
 }

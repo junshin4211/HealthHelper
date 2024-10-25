@@ -37,10 +37,18 @@
     //light gray
     <color name="very_light_gray">#8E8E8E</color>
     <color name="a_little_light_gray">#6B6B6B</color>
+    <color name="gray_300">#B4B7C9</color>
+    <color name="gray_200">#F3F3F3</color>
+    <color name="gray_100">#EFF2FC</color>
 
     //dark gray
     <color name="dark_gray">#505050</color>
 
     //black color
     <color name="very_light_black">#3D3D3D</color>
+    <color name="black_200">#4F4C4C</color>
+    <color name="black_300">#292D32</color>
+
+    //red color
+    <color name="red_100">#F8312A</color>
 </resources>

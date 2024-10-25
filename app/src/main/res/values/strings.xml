@@ -99,6 +99,11 @@
     <string name="enddate">結束日期</string>
     <string name="save">儲存</string>
     <string name="historyRecord">歷史紀錄</string>
+
+    <string name="post_title">title</string>
+    <string name="post_content">Write your post or question here</string>
+    <string name="userName">John Doe</string>
+
     <string name="weight">體重</string>
     <string name="BMI">BMI</string>
     <string name="body_fat">體脂</string>

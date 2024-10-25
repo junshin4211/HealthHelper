@@ -14,12 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,9 +40,8 @@ import androidx.compose.ui.unit.sp
 import com.example.healthhelper.R
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
-
 @Composable
-fun CreatePostScreen() {
+fun EditPostScreen() {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
@@ -119,12 +117,14 @@ fun CreatePostScreen() {
                 Spacer(modifier = Modifier.weight(1f))
 
                 Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Close",
+                    painter = painterResource(id = R.drawable.trash_can),
+                    contentDescription = "Delete",
                     modifier = Modifier
+                        .padding(16.dp)
                         .clickable {
                             // 點擊關閉處理邏輯
-                        }
+                        },
+                    colorResource(R.color.red_100)
                 )
             }
 
@@ -240,9 +240,8 @@ fun CreatePostScreen() {
 
 @Preview(showBackground = true)
 @Composable
-fun CreatePostScreenPreview() {
+fun EditPostScreenPreview() {
     HealthHelperTheme {
-        CreatePostScreen()
+        EditPostScreen()
     }
 }
-
