@@ -137,4 +137,5 @@
     <string name="lunch">lunch</string>
     <string name="dinner">dinner</string>
     <string name="supper">supper</string>
+    <string name="calendar">日曆</string>
 </resources>

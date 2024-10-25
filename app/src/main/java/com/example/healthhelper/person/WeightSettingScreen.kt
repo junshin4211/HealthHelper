@@ -4,18 +4,29 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,15 +46,24 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.MeasurementRow
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter.ofLocalizedDate
+import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeightSettingScreen(navController: NavHostController) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    var showDatePickerDialog by remember { mutableStateOf(false) }
+    var selectDate by remember { mutableStateOf("") }
     var height by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
     var fat by remember { mutableStateOf("") }
+
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -62,8 +82,25 @@ fun WeightSettingScreen(navController: NavHostController) {
                 .background(colorResource(R.color.backgroundcolor)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // TODO: 可以選擇日期
-            Text("顯示日期", fontSize = 24.sp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(selectDate, fontSize = 24.sp)
+                IconButton(
+                    onClick = {
+                        showDatePickerDialog = true
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = stringResource(R.string.calendar)
+                    )
+                }
+            }
+
             Box(
                 modifier = Modifier
                     .height(270.dp)
@@ -109,10 +146,68 @@ fun WeightSettingScreen(navController: NavHostController) {
                 )
             }
         }
+        if(showDatePickerDialog) {
+            CustomDatePickerDialog(
+                onDismissRequest = {
+                    showDatePickerDialog = false
+                },
+                onConfirm = { utcTimeMillis ->
+                    selectDate = "${
+                        utcTimeMillis?.let {
+                            Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
+                                .toLocalDate().format(ofLocalizedDate(FormatStyle.MEDIUM))
+                        } ?: "no selection"
+                    }"
+                    showDatePickerDialog = false
+                },
+                onDismiss = {
+                    showDatePickerDialog = false
+                }
+            )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDatePickerDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: (Long?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val today = LocalDate.now()
 
+    val datePickerState = rememberDatePickerState(
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val selectedDate = Instant.ofEpochMilli(utcTimeMillis)
+                    .atZone(ZoneId.of("UTC"))
+                    .toLocalDate()
+                return !selectedDate.isAfter(today)
+            }
+        }
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm(datePickerState.selectedDateMillis)
+                }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
 
 
 @Preview(showBackground = true)
