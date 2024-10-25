@@ -20,53 +20,53 @@ import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.model.PlanProperty
 
 class CustomList {
-    @Composable
-    fun BookLists(
-        plans: List<PlanProperty>,
-        innerPadding: PaddingValues,
-        onItemClick: (PlanProperty) -> Unit
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            items(plans) { book ->
-                // 用來建立Lists內容物
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onItemClick(book)
-                    },
-                    overlineContent = { Text(text = book.id) },
-                    headlineContent = { Text(book.name) },
-                    supportingContent = { Text(book.price.toString()) },
-                    leadingContent = {
-                        Image(
-                            painter = painterResource(id = book.image),
-                            contentDescription = "book",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    },
-                    trailingContent = {
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "shoppingCart",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                )
-                HorizontalDivider()
-            }
-        }
-    }
-
-    /**
-     * 載入測試需要資料
-     * @return 多本書資訊
-     */
-    fun fetchBooks(): List<PlanProperty> {
-        return listOf(
-            PlanProperty()
-        )
-    }
+//    @Composable
+//    fun BookLists(
+//        plans: List<PlanProperty>,
+//        innerPadding: PaddingValues,
+//        onItemClick: (PlanProperty) -> Unit
+//    ) {
+//        LazyColumn(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(innerPadding)
+//        ) {
+//            items(plans) { book ->
+//                // 用來建立Lists內容物
+//                ListItem(
+//                    modifier = Modifier.clickable {
+//                        onItemClick(book)
+//                    },
+//                    overlineContent = { Text(text = book.id) },
+//                    headlineContent = { Text(book.name) },
+//                    supportingContent = { Text(book.price.toString()) },
+//                    leadingContent = {
+//                        Image(
+//                            painter = painterResource(id = book.image),
+//                            contentDescription = "book",
+//                            modifier = Modifier.padding(16.dp)
+//                        )
+//                    },
+//                    trailingContent = {
+//                        Icon(
+//                            imageVector = Icons.Filled.Favorite,
+//                            contentDescription = "shoppingCart",
+//                            modifier = Modifier.padding(16.dp)
+//                        )
+//                    }
+//                )
+//                HorizontalDivider()
+//            }
+//        }
+//    }
+//
+//    /**
+//     * 載入測試需要資料
+//     * @return 多本書資訊
+//     */
+//    fun fetchBooks(): List<PlanProperty> {
+//        return listOf(
+//            PlanProperty()
+//        )
+//    }
 }
