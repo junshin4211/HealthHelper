@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+import com.example.healthhelper.community.CmtController
 import com.example.healthhelper.healthyMap.MainMapSearchScreen
 import com.example.healthhelper.person.MainPersonScreen
 import com.example.healthhelper.plan.Plan
@@ -58,8 +59,8 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
         ) {
             when (tabIndex) {
                 0 -> MainPersonScreen()
-//                1 -> DietDiaryMainFrame()
-//                2 -> Community()
+                1 -> CmtController()
+//              2 -> DietDiaryMainFrame()
                 3 -> Plan()
                 4 -> RequestAccessLocationPermission(onGrant = {
                         MainMapSearchScreen()
