@@ -50,7 +50,7 @@ fun QueryTopAppBar(
             NavigateUpNavigationIcon(navController)
         },
         actions = {
-            SearchIcon(navController, selectedMealsOption)
+            SearchIcon(navController, selectedMealsOption.mealsOptionText)
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
