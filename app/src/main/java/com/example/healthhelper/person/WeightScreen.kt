@@ -72,13 +72,13 @@ fun WeightScreen(
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val data = listOf(
-        WeightData("10/09", 50.5, 25.5, 33.4),
-        WeightData("10/01", 70.3, 30.3, 20.5),
-        WeightData("09/27", 99.9, 30.5, 36.1),
-        WeightData("09/20", 48.5, 22.6, 27.3),
-        WeightData("09/20", 48.5, 22.6, 27.3),
-        WeightData("09/20", 48.5, 22.6, 27.3),
-        WeightData("09/20", 48.5, 22.6, 27.3),
+        WeightData("10/09", 50.5f, 25.5f, 33.4f),
+        WeightData("10/01", 70.3f, 30.3f, 20.5f),
+        WeightData("09/27", 99.9f, 30.5f, 36.1f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
     )
     var selectedTab by remember { mutableStateOf(0) }
     val tabColors = listOf(

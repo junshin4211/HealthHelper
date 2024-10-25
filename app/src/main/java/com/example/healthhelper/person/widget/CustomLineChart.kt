@@ -201,7 +201,6 @@ fun generateMockPointList(): List<LineData> {
         LineData(27F, "Dec"),
         LineData(10F, "Jan"),
         LineData(13F, "Oct"),
-        LineData(-10F, "Nov"),
         LineData(0F, "Dec"),
         LineData(10F, "Jan"),
     )

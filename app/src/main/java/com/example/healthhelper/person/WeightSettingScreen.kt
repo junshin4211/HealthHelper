@@ -116,7 +116,6 @@ fun WeightSettingScreen(navController: NavHostController) {
             }
         }
     }
-
 }
 
 
