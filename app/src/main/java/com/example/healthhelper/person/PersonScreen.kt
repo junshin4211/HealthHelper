@@ -31,9 +31,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 
 @Composable
@@ -73,7 +75,7 @@ fun PersonScreen(
                             .size(40.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.edit),
+                            painter = painterResource(R.drawable.editperson),
                             contentDescription = stringResource(R.string.editPhoto)
                         )
                         PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false })
@@ -162,3 +164,9 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PersonPreview() {
+
+    PersonScreen(rememberNavController())
+}

@@ -17,14 +17,8 @@ gson = "2.11.0"
 gsonParent = "2.11.0"
 playServicesLocation = "21.3.0"
 accompanistPermissions = "0.36.0"
-
-    material3 = "1.4.0-alpha02"
-    uiTooling = "1.8.0-alpha04"
-
-
-#composeThemeAdapter = "1.2.1"
 charty = "2.0.0-alpha01"
-
+#composeThemeAdapter = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -50,17 +44,11 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 gson-parent = { group = "com.google.code.gson", name = "gson-parent", version.ref = "gsonParent" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
-    material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
-    ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+
 charty = { group = "com.himanshoe", name = "charty", version.ref = "charty" }
-
-
-[plugins]
-
-
 #compose-theme-adapter = { group = "com.google.android.material", name = "compose-theme-adapter", version.ref = "composeThemeAdapter" }
 
-
+[plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
