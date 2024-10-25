@@ -55,7 +55,7 @@ fun CustomEditPlan(planname:String,
              tabViewModel: TabViewModel = viewModel()
 ){
     val scrollstate = rememberScrollState()
-    //tabViewModel.setTabVisibility(false)
+    tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
     var selectedDate by remember { mutableStateOf("") }
     var carbgram by remember { mutableFloatStateOf(0.0f) }

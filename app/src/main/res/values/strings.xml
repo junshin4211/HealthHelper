@@ -46,9 +46,8 @@
     <string name="ketone">生酮</string>
     <string name="mediterra">地中海</string>
     <string name="custom">自訂</string>
-    <string name="editplan">EditPlan</string>
-    <string name="manageplan">ManagePlan</string>
-    <string name="checkedit">CheckEdit</string>
+    <string name="manageplan">計劃管理</string>
+    <string name="checkplan">查看計畫</string>
     <string name="setplantime">設定你的週期</string>
     <string name="pickdaterange">選擇週期</string>
     <string name="aweek">一周</string>

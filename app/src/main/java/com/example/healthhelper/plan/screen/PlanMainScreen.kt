@@ -14,6 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
@@ -30,16 +31,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.Bar
 import com.example.healthhelper.plan.PlanPage
+import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 @Composable
 fun PlanMain(context: Context = LocalContext.current,
-             navcontroller: NavHostController = rememberNavController()) {
+             navcontroller: NavHostController = rememberNavController(),
+             tabViewModel: TabViewModel = viewModel()
+) {
+    tabViewModel.setTabVisibility(true)
+    var planpannel by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -157,7 +164,10 @@ fun PlanMain(context: Context = LocalContext.current,
                 )
             }
             TextButton(
-                onClick = {},
+                onClick = {
+                    planpannel = PlanPage.MyPlan.name
+                    navcontroller.navigate("${PlanPage.ManagePlan.name}/$planpannel")
+                          },
                 modifier = Modifier
                     .height(40.dp)
                     .align(Alignment.End)
@@ -257,7 +267,10 @@ fun PlanMain(context: Context = LocalContext.current,
                 )
             }
             TextButton(
-                onClick = {},
+                onClick = {
+                    planpannel = PlanPage.CompletedPlan.name
+                    navcontroller.navigate("${PlanPage.ManagePlan.name}/$planpannel")
+                          },
                 modifier = Modifier
                     .height(40.dp)
                     .align(Alignment.End)

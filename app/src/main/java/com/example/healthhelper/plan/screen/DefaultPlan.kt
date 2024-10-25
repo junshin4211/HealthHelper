@@ -51,7 +51,7 @@ fun EditPlan(planname:String,
              tabViewModel: TabViewModel = viewModel()
 ){
     val scrollstate = rememberScrollState()
-    //tabViewModel.setTabVisibility(false)
+    tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
     var selectedDate by remember { mutableStateOf("") }
     var carbgram by remember { mutableFloatStateOf(0.0f) }
@@ -73,7 +73,9 @@ fun EditPlan(planname:String,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .padding(start = 10.dp, bottom = 10.dp)
-                    .clickable { navcontroller.popBackStack() }
+                    .clickable {
+                        navcontroller.popBackStack()
+                    }
             ) {
                 Image(
                     painter = painterResource(R.drawable.arrow),
