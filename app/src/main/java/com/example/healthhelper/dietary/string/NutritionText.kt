@@ -1,12 +1,12 @@
 package com.example.healthhelper.dietary.string
 
-import com.example.healthhelper.dietary.dataclasses.Nutrition
+import com.example.healthhelper.dietary.dataclasses.dao.NutritionDao
 
 fun NutritionText(
-    nutritions: List<Nutrition>,
+    nutritionDaos: List<NutritionDao>,
 ): List<String> {
     val texts: MutableList<String> = mutableListOf()
-    nutritions.forEachIndexed { index, nutrition ->
+    nutritionDaos.forEachIndexed { index, nutrition ->
         val text = "fat:${nutrition.fat}\n" +
                 "carbon:${nutrition.carbon}\n" +
                 "protein:${nutrition.protein}\n" +

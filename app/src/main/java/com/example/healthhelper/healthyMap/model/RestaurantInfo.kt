@@ -8,4 +8,8 @@ data class RestaurantInfo(
     val address: String,
     val latitude: Double,
     val longitude: Double,
+    val rating: Double,
+    val homePhone: String,
+    val phone: String,
+    val web: String
 )

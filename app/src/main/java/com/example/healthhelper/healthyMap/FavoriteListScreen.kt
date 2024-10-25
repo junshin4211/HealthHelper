@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.healthyMap.model.ResturantsFavorList
-import com.example.healthhelper.healthyMap.viewModelScreen.FavorListViewModel
+import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
 import kotlinx.coroutines.launch
 
 

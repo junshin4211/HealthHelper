@@ -1,8 +1,8 @@
 package com.example.healthhelper.person
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,21 +11,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,232 +37,290 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.model.WeightData
+import com.example.healthhelper.person.widget.CustomTabRow
+import com.example.healthhelper.person.widget.CustomTopBar
+import com.example.healthhelper.person.widget.LineChart
+import com.example.healthhelper.person.widget.generateMockPointList
+import com.himanshoe.charty.common.toChartDataCollection
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeightScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { /* Handle back navigation */ }) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_arrow_back_ios_24),
-                    contentDescription = "Back"
-                )
-            }
-            IconButton(onClick = { /* Handle calendar */ }) {
-                Icon(Icons.Default.DateRange, contentDescription = "Calendar")
-            }
+fun WeightScreen(
+    navController: NavHostController,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val data = listOf(
+        WeightData("10/09", 50.5f, 25.5f, 33.4f),
+        WeightData("10/01", 70.3f, 30.3f, 20.5f),
+        WeightData("09/27", 99.9f, 30.5f, 36.1f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+        WeightData("09/20", 48.5f, 22.6f, 27.3f),
+    )
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabColors = listOf(
+        colorResource(R.color.primarycolor),
+        colorResource(R.color.primarycolor),
+        colorResource(R.color.primarycolor)
+    )
+    val labels = listOf(
+        stringResource(R.string.weight),
+        stringResource(R.string.BMI),
+        stringResource(R.string.body_fat)
+    )
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            CustomTopBar(
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() },
+                scrollBehavior = scrollBehavior,
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(PersonScreenEnum.weightSettingScreen.name)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.weightSetting),
+                            modifier = Modifier.size(40.dp),
+                            tint = colorResource(R.color.primarycolor)
+                        )
+                    }
+                }
+            )
         }
-        Box(
+    ) { innerpadding ->
+        Column(
             modifier = Modifier
-                .height(270.dp)
-                .width(412.dp)
-                .background(
-                    colorResource(R.color.primarycolor),
-                    shape = RoundedCornerShape(0.dp, 0.dp, 15.dp, 15.dp)
-                )
+                .fillMaxSize()
+                .padding(innerpadding)
+                .background(colorResource(R.color.backgroundcolor))
         ) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MeasurementRow("身高", "170.5", "公分")
-                Spacer(modifier = Modifier.height(8.dp))
-                MeasurementRow("體重", "50.5", "公斤")
-                Spacer(modifier = Modifier.height(8.dp))
-                MeasurementRow("體脂", "20.6", "百分")
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(
-                    onClick = { /* Handle save */ },
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(40.dp)
-                        .clip(RoundedCornerShape(20.dp)),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                ) {
-                    Text(stringResource(R.string.save), color = colorResource(R.color.primarycolor), fontSize = 18.sp)
+                CustomDateRangePicker()
+                LazyColumn {
+                    item {
+                        CustomTabRow(
+                            selectedTab = selectedTab,
+                            onTabSelected = { newTab -> selectedTab = newTab },
+                            tabColors = tabColors,
+                            textColor = Color.Black,
+                            selectedTextColor = Color.White,
+                            labels = labels
+                        )
+                        when (selectedTab) {
+                            0 -> WeightList()
+                            1 -> BMIList()
+                            2 -> FatList()
+                        }
+                        LineChart(
+                            dataCollection = generateMockPointList().toChartDataCollection(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                stringResource(R.string.historyRecord),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        }
+                        ListItem(
+                            { HeaderRow() },
+                            colors = ListItemDefaults.colors(containerColor = colorResource(R.color.backgroundcolor)),
+                        )
+                    }
+                    items(data) { item ->
+                        WeightDataRow(item, navController = navController)
+                        HorizontalDivider(
+                            color = colorResource(R.color.primarycolor),
+                            thickness = 1.dp
+                        )
+                    }
                 }
             }
+
+
         }
 
-        // Tab Row
-        var selectedTab by remember { mutableStateOf(0) }
-        TabRow(
-            selectedTabIndex = selectedTab,
-            modifier = Modifier.padding(vertical = 8.dp)
-        ) {
-            Tab(
-                selected = selectedTab == 0,
-                onClick = { selectedTab = 0 }
-            ) {
-                Text("體重", modifier = Modifier.padding(vertical = 12.dp))
-            }
-            Tab(
-                selected = selectedTab == 1,
-                onClick = { selectedTab = 1 }
-            ) {
-                Text("BMI", modifier = Modifier.padding(vertical = 12.dp))
-            }
-            Tab(
-                selected = selectedTab == 2,
-                onClick = { selectedTab = 2 }
-            ) {
-                Text("體脂", modifier = Modifier.padding(vertical = 12.dp))
-            }
-        }
-
-//         Chart Section
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(200.dp)
-//                .padding(vertical = 8.dp)
-//        ) {
-//            val dataPoints = listOf(
-//                LineData(54.5f,"9/20"),
-//                LineData( 55.0f,"9/27"),
-//                LineData(52.5f,"10/1"),
-//                LineData(50.5f,"10/9")
-//            )
-//
-//            val dataCollection = ChartDataCollection(
-//                data = dataPoints
-//            )
-//            val axisConfig = AxisConfig(
-//                showAxes = true,
-//                showGridLines = true,
-//                showGridLabel = true,
-//                axisStroke = 1f,
-//                minLabelCount = 4,
-//                axisColor = Color(0xFF2196F3),
-//                gridColor = Color.LightGray.copy(alpha = 0.5f)
-//            )
-//
-//            LineChart(
-//                dataCollection = dataCollection,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp),
-//                padding = 16.dp,
-//                axisConfig = axisConfig,
-//                radiusScale = 0.02f,
-//                lineConfig = LineConfig(
-//                    hasSmoothCurve = true,
-//                    hasDotMarker = true,
-//                    strokeSize = 2f
-//                ),
-//                chartColors = LineChartColors(
-//                    lineColor = listOf(Color(0xFF2196F3)),
-//                    dotColor = listOf(Color(0xFF2196F3)),
-//                    backgroundColors = listOf(Color.Transparent)
-//                )
-//            )
-//        }
-
-        Text(
-            stringResource(R.string.historyRecord),
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        LazyColumn {
-            items(historyItems) { item ->
-                HistoryItem(item)
-            }
-        }
-    }
-}
-
-
-@Composable
-fun MeasurementRow(label: String, value: String, unit: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = label, color = Color.White, fontSize = 24.sp)
-        Box(
-            modifier = Modifier
-                .size(100.dp, 40.dp)
-                .background(colorResource(R.color.backgroundcolor), RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = value, color = Color.Black, fontSize = 18.sp)
-        }
-        Text(text = unit, color = Color.White, fontSize = 24.sp)
     }
 }
 
 @Composable
-fun HistoryItem(item: HistoryData) {
+fun HeaderRow() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(item.date)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                "${item.weight} 公斤",
-                modifier = Modifier.padding(end = 8.dp)
-            )
-            Icon(
-                if (item.trend == Trend.UP) Icons.Default.KeyboardArrowUp
-                else Icons.Default.KeyboardArrowDown,
-                contentDescription = "Trend",
-                tint = if (item.trend == Trend.UP) Color.Red else Color.Green
-            )
-        }
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = stringResource(R.string.weight),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(0.5f),
+            fontSize = 18.sp
+        )
+        Text(
+            text = stringResource(R.string.BMI),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(0.5f),
+            fontSize = 18.sp
+        )
+        Text(
+            text = stringResource(R.string.body_fat),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(0.5f),
+            fontSize = 18.sp
+        )
     }
 }
 
-data class HistoryData(
-    val date: String,
-    val weight: Double,
-    val trend: Trend,
-)
-
-enum class Trend {
-    UP, DOWN
+@Composable
+fun WeightDataRow(data: WeightData, navController: NavHostController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .clickable { navController.navigate(PersonScreenEnum.weightReviseScreen.name) },
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = data.date, modifier = Modifier.weight(1f), fontSize = 18.sp)
+        Text(text = data.weight.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp)
+        Text(text = data.bmi.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp)
+        Text(text = data.bodyFat.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp)
+    }
 }
 
-val historyItems = listOf(
-    HistoryData("10/09", 50.5, Trend.DOWN),
-    HistoryData("10/01", 52.5, Trend.DOWN),
-    HistoryData("09/27", 55.0, Trend.UP),
-    HistoryData("09/20", 54.5, Trend.DOWN)
-)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDateRangePicker() {
+    val today = LocalDate.now()
+    val oneMonthAgo = today.minusMonths(1)
+
+    val initialStartDateMillis =
+        oneMonthAgo.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+    val initialEndDateMillis = today.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+
+    val dateRangePickerState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = initialStartDateMillis,
+        initialSelectedEndDateMillis = initialEndDateMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                val selectedDate = Instant.ofEpochMilli(utcTimeMillis)
+                    .atZone(ZoneId.of("UTC"))
+                    .toLocalDate()
+                return !selectedDate.isAfter(today)
+            }
+        }
+    )
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp),
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        DateRangePicker(
+            state = dateRangePickerState,
+            showModeToggle = false,
+            title = { },
+            headline = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val startDate = dateRangePickerState.selectedStartDateMillis?.let {
+                        Instant.ofEpochMilli(it)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+                            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                    } ?: stringResource(R.string.noChoose)
+                    val endDate = dateRangePickerState.selectedEndDateMillis?.let {
+                        Instant.ofEpochMilli(it)
+                            .atZone(ZoneId.of("UTC"))
+                            .toLocalDate()
+                            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                    } ?: stringResource(R.string.noChoose)
+                    Text(
+                        text = "$startDate ~ $endDate",
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
+
+                }
+            },
+            colors = DatePickerDefaults.colors(
+                containerColor = colorResource(R.color.primarycolor),
+                weekdayContentColor = Color.White,
+                subheadContentColor = Color.White,
+                yearContentColor = Color.White,
+                currentYearContentColor = Color.White,
+                selectedYearContainerColor = Color.White.copy(alpha = 0.3f),
+                selectedYearContentColor = Color.White,
+                dayContentColor = Color.White,
+                selectedDayContainerColor = Color.White.copy(alpha = 0.3f),
+                selectedDayContentColor = Color.White,
+                todayContentColor = Color.White,
+                todayDateBorderColor = Color.White
+            )
+        )
+    }
+}
+
+
+@Composable
+fun WeightList() {
+}
+
+@Composable
+fun BMIList() {
+}
+
+@Composable
+fun FatList() {
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun WeightPreview() {
-        WeightScreen()
+    WeightScreen(rememberNavController())
 
 }

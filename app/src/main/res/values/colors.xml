@@ -13,6 +13,8 @@
     <color name="blue04">#E6EEFF</color>
     <color name="red01">#FE1010</color>
     <color name="darkgray">#9F9BAA</color>
+    <color name="light_green">#00FF7B</color>
+    <color name="light_gray">#EFF1F5</color>
     //主題一 橘色
     <color name="backgroundcolor">#FFFEED</color>
     <color name="primarycolor">#F19204</color>

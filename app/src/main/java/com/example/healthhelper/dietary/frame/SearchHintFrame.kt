@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
-import com.example.healthhelper.screen.Main
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,11 +25,19 @@ fun SearchHintFrame(
         topBar = {
             DietAppTopBar(
                 navController = navController,
+                title = {
+                    Text(
+                        text = stringResource(R.string.diet_app_title),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
                 hasShareButton = false,
+
             )
         },
         bottomBar = {
-            Main()
+
         },
         content = { innerPadding ->
             Column(
