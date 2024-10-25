@@ -1,22 +1,11 @@
 package com.example.healthhelper.dietary.viewmodel
 
-import com.example.healthhelper.dietary.dataclasses.Diary
+import androidx.lifecycle.ViewModel
+import com.example.healthhelper.dietary.dataclasses.dao.DiaryDao
+import com.example.healthhelper.dietary.repository.DiaryRepository
+import kotlinx.coroutines.flow.StateFlow
 
-object DiaryViewModel {
-    val diaries = mutableListOf<Diary>()
-
-    fun addDiary(
-        name:String,
-        foodName:String,
-        date:String,
-        time:String,
-    ){
-        val diary = Diary(
-            name = name,
-            foodName = foodName ,
-            date = date,
-            time = time,
-        )
-        diaries.add(diary)
-    }
+class DiaryViewModel: ViewModel() {
+    private val repository = DiaryRepository
+    val data: StateFlow<MutableList<DiaryDao>> = repository.dataFlow
 }

@@ -176,7 +176,7 @@ fun CustomEditPlan(planname:String,
                             "${stringResource(R.string.protein)} $proteingram 克",15.sp)
                         2 -> CustomText().TextWithDiffColor(
                             R.color.light_green,
-                            "${stringResource(R.string.fat)} $fatgram 克",15.sp)
+                            "${stringResource(R.string.body_fat)} $fatgram 克",15.sp)
                     }
                 }
             }
@@ -277,7 +277,7 @@ fun CustomEditPlan(planname:String,
                 verticalAlignment = Alignment.CenterVertically
             ){
                 CustomText().TextWithDiffColor(
-                    text = stringResource(R.string.fat),
+                    text = stringResource(R.string.body_fat),
                     setsize = 22.sp
                 )
 

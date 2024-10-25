@@ -13,6 +13,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.iconbutton.navigationicon.HamburgerNavigationIcon
@@ -33,23 +35,19 @@ import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 @Composable
 fun DietAppTopBar(
     navController: NavHostController,
+    vm: DiaryViewModel = viewModel(),
     modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(
         rememberTopAppBarState()
     ),
     hasShareButton: Boolean = false,
 ) {
     val currentContext = LocalContext.current
-    val diaries by remember { mutableStateOf(DiaryViewModel.diaries) }
+    val diaries by vm.data.collectAsState()
     CenterAlignedTopAppBar(
         modifier = modifier,
-        title = {
-            Text(
-                text = stringResource(R.string.diet_app_title),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
+        title = title,
         navigationIcon = {
             HamburgerNavigationIcon()
         },

@@ -171,7 +171,7 @@ fun EditPlan(planname:String,
                             1 -> CustomText().TextWithDiffColor(R.color.sky_blue,
                                 "${stringResource(R.string.protein)} $proteingram 克",15.sp)
                             2 -> CustomText().TextWithDiffColor(R.color.light_green,
-                                "${stringResource(R.string.fat)} $fatgram 克",15.sp)
+                                "${stringResource(R.string.body_fat)} $fatgram 克",15.sp)
                         }
                     }
                 }
@@ -242,7 +242,7 @@ fun EditPlan(planname:String,
                 )
 
                 CreateDesciption(
-                    stringResource(R.string.fat),
+                    stringResource(R.string.body_fat),
                     fatpercent,fatgram,
                     stringResource(R.string.fatdescripttitle),
                     stringResource(R.string.fatdescription)

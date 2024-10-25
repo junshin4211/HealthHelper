@@ -1,4 +1,4 @@
-    [versions]
+[versions]
 agp = "8.6.0"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
@@ -17,9 +17,10 @@ gson = "2.11.0"
 gsonParent = "2.11.0"
 playServicesLocation = "21.3.0"
 accompanistPermissions = "0.36.0"
-    charty = "2.0.0-alpha01"
+charty = "2.0.0-alpha01"
+composeThemeAdapter = "1.2.1"
 
-    [libraries]
+[libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -43,9 +44,11 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 gson-parent = { group = "com.google.code.gson", name = "gson-parent", version.ref = "gsonParent" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
-    charty = { group = "com.himanshoe", name = "charty", version.ref = "charty" }
 
-    [plugins]
+charty = { group = "com.himanshoe", name = "charty", version.ref = "charty" }
+compose-theme-adapter = { group = "com.google.android.material", name = "compose-theme-adapter", version.ref = "composeThemeAdapter" }
+
+[plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 

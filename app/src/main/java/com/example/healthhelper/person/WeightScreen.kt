@@ -15,8 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DateRangePicker
@@ -44,13 +42,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.person.model.WeightData
@@ -89,7 +85,7 @@ fun WeightScreen(
     val labels = listOf(
         stringResource(R.string.weight),
         stringResource(R.string.BMI),
-        stringResource(R.string.fat)
+        stringResource(R.string.body_fat)
     )
 
     Scaffold(
@@ -205,7 +201,7 @@ fun HeaderRow() {
             fontSize = 18.sp
         )
         Text(
-            text = stringResource(R.string.fat),
+            text = stringResource(R.string.body_fat),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(0.5f),
             fontSize = 18.sp

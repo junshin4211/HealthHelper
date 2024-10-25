@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+
 import com.example.healthhelper.healthyMap.MainMapSearchScreen
 import com.example.healthhelper.person.MainPersonScreen
 import com.example.healthhelper.plan.screen.Plan
@@ -36,6 +38,8 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+
+import com.example.healthhelper.dietary.screen.DietDiaryMainScreen
 
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
@@ -58,13 +62,12 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
         ) {
             when (tabIndex) {
                 0 -> MainPersonScreen()
-//                1 -> DietDiaryMainFrame()
-//                2 -> Community()
+//                1 -> Community()
+                2 -> { DietDiaryMainScreen() }
                 3 -> Plan()
                 4 -> RequestAccessLocationPermission(onGrant = {
                         MainMapSearchScreen()
                     })
-//            }
             }
         }
         if (tabVisibility.value) {
@@ -95,7 +98,9 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
                             )
                         },
                         selected = tabIndex == index,
-                        onClick = { tabIndex = index },
+                        onClick = {
+                            tabIndex = index
+                        },
                         unselectedContentColor = colorResource(id = R.color.footericon),
                         selectedContentColor = colorResource(id = R.color.footerselect),
                         icon = {

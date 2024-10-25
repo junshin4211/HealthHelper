@@ -92,7 +92,7 @@ fun WeightReviseScreen(navController: NavHostController) {
                     ) { weight = it }
                     Spacer(modifier = Modifier.height(8.dp))
                     MeasurementRow(
-                        stringResource(R.string.fat),
+                        stringResource(R.string.body_fat),
                         fat,
                         stringResource(R.string.percentage)
                     ) { fat = it }

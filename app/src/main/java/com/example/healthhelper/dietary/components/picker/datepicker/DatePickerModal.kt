@@ -11,37 +11,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerModal(
-    onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit,
-    _selectableDates: SelectableDates? = null,
-) {
-    val selectableDates = _selectableDates  ?: object : SelectableDates {
-        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-            return utcTimeMillis <= System.currentTimeMillis()
-        }
-    }
-    val datePickerState = rememberDatePickerState(
-        selectableDates = selectableDates,
-    )
-
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                onDateSelected(datePickerState.selectedDateMillis)
-            }) {
-                Text(stringResource(R.string.ok_option_text))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel_option_text))
-            }
-        }
+object DatePickerModal {
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun DatePickerDialog(
+        onDateSelected: (Long?) -> Unit,
+        onDismiss: () -> Unit,
+        _selectableDates: SelectableDates? = null,
     ) {
-        DatePicker(state = datePickerState)
+        val selectableDates = _selectableDates ?: object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= System.currentTimeMillis()
+            }
+        }
+        val datePickerState = rememberDatePickerState(
+            selectableDates = selectableDates,
+        )
+
+        DatePickerDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {
+                TextButton(onClick = {
+                    onDateSelected(datePickerState.selectedDateMillis)
+                }) {
+                    Text(stringResource(R.string.ok_option_text))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel_option_text))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 }
