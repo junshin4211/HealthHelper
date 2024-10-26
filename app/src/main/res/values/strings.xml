@@ -143,4 +143,5 @@
     <string name="dinner">dinner</string>
     <string name="supper">supper</string>
     <string name="calendar">日曆</string>
+    <string name="drag_and_zoom">移動與縮放</string>
 </resources>

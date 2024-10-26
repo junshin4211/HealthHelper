@@ -1,5 +1,7 @@
 package com.example.healthhelper.person
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
@@ -9,6 +11,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainPersonScreen(
     navController: NavHostController = rememberNavController()
@@ -20,6 +23,9 @@ fun MainPersonScreen(
     ) {
         composable(route = PersonScreenEnum.personScreen.name) {
             PersonScreen(navController= navController)
+        }
+        composable(route = PersonScreenEnum.pickPhotoScreen.name) {
+            PickPhotoScreen(navController)
         }
         composable(route = PersonScreenEnum.weightScreen.name) {
             WeightScreen(navController)

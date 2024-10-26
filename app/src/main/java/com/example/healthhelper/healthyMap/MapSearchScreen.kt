@@ -2,6 +2,7 @@ package com.example.healthhelper.healthyMap
 
 import android.location.Location
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -111,7 +113,7 @@ fun MapSearchScreen(
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (selectedSearchMethod == 0) colorResource(R.color.primarycolor) else colorResource(
-                            R.color.white
+                            R.color.backgroundcolor
                         ),
                     ),
                     border = BorderStroke(1.dp, colorResource(R.color.primarycolor)),
@@ -128,7 +130,7 @@ fun MapSearchScreen(
                     onClick = { selectedSearchMethod = 1 },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (selectedSearchMethod == 1) colorResource(R.color.primarycolor) else colorResource(
-                            R.color.white
+                            R.color.backgroundcolor
                         )
                     ),
                     border = BorderStroke(1.dp, colorResource(R.color.primarycolor)),
@@ -236,6 +238,7 @@ fun CityList(
         items(cities) { city ->
             ListItem(
                 modifier = Modifier.clickable { onItemClick(city) },
+                colors = ListItemDefaults. colors(colorResource(R.color.backgroundcolor)),
                 headlineContent = { Text(city.name) },
                 trailingContent = {
                     Icon(
@@ -259,6 +262,7 @@ fun RegionList(
         items(city.districts) { district ->
             ListItem(
                 modifier = Modifier.clickable { onItemClick(district) },
+                colors = ListItemDefaults. colors(colorResource(R.color.backgroundcolor)),
                 headlineContent = { Text(district.name) },
                 trailingContent = {
                     Icon(
@@ -289,33 +293,11 @@ fun RestaurantList(
             } else {
                 "N/A"
             }
-            ListItem(
-                modifier = Modifier.clickable {
-                    navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.id}")
-                },
-                headlineContent = { Text(restaurant.name) },
-                supportingContent = { Text(restaurant.address) },
-                trailingContent = {
-                    Row(horizontalArrangement = Arrangement.SpaceEvenly,verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = stringResource(R.string.distance),
-                            tint = colorResource(R.color.footer)
-                        )
-                        Text(distance, color = colorResource(R.color.footer), fontSize = 14.sp)
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.go2Map),
-                            tint = colorResource(R.color.primarycolor)
-                        )
-                    }
-                }
-            )
-            HorizontalDivider(color = colorResource(R.color.primarycolor))
+            RestaurantListItem(navController, restaurant, distance)
         }
     }
-
 }
+
 
 @Composable
 fun RestaurantFilter(
@@ -361,28 +343,7 @@ fun RestaurantFilter(
             } else {
                 "N/A"
             }
-            ListItem(
-                modifier = Modifier.clickable {
-                    navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.id}")
-                },
-                headlineContent = { Text(restaurant.name) },
-                supportingContent = { Text(restaurant.address) },
-                trailingContent = {
-                    Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.LocationOn,
-                            contentDescription = stringResource(R.string.distance),
-                            tint = colorResource(R.color.footer)
-                        )
-                        Text(distance, color = colorResource(R.color.footer), fontSize = 14.sp)
-                        Icon(
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.go2Map),
-                            tint = colorResource(R.color.primarycolor)
-                        )
-                    }
-                }
-            )
-            HorizontalDivider(color = colorResource(R.color.primarycolor))
+            RestaurantListItem(navController, restaurant, distance)
         }
         if (filteredRestaurants.isEmpty()) {
             item {
@@ -393,6 +354,41 @@ fun RestaurantFilter(
             }
         }
     }
+}
+
+@Composable
+fun RestaurantListItem(
+    navController: NavController,
+    restaurant: RestaurantInfo,
+    distance: String
+) {
+    ListItem(
+        modifier = Modifier.clickable {
+            navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.id}")
+        },
+        colors = ListItemDefaults.colors(colorResource(R.color.backgroundcolor)),
+        headlineContent = { Text(restaurant.name) },
+        supportingContent = { Text(restaurant.address) },
+        trailingContent = {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = stringResource(R.string.distance),
+                    tint = colorResource(R.color.footer)
+                )
+                Text(distance, color = colorResource(R.color.footer), fontSize = 14.sp)
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = stringResource(R.string.go2Map),
+                    tint = colorResource(R.color.primarycolor)
+                )
+            }
+        }
+    )
+    HorizontalDivider(color = colorResource(R.color.primarycolor))
 }
 
 fun findNearbyRestaurantsLatLngRange(

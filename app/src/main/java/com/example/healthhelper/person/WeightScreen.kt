@@ -1,5 +1,7 @@
 package com.example.healthhelper.person
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,11 +25,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,17 +47,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.person.model.WeightData
+import com.example.healthhelper.person.widget.CustomDateRangePickerDialog
 import com.example.healthhelper.person.widget.CustomTabRow
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.LineChart
 import com.example.healthhelper.person.widget.generateMockPointList
 import com.himanshoe.charty.common.toChartDataCollection
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeightScreen(
@@ -76,6 +73,18 @@ fun WeightScreen(
         WeightData("09/20", 48.5f, 22.6f, 27.3f),
         WeightData("09/20", 48.5f, 22.6f, 27.3f),
     )
+    var showDatePickerRangeDialog by remember { mutableStateOf(false) }
+    val today = LocalDate.now()
+    val thirtyDaysAgo = today.minusDays(30)
+    var selectedDateRange by remember {
+        mutableStateOf(
+            "${thirtyDaysAgo.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))} ~ ${
+                today.format(
+                    DateTimeFormatter.ofPattern("yyyy/MM/dd")
+                )
+            }"
+        )
+    }
     var selectedTab by remember { mutableStateOf(0) }
     val tabColors = listOf(
         colorResource(R.color.primarycolor),
@@ -122,7 +131,37 @@ fun WeightScreen(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CustomDateRangePicker()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = selectedDateRange,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = {
+                            showDatePickerRangeDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = stringResource(R.string.calendar)
+                        )
+                    }
+                }
+                if (showDatePickerRangeDialog) {
+                    CustomDateRangePickerDialog(
+                        onDismissRequest = { showDatePickerRangeDialog = false },
+                        onConfirm = { startDate, endDate ->
+                            selectedDateRange = "$startDate ~ $endDate"
+                            showDatePickerRangeDialog = false
+                        }
+                    )
+                }
                 LazyColumn {
                     item {
                         CustomTabRow(
@@ -171,10 +210,7 @@ fun WeightScreen(
                     }
                 }
             }
-
-
         }
-
     }
 }
 
@@ -226,85 +262,6 @@ fun WeightDataRow(data: WeightData, navController: NavHostController) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomDateRangePicker() {
-    val today = LocalDate.now()
-    val oneMonthAgo = today.minusMonths(1)
-
-    val initialStartDateMillis =
-        oneMonthAgo.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
-    val initialEndDateMillis = today.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
-
-    val dateRangePickerState = rememberDateRangePickerState(
-        initialSelectedStartDateMillis = initialStartDateMillis,
-        initialSelectedEndDateMillis = initialEndDateMillis,
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                val selectedDate = Instant.ofEpochMilli(utcTimeMillis)
-                    .atZone(ZoneId.of("UTC"))
-                    .toLocalDate()
-                return !selectedDate.isAfter(today)
-            }
-        }
-    )
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(240.dp),
-        shape = RoundedCornerShape(15.dp)
-    ) {
-        DateRangePicker(
-            state = dateRangePickerState,
-            showModeToggle = false,
-            title = { },
-            headline = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val startDate = dateRangePickerState.selectedStartDateMillis?.let {
-                        Instant.ofEpochMilli(it)
-                            .atZone(ZoneId.of("UTC"))
-                            .toLocalDate()
-                            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
-                    } ?: stringResource(R.string.noChoose)
-                    val endDate = dateRangePickerState.selectedEndDateMillis?.let {
-                        Instant.ofEpochMilli(it)
-                            .atZone(ZoneId.of("UTC"))
-                            .toLocalDate()
-                            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
-                    } ?: stringResource(R.string.noChoose)
-                    Text(
-                        text = "$startDate ~ $endDate",
-                        color = Color.White,
-                        fontSize = 18.sp
-                    )
-
-                }
-            },
-            colors = DatePickerDefaults.colors(
-                containerColor = colorResource(R.color.primarycolor),
-                weekdayContentColor = Color.White,
-                subheadContentColor = Color.White,
-                yearContentColor = Color.White,
-                currentYearContentColor = Color.White,
-                selectedYearContainerColor = Color.White.copy(alpha = 0.3f),
-                selectedYearContentColor = Color.White,
-                dayContentColor = Color.White,
-                selectedDayContainerColor = Color.White.copy(alpha = 0.3f),
-                selectedDayContentColor = Color.White,
-                todayContentColor = Color.White,
-                todayDateBorderColor = Color.White
-            )
-        )
-    }
-}
-
-
 @Composable
 fun WeightList() {
 }
@@ -318,6 +275,7 @@ fun FatList() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun WeightPreview() {

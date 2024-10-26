@@ -78,7 +78,7 @@ fun PersonScreen(
                             painter = painterResource(R.drawable.editperson),
                             contentDescription = stringResource(R.string.editPhoto)
                         )
-                        PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false })
+                        PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false }, navController)
                     }
                 }
 
@@ -131,7 +131,7 @@ fun PersonScreen(
 }
 
 @Composable
-fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
+fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: NavHostController) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { onDismiss() },
@@ -158,7 +158,7 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
             },
             text = { Text(stringResource(R.string.choosePicture)) },
             onClick = {
-                onDismiss()
+                navController.navigate(PersonScreenEnum.pickPhotoScreen.name)
             }
         )
     }
