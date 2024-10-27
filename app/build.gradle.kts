@@ -69,8 +69,9 @@ dependencies {
     implementation(libs.gson.parent)
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
-//    implementation(libs.compose.theme.adapter)
     implementation(libs.charty)
+//    implementation(libs.compose.theme.adapter)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

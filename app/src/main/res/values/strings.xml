@@ -100,8 +100,8 @@
     <string name="save">儲存</string>
     <string name="historyRecord">歷史紀錄</string>
 
-    <string name="post_title">title</string>
-    <string name="post_content">Write your post or question here</string>
+    <string name="post_title">請輸入標題</string>
+    <string name="post_content">寫點什麼吧...</string>
     <string name="userName">John Doe</string>
 
     <string name="weight">體重</string>

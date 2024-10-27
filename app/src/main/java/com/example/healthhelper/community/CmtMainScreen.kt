@@ -1,12 +1,11 @@
 package com.example.healthhelper.community
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,89 +15,49 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.ui.theme.HealthHelperTheme
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CmtMainScreen(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     var inputText by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 40.dp)
+            .background(colorResource(id = R.color.backgroundcolor))
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_back_ios_new),
-                contentDescription = "arrowBack",
-                tint = colorResource(id = R.color.primarycolor)
-            )
-            Text(
-                text = "飲食社群",
-                fontSize = 24.sp,
-                color = colorResource(id = R.color.primarycolor),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight(600),
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.tabler_receipt),
-                contentDescription = "arrowBack",
-                tint = colorResource(id = R.color.primarycolor)
-            )
-        }
-        HorizontalDivider(
-            thickness = 2.dp,
-            modifier = Modifier
-                .fillMaxWidth(),
-            color = colorResource(id = R.color.primarycolor)
-        )
+        CmtNavbarComponent(navController = navController)
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .border(4.dp, colorResource(R.color.primarycolor), shape = RoundedCornerShape(15.dp)),
+                .border(
+                    4.dp,
+                    colorResource(R.color.primarycolor),
+                    shape = RoundedCornerShape(15.dp)
+                ),
             value = inputText,
             onValueChange = { inputText = it },
             placeholder = { Text(text = "請輸入關鍵字") },
@@ -119,6 +78,20 @@ fun CmtMainScreen(
             shape = RoundedCornerShape(15.dp),
             singleLine = true,
         )
+        IconButton(
+            onClick = {
+                navController.navigate(CmtScreenEnum.CreatePostScreen.name)
+            },
+            modifier = Modifier,
+
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.create_post),
+                contentDescription = "Create Post",
+                modifier = Modifier,
+                colorResource(id = R.color.primarycolor)
+            )
+        }
     }
 }
 
@@ -133,7 +106,7 @@ fun CmtMainScreen(
 fun PostLists(
     posts: List<Post>,
     innerPadding: PaddingValues,
-    onItemClick: (Post) -> Unit
+    onItemClick: (Post) -> Unit,
 ) {
     // 也可改用LazyColumn
     Column(
@@ -156,7 +129,6 @@ fun PostLists(
         }
     }
 }
-
 
 
 /**

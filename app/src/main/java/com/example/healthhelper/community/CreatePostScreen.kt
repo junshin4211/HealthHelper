@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,61 +28,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 
 @Composable
-fun CreatePostScreen() {
+fun CreatePostScreen(navController: NavHostController) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 40.dp)
+            .background(colorResource(id = R.color.backgroundcolor))
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_back_ios_new),
-                contentDescription = "arrowBack",
-                tint = colorResource(id = R.color.primarycolor)
-            )
-            Text(
-                text = "飲食社群",
-                fontSize = 24.sp,
-                color = colorResource(id = R.color.primarycolor),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight(600),
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.tabler_receipt),
-                contentDescription = "arrowBack",
-                tint = colorResource(id = R.color.primarycolor)
-            )
-        }
-        HorizontalDivider(
-            thickness = 2.dp,
-            modifier = Modifier
-                .fillMaxWidth(),
-            color = colorResource(id = R.color.primarycolor)
-        )
+        CmtNavbarComponent(navController = navController)
         Column(
             // 內容物水平置中
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -216,7 +184,7 @@ fun CreatePostScreen() {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Button(
-                    onClick = { /* 點擊送出的邏輯 */ },
+                    onClick = { navController.navigate(CmtScreenEnum.MyPostsScreen.name)},
                     modifier = Modifier
                         .width(161.dp)
                         .height(52.dp)
@@ -242,7 +210,7 @@ fun CreatePostScreen() {
 @Composable
 fun CreatePostScreenPreview() {
     HealthHelperTheme {
-        CreatePostScreen()
+        CreatePostScreen(rememberNavController())
     }
 }
 
