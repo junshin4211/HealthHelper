@@ -86,11 +86,6 @@ fun WeightScreen(
         )
     }
     var selectedTab by remember { mutableStateOf(0) }
-    val tabColors = listOf(
-        colorResource(R.color.primarycolor),
-        colorResource(R.color.primarycolor),
-        colorResource(R.color.primarycolor)
-    )
     val labels = listOf(
         stringResource(R.string.weight),
         stringResource(R.string.BMI),
@@ -101,6 +96,7 @@ fun WeightScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CustomTopBar(
+                title = "",
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
                 scrollBehavior = scrollBehavior,
@@ -167,7 +163,6 @@ fun WeightScreen(
                         CustomTabRow(
                             selectedTab = selectedTab,
                             onTabSelected = { newTab -> selectedTab = newTab },
-                            tabColors = tabColors,
                             textColor = Color.Black,
                             selectedTextColor = Color.White,
                             labels = labels

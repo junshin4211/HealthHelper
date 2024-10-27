@@ -19,7 +19,7 @@ fun SaveButton(
     onClick: () -> Unit,
 ) {
     Button(
-        onClick = {onClick()},
+        onClick = onClick,
         modifier = Modifier
             .width(100.dp),
         shape = RoundedCornerShape(10.dp),

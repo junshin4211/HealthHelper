@@ -1,8 +1,16 @@
 package com.example.healthhelper.person
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.graphics.Matrix
+import android.graphics.Path
 import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.rememberTransformableState
@@ -23,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,6 +46,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,20 +55,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
+import com.example.healthhelper.person.model.UserData
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.SaveButton
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
+import java.io.IOException
 
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PickPhotoScreen(navController: NavHostController) {
+fun PickPhotoScreen(
+    navController: NavHostController,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var scale by remember { mutableStateOf(1f) }
+    var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri: Uri? ->
@@ -74,10 +85,12 @@ fun PickPhotoScreen(navController: NavHostController) {
             )
         )
     }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CustomTopBar(
+                title = "",
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
                 scrollBehavior = scrollBehavior,
@@ -112,6 +125,7 @@ fun PickPhotoScreen(navController: NavHostController) {
                         newOffset.y.coerceIn(-maxY, maxY)
                     )
                 }
+
                 Box(
                     modifier = Modifier
                         .size(350.dp)
@@ -137,20 +151,120 @@ fun PickPhotoScreen(navController: NavHostController) {
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            val context = LocalContext.current
             SaveButton(
-                onClick = { navController.navigateUp() }
+                onClick = {
+                    val croppedBitmap = selectedImageUri?.let { uri ->
+                        generateCroppedBitmap(context, uri, scale, offset, 350)
+                    }
+                    UserData.photoUri = croppedBitmap
+                    navController.navigateUp()
+                }
             )
         }
-
     }
 }
+@RequiresApi(Build.VERSION_CODES.P)
+//fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offset, size: Int): Bitmap? {
+//    val sourceBitmap = try {
+//        ImageDecoder.decodeBitmap(
+//            ImageDecoder.createSource(context.contentResolver, uri)
+//        ) { decoder, _, _ ->
+//            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+//            decoder.isMutableRequired = true
+//        }
+//    } catch (e: IOException) {
+//        e.printStackTrace()
+//        return null
+//    }
+//
+//    Log.d("CropDebug", "Source bitmap size: ${sourceBitmap.width}x${sourceBitmap.height}")
+//    Log.d("CropDebug", "Scale: $scale, Offset: $offset")
+//
+//    val outputBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+//    val canvas = android.graphics.Canvas(outputBitmap)
+//
+//    val centerX = size / 2f
+//    val centerY = size / 2f
+//
+//    val scaleX = size.toFloat() / sourceBitmap.width
+//    val scaleY = size.toFloat() / sourceBitmap.height
+//    val baseScale = maxOf(scaleX, scaleY)
+//
+//    val matrix = Matrix().apply {
+//        postScale(baseScale, baseScale)
+//        postTranslate(
+//            (size - sourceBitmap.width * baseScale) / 2f,
+//            (size - sourceBitmap.height * baseScale) / 2f
+//        )
+//        postScale(scale, scale, centerX, centerY)
+//        postTranslate(offset.x, offset.y)
+//    }
+//
+//    Log.d("CropDebug", "Base scale: $baseScale")
+//    Log.d("CropDebug", "Final matrix: $matrix")
+//
+//    canvas.drawBitmap(sourceBitmap, matrix, null)
+//    sourceBitmap.recycle()
+//
+//    return outputBitmap
+//}
 
+fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offset, size: Int): Bitmap? {
+    val sourceBitmap = try {
+        ImageDecoder.decodeBitmap(
+            ImageDecoder.createSource(context.contentResolver, uri)
+        ) { decoder, _, _ ->
+            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            decoder.isMutableRequired = true
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+        return null
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun PhotoPreview() {
-    PickPhotoScreen(rememberNavController())
+//    Log.d("CropDebug", "Source bitmap size: ${sourceBitmap.width}x${sourceBitmap.height}")
+//    Log.d("CropDebug", "Scale: $scale, Offset: $offset")
+    val outputBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val canvas = android.graphics.Canvas(outputBitmap)
+    val centerX = size / 2f
+    val centerY = size / 2f
+    val scaleX = size.toFloat() / sourceBitmap.width
+    val scaleY = size.toFloat() / sourceBitmap.height
+    val baseScale = maxOf(scaleX, scaleY)
+    val path = Path().apply {
+        addCircle(centerX, centerY, size / 2f, Path.Direction.CCW)
+    }
+    canvas.clipPath(path)
+
+    val matrix = Matrix().apply {
+        postScale(baseScale, baseScale)
+        postTranslate(
+            (size - sourceBitmap.width * baseScale) / 2f,
+            (size - sourceBitmap.height * baseScale) / 2f
+        )
+        postScale(scale, scale, centerX, centerY)
+        postTranslate(offset.x, offset.y)
+    }
+//
+//    Log.d("CropDebug", "Base scale: $baseScale")
+//    Log.d("CropDebug", "Final matrix: $matrix")
+    canvas.drawBitmap(sourceBitmap, matrix, null)
+    sourceBitmap.recycle()
+
+    return outputBitmap
 }
+
+
+
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun PhotoPreview() {
+//    PickPhotoScreen(rememberNavController())
+//}
 
 
 
