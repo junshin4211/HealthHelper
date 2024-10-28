@@ -31,4 +31,26 @@ class CustomButton {
         }
 
     }
+
+    @Composable
+    fun CreateButton(
+        text:String,
+        @ColorRes color:Int,
+        width:Int = 120,
+        onClick:()->Unit,
+        leadIcon:@Composable ()->Unit,
+        trailIcon:@Composable ()->Unit,
+    ){
+        Button(
+            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = color)),
+            shape = RoundedCornerShape(15.dp),
+            onClick = { onClick() },
+            modifier = Modifier
+                .width(width.dp)
+        ){
+            leadIcon()
+            CustomText().TextWithDiffColor(setcolor = R.color.black, text = text, setsize = 20.sp)
+            trailIcon()
+        }
+    }
 }

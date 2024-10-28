@@ -53,7 +53,7 @@ fun <T> CreateDropDownMenu(
             onValueChange = {  },
             singleLine = true,
             label = { Text(text = stringResource(R.string.pickdaterange)) },
-            trailingIcon = { if (expanded) CreateArrow() else CreateArrow(true) },
+            trailingIcon = { if (expanded) CustomIcon().CreateArrow() else CustomIcon().CreateArrow(true) },
             modifier = Modifier
                 .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 .border(
