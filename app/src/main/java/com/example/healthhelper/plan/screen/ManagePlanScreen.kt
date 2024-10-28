@@ -3,22 +3,17 @@ package com.example.healthhelper.plan.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -38,19 +32,21 @@ import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CustomText
 import com.example.healthhelper.plan.ui.CreateToggleButton
+import com.example.healthhelper.plan.ui.CustomList
+import com.example.healthhelper.plan.viewmodel.PlanViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManagePlan(
     navcontroller: NavHostController = rememberNavController(),
-    planpannel: String
+    planpannel: String,
+    planViewModel: PlanViewModel = PlanViewModel()
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     var activatepannel by remember { mutableStateOf(planpannel) }
-    var activatecolor by remember { mutableIntStateOf(R.color.primarycolor) }
-    var activatetextcolor by remember { mutableIntStateOf(R.color.white) }
+    val plan by planViewModel.planState.collectAsState()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -129,6 +125,11 @@ fun ManagePlan(
                 }
             }
 
+            CustomList().PlanList(
+                plans = plan,
+                innerPadding = innerPadding,
+                onItemClick = { }
+            )
         }
 
     }
