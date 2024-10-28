@@ -4,6 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -33,7 +34,7 @@ class CustomIcon {
     }
 
     @Composable
-    fun CreateArrow(isRight: Boolean = false, size:Float,@ColorRes color:Int) {
+    fun CreateArrow(isRight: Boolean = false, size: Float, @ColorRes color: Int) {
         if (isRight) {
             Icon(
                 painter = painterResource(R.drawable.arrow),
@@ -49,6 +50,24 @@ class CustomIcon {
                     .graphicsLayer(scaleX = -1f)
                     .scale(size),
                 tint = colorResource(color)
+            )
+        }
+    }
+
+    @Composable
+    fun CreateDelete(
+        size: Float,
+        onDeleteClick: () -> Unit,
+    ) {
+        IconButton(
+            onClick = {
+                onDeleteClick()
+            }
+        ){
+            Icon(
+                painter = painterResource(R.drawable.delete),
+                contentDescription = "delete",
+                modifier = Modifier.scale(size)
             )
         }
     }
