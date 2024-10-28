@@ -32,15 +32,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTopAppBar
 import com.example.healthhelper.dietary.components.button.AddNewDietDiaryItemButton
-import com.example.healthhelper.dietary.components.button.DateButton
 import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
+import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import java.util.Date
@@ -59,7 +61,6 @@ fun DietDiaryMainFrame(
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
 
-    val selectedDate = remember { mutableStateOf((Date(System.currentTimeMillis()).toString())) }
     val selectedMealOptionIndex = remember { mutableIntStateOf(0) }
     val verticalScrollState = rememberScrollState()
 
@@ -87,9 +88,7 @@ fun DietDiaryMainFrame(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
                 ) {
-                    DateButton(
-                        selectedDate
-                    )
+                    CustomDatePicker()
 
                     Spacer(
                         modifier = Modifier
@@ -122,9 +121,7 @@ fun DietDiaryMainFrame(
                             outerIconButtonModifier = outerIconButtonModifier,
                             outerIconButtonColor = outerIconButtonColor,
                             onClick = {
-                                Log.d(TAG,"The ${index}th button was clicked")
                                 selectedMealOptionIndex.intValue = index
-                                Log.d(TAG,"After value changed, selectedMealOptionIndex.intValue:${selectedMealOptionIndex.intValue}")
                             },
                             innerIconId = innerIconId,
                             spacerModifier = spacerModifier,
@@ -181,4 +178,11 @@ fun DietDiaryMainFrame(
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DietDiaryMainFramePreview() {
+    val navController = rememberNavController()
+    DietDiaryMainFrame(navController);
 }

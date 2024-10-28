@@ -1,6 +1,11 @@
 package com.example.healthhelper.attr.color.defaultcolor
 
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -53,5 +58,43 @@ object DefaultColorViewModel {
             unfocusedSuffixColor = Color.Gray,
             disabledSuffixColor = colorResource(R.color.very_light_black),
             errorSuffixColor = Color.Red,
+        )
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    val topAppBarColors: TopAppBarColors
+        @Composable
+        get() = TopAppBarColors(
+            containerColor = colorResource(R.color.primarycolor),
+            scrolledContainerColor = colorResource(R.color.primarycolor),
+            navigationIconContentColor = Color.Black,
+            titleContentColor = Color.White,
+            actionIconContentColor = Color.Black,
+        )
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    val datePickerColors: DatePickerColors
+        @Composable
+        get() = DatePickerDefaults.colors(
+            containerColor = colorResource(R.color.primarycolor),
+            weekdayContentColor = Color.White,
+            subheadContentColor = Color.White,
+            yearContentColor = Color.White,
+            currentYearContentColor = Color.White,
+            selectedYearContainerColor = Color.White.copy(alpha = 0.3f),
+            selectedYearContentColor = Color.White,
+            dayContentColor = Color.White,
+            selectedDayContainerColor = Color.White.copy(alpha = 0.3f),
+            selectedDayContentColor = Color.White,
+            todayContentColor = Color.White,
+            todayDateBorderColor = Color.White
+        )
+
+    val iconButtonColors: IconButtonColors
+        @Composable
+        get() = IconButtonColors(
+            containerColor = colorResource(R.color.primarycolor),
+            contentColor = colorResource(R.color.primarycolor),
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.Gray,
         )
 }
