@@ -22,25 +22,21 @@ import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
 import com.example.healthhelper.dietary.components.iconbutton.navigationicon.NavigateUpNavigationIcon
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
+import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun QueryTopAppBar(
     navController: NavHostController,
-    title: @Composable () -> Unit,
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
-    selectedMealsOptionIndex: MutableState<Int>,
+    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
     modifier: Modifier = Modifier,
+    title: @Composable () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(
         rememberTopAppBarState()
     ),
 ) {
     val TAG = "tag_QueryTopAppBar"
-
-
-    val mealsOptions by mealsOptionViewModel.data.collectAsState()
-
-    val selectedMealsOption = mealsOptions[selectedMealsOptionIndex.value]
 
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -50,7 +46,7 @@ fun QueryTopAppBar(
             NavigateUpNavigationIcon(navController)
         },
         actions = {
-            SearchIcon(navController, selectedMealsOption.mealsOptionText)
+            SearchIcon(navController)
         },
         scrollBehavior = scrollBehavior,
     )

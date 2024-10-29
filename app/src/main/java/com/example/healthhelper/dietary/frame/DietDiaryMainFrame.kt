@@ -43,8 +43,11 @@ import com.example.healthhelper.dietary.components.button.AddNewDietDiaryItemBut
 import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
+import com.example.healthhelper.dietary.dataclasses.vo.SelectedMealOptionVO
+import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
+import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,14 +57,12 @@ fun DietDiaryMainFrame(
     navController: NavHostController,
     diaryViewModel: DiaryViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
+    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
 ) {
-    val TAG = "tag_DietDiaryMainFrame"
-
     val context = LocalContext.current
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
 
-    val selectedMealOptionIndex = remember { mutableIntStateOf(0) }
     val verticalScrollState = rememberScrollState()
 
     Scaffold(
@@ -70,7 +71,6 @@ fun DietDiaryMainFrame(
             QueryTopAppBar(
                 navController = navController,
                 title = { Text(stringResource(R.string.diet_diary_main_frame_title)) },
-                selectedMealsOptionIndex = selectedMealOptionIndex,
             )
         },
         content = { innerPadding ->
@@ -88,6 +88,12 @@ fun DietDiaryMainFrame(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
                 ) {
+                    Spacer(
+                        modifier = Modifier
+                            .height(10.dp)
+                            .fillMaxWidth()
+                    )
+
                     CustomDatePicker()
 
                     Spacer(
@@ -121,7 +127,7 @@ fun DietDiaryMainFrame(
                             outerIconButtonModifier = outerIconButtonModifier,
                             outerIconButtonColor = outerIconButtonColor,
                             onClick = {
-                                selectedMealOptionIndex.intValue = index
+                                SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = mealsOption.mealsOptionText))
                             },
                             innerIconId = innerIconId,
                             spacerModifier = spacerModifier,

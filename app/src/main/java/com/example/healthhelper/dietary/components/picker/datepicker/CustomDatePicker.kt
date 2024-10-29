@@ -67,11 +67,12 @@ fun CustomDatePicker() {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(240.dp)
+            .height(180.dp)
             .verticalScroll(scrollState),
         shape = RoundedCornerShape(15.dp),
     ) {
         DatePicker(
+            modifier = Modifier.padding(),
             state = datePickerState,
             showModeToggle = false,
             title = {
@@ -81,8 +82,8 @@ fun CustomDatePicker() {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                        .height(40.dp)
+                        .padding(start = 16.dp, end = 16.dp, bottom = 4.dp),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {

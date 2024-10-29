@@ -1,6 +1,7 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,23 +29,37 @@ import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
 import com.example.healthhelper.dietary.components.button.AddNewDietDiaryItemButton
 import com.example.healthhelper.dietary.components.button.DownloadButton
-import com.example.healthhelper.dietary.components.card.DietDiaryCards
+import com.example.healthhelper.dietary.components.listitem.ListItems
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextField
+import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
+import com.example.healthhelper.dietary.repository.SelectedFoodItemRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun DietDiaryMealFrame(
     navController: NavHostController = rememberNavController(),
-    vm : DiaryViewModel = viewModel(),
+    diaryViewModel: DiaryViewModel = viewModel(),
+    selectedFoodItemViewModel: SelectedFoodItemViewModel = viewModel(),
     title: @Composable () -> Unit,
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
+    val foodItems = listOf<SelectedFoodItemVO>(
+        SelectedFoodItemVO("Apple", 20.0),
+        SelectedFoodItemVO("Banana", 30.0)
+    )
     val context = LocalContext.current
     val verticalScrollState = rememberScrollState()
-    val diaries by vm.data.collectAsState()
+
+    val diaries by diaryViewModel.data.collectAsState()
+    val selectedFoodItem by selectedFoodItemViewModel.data.collectAsState()
+
+    LaunchedEffect(Unit) {
+        SelectedFoodItemRepository.setData(foodItems[0])
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -70,10 +86,9 @@ fun DietDiaryMealFrame(
                         label = { Text(stringResource(R.string.search_label)) },
                     )
 
-                    DietDiaryCards(
-                        context = context,
-                        cards = diaries,
-                        modifier = Modifier.fillMaxWidth(),
+                    ListItems(
+                        navController = navController,
+                        foodItems = foodItems,
                     )
                 }
                 Column(

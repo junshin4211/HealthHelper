@@ -15,19 +15,19 @@ object DefaultColorViewModel {
     val outlinedTextFieldDefaultColors
         @Composable
         get() = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.Blue,
+            focusedTextColor = Color.Black,
             unfocusedTextColor = Color.Gray,
             disabledTextColor = colorResource(R.color.very_light_black),
             errorTextColor = Color.Red,
-            focusedContainerColor = Color.Blue,
-            unfocusedContainerColor = Color.Gray,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
             disabledContainerColor = colorResource(R.color.very_light_black),
             errorContainerColor = Color.Red,
             cursorColor = colorResource(R.color.blue01),
             errorCursorColor = Color.Red,
             selectionColors = null,
-            focusedBorderColor = Color.Blue,
-            unfocusedBorderColor = Color.Gray,
+            focusedBorderColor = colorResource(R.color.primarycolor),
+            unfocusedBorderColor = colorResource(R.color.primarycolor),
             disabledBorderColor = colorResource(R.color.very_light_black),
             errorBorderColor = Color.Red,
             focusedLeadingIconColor = Color.Blue,
@@ -97,4 +97,5 @@ object DefaultColorViewModel {
             disabledContainerColor = Color.Gray,
             disabledContentColor = Color.Gray,
         )
+
 }

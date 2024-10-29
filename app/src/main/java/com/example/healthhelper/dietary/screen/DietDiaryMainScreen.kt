@@ -5,22 +5,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.healthhelper.dietary.dataclasses.vo.SelectedMealOptionVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.frame.AddNewDietDiaryItemFrame
 import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.dietary.frame.DietDiaryMealFrame
+import com.example.healthhelper.dietary.frame.FoodItemInfoFrame
 import com.example.healthhelper.dietary.frame.SearchHintFrame
+import com.example.healthhelper.dietary.repository.SelectedFoodItemRepository
+import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
+import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
 
 @Composable
 fun DietDiaryMainScreen(
     navController: NavHostController = rememberNavController(),
+    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
 ) {
+    val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
+
+    SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = "breakfast"))
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -41,15 +54,13 @@ fun DietDiaryMainScreen(
             }
 
             composable(
-                route = "${DietDiaryScreenEnum.DietDiaryMealFrame.name}/{selectedMealsOption}"
-            ) { backStackEntry ->
-                val selectedMealOption =
-                    backStackEntry.arguments?.getString("selectedMealsOption") ?: ""
+                route = DietDiaryScreenEnum.DietDiaryMealFrame.name
+            ) {
                 DietDiaryMealFrame(
                     navController = navController,
                     title = {
                         Text(
-                            text = selectedMealOption,
+                            text = selectedMealOption.name,
                             maxLines = 1,
                         )
                     }
@@ -65,6 +76,11 @@ fun DietDiaryMainScreen(
             }
 
             composable(
+                route = DietDiaryScreenEnum.FoodItemInfoFrame.name
+            ) {
+                FoodItemInfoFrame(navController = navController)
+            }
+            composable(
                 route = DietDiaryScreenEnum.SearchHintFrame.name
             ) {
                 SearchHintFrame(
@@ -77,6 +93,6 @@ fun DietDiaryMainScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun DietDiaryMainScreenPreview(){
+fun DietDiaryMainScreenPreview() {
     DietDiaryMainScreen()
 }

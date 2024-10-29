@@ -143,4 +143,5 @@
     <string name="dinner">dinner</string>
     <string name="supper">supper</string>
     <string name="calendar">日曆</string>
+    <string name="food_item_info_frame">Food Item Info Frame</string>
 </resources>
