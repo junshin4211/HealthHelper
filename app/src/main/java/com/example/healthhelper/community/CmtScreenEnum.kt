@@ -4,6 +4,7 @@ enum class CmtScreenEnum {
     CmtMainScreen,
     CreatePostScreen,
     EditPostScreen,
-    MyPostsScreen
+    MyPostsScreen,
+    PersonalPostScreen
 
 }

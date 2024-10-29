@@ -35,6 +35,12 @@ fun CmtController(
         ) {
             MyPostsScreen(navController)
         }
+        composable(
+                route = CmtScreenEnum.PersonalPostScreen.name
+                ) {
+            PersonalPostScreen(navController)
+        }
+
     }
 }
 

@@ -100,9 +100,12 @@
     <string name="save">儲存</string>
     <string name="historyRecord">歷史紀錄</string>
 
-    <string name="post_title">請輸入標題</string>
-    <string name="post_content">寫點什麼吧...</string>
+    <string name="input_post_title">請輸入標題</string>
+    <string name="input_post_content">寫點什麼吧...</string>
     <string name="userName">John Doe</string>
+    <string name="make_sure_delete_post">確定要刪除貼文嗎?</string>
+    <string name="post_title_text">TF-IDF Content Optimisation: Your Guide to an Underappreciated SEO Concept</string>
+    <string name="post_content_text">In mauris porttitor tincidunt mauris massa sit lorem sed scelerisque. Fringilla pharetra vel massa enim sollicitudin cras. At pulvinar eget sociis adipiscing eget donec ultricies nibh tristique. Adipiscing dui orci ac purus lacus, nulla auctor. Ultrices sit leo diam etiam cras cras fermentum.</string>
 
     <string name="weight">體重</string>
     <string name="BMI">BMI</string>

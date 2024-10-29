@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
+import com.example.healthhelper.community.components.CmtNavbarComponent
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
