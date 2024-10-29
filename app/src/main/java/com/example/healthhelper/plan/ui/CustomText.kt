@@ -1,0 +1,43 @@
+package com.example.healthhelper.plan.ui
+
+import androidx.annotation.ColorRes
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
+import com.example.healthhelper.R
+
+class CustomText {
+
+    @Composable
+    fun TextWithDiffColor(
+        @ColorRes setcolor:Int = R.color.black,
+        text:String = "",
+        setsize:TextUnit = 12.sp
+    ){
+        Text(
+            text = text,
+            style = TextStyle(
+                fontSize = setsize,
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight(600),
+                color = colorResource(id = setcolor),
+                textAlign = TextAlign.Start,
+                letterSpacing = 0.2.sp
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun TextPreview(){
+    CustomText().TextWithDiffColor(R.color.primarycolor,"測試")
+}

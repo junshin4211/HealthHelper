@@ -13,6 +13,8 @@
     <color name="blue04">#E6EEFF</color>
     <color name="red01">#FE1010</color>
     <color name="darkgray">#9F9BAA</color>
+    <color name="light_green">#00FF7B</color>
+    <color name="light_gray">#EFF1F5</color>
     //主題一 橘色
     <color name="backgroundcolor">#FFFEED</color>
     <color name="primarycolor">#F19204</color>
@@ -20,9 +22,33 @@
     <color name="footericon">#FFFFFFFF</color>
     <color name="footer">#EDB86A</color>
     //主題二 藍色
-<!--    <color name="backgroundcolor">#FFFFFFFF</color>-->
-<!--    <color name="primarycolor">#FFFFFFFF</color>-->
-<!--    <color name="footerselect">#FFFFFFFF</color>-->
-<!--    <color name="footericon">#FFFFFFFF</color>-->
-<!--    <color name="footer">#0174DB</color>-->
+
+    //blue color
+    //light blue (i.e. sky blue)
+    <color name = "light_sky_blue">#82B2DC</color>
+    <color name = "sky_blue">#4C99DC</color>
+    <color name = "light_blue">#2E86D4</color>
+
+    //dark blue
+    <color name = "dark_blue">#3F68A7</color>
+    <color name = "heavy_dark_blue">#2A579F</color>
+
+    //gray color
+    //light gray
+    <color name="very_light_gray">#8E8E8E</color>
+    <color name="a_little_light_gray">#6B6B6B</color>
+    <color name="gray_300">#B4B7C9</color>
+    <color name="gray_200">#F3F3F3</color>
+    <color name="gray_100">#EFF2FC</color>
+
+    //dark gray
+    <color name="dark_gray">#505050</color>
+
+    //black color
+    <color name="very_light_black">#3D3D3D</color>
+    <color name="black_200">#4F4C4C</color>
+    <color name="black_300">#292D32</color>
+
+    //red color
+    <color name="red_100">#F8312A</color>
 </resources>
