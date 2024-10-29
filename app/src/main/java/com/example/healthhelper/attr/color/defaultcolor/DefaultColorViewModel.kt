@@ -1,5 +1,7 @@
 package com.example.healthhelper.attr.color.defaultcolor
 
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -98,4 +100,12 @@ object DefaultColorViewModel {
             disabledContentColor = Color.Gray,
         )
 
+    val buttonColors: ButtonColors
+        @Composable
+        get() = ButtonDefaults.buttonColors(
+            containerColor = colorResource(R.color.primarycolor),
+            contentColor = Color.White,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.White,
+        )
 }
