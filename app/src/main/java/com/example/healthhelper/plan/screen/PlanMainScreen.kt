@@ -3,6 +3,7 @@ package com.example.healthhelper.plan.screen
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.HorizontalDivider
@@ -14,7 +15,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
@@ -45,7 +45,6 @@ fun PlanMain(context: Context = LocalContext.current,
              planViewModel: PlanVM
 ) {
     tabViewModel.setTabVisibility(true)
-    var planpannel by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -93,7 +92,10 @@ fun PlanMain(context: Context = LocalContext.current,
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 5.dp),
+                .padding(top = 5.dp)
+                .clickable {
+                    navcontroller.navigate(PlanPage.CheckPlan.name)
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
@@ -144,27 +146,29 @@ fun PlanMain(context: Context = LocalContext.current,
                         .padding(start = 8.dp)
                 )
             }
-            TextButton(
-                onClick = {
-                    planViewModel.panneelname = PlanPage.MyPlan.name
-                    navcontroller.navigate(PlanPage.ManagePlan.name)
-                          },
-                modifier = Modifier
-                    .height(40.dp)
-                    .align(Alignment.End)
-            ) {
-                Text(
-                    text = "more‧‧‧",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily.Default,
-                        fontWeight = FontWeight(600),
-                        color = colorResource(R.color.black),
-                        letterSpacing = 0.2.sp
-                    )
-                )
-            }
 
+
+        }
+
+        TextButton(
+            onClick = {
+                planViewModel.panneelname = PlanPage.MyPlan.name
+                navcontroller.navigate(PlanPage.ManagePlan.name)
+            },
+            modifier = Modifier
+                .height(40.dp)
+                .align(Alignment.End)
+        ) {
+            Text(
+                text = "more‧‧‧",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight(600),
+                    color = colorResource(R.color.black),
+                    letterSpacing = 0.2.sp
+                )
+            )
         }
 
         HorizontalDivider(
@@ -196,7 +200,10 @@ fun PlanMain(context: Context = LocalContext.current,
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 5.dp),
+                .padding(top = 5.dp)
+                .clickable {
+                    navcontroller.navigate(PlanPage.CheckPlan.name)
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
@@ -247,27 +254,28 @@ fun PlanMain(context: Context = LocalContext.current,
                         .padding(start = 8.dp)
                 )
             }
-            TextButton(
-                onClick = {
-                    planViewModel.panneelname = PlanPage.CompletedPlan.name
-                    navcontroller.navigate(PlanPage.ManagePlan.name)
-                          },
-                modifier = Modifier
-                    .height(40.dp)
-                    .align(Alignment.End)
-            ) {
-                Text(
-                    text = "more‧‧‧",
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily.Default,
-                        fontWeight = FontWeight(600),
-                        color = colorResource(R.color.black),
-                        letterSpacing = 0.2.sp
-                    )
-                )
-            }
 
+        }
+
+        TextButton(
+            onClick = {
+                planViewModel.panneelname = PlanPage.CompletedPlan.name
+                navcontroller.navigate(PlanPage.ManagePlan.name)
+            },
+            modifier = Modifier
+                .height(40.dp)
+                .align(Alignment.End)
+        ) {
+            Text(
+                text = "more‧‧‧",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight(600),
+                    color = colorResource(R.color.black),
+                    letterSpacing = 0.2.sp
+                )
+            )
         }
     }
 }

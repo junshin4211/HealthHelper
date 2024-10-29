@@ -142,6 +142,13 @@ fun Plan(
                     }
                 )
             }
+            composable(route = PlanPage.CheckPlan.name)
+            {
+                CheckPlan(
+                    navcontroller = navController,
+                    tabViewModel
+                )
+            }
         }
     }
 }
@@ -174,7 +181,7 @@ fun PlanAppBar(
                     }
 
                     else -> {
-                        currentScreen.getPlanTitle(context) + "計畫" // 其他頁面的標題
+                        currentScreen.getPlanTitle(context) + "飲食計畫" // 其他頁面的標題
                     }
                 }
             CustomText().TextWithDiffColor(
