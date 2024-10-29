@@ -27,7 +27,6 @@ import com.example.healthhelper.R
 fun CustomTabRow(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
-    tabColors: List<Color>,
     textColor: Color,
     selectedTextColor: Color,
     labels: List<String>,
@@ -41,7 +40,7 @@ fun CustomTabRow(
         Button(
             onClick = { onTabSelected(0) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (selectedTab == 0) tabColors[0] else Color.Transparent
+                containerColor = if (selectedTab == 0) colorResource(R.color.primarycolor) else Color.Transparent
             ),
             modifier = Modifier.padding(vertical = 12.dp),
             shape = RoundedCornerShape(15.dp, 0.dp, 0.dp, 15.dp),
@@ -66,7 +65,7 @@ fun CustomTabRow(
         Button(
             onClick = { onTabSelected(1) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (selectedTab == 1) tabColors[1] else Color.Transparent
+                containerColor = if (selectedTab == 1) colorResource(R.color.primarycolor) else Color.Transparent
             ),
             modifier = Modifier.padding(vertical = 12.dp),
             shape = RoundedCornerShape(0.dp),
@@ -90,7 +89,7 @@ fun CustomTabRow(
         Button(
             onClick = { onTabSelected(2) },
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (selectedTab == 2) tabColors[2] else Color.Transparent
+                containerColor = if (selectedTab == 2) colorResource(R.color.primarycolor) else Color.Transparent
             ),
             modifier = Modifier.padding(vertical = 12.dp),
             shape = RoundedCornerShape(0.dp, 15.dp, 15.dp, 0.dp),

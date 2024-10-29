@@ -1,15 +1,15 @@
 package com.example.healthhelper.dietary.repository
 
-import com.example.healthhelper.dietary.dataclasses.dao.NutritionDao
+import com.example.healthhelper.dietary.dataclasses.vo.NutritionVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object NutritionRepository {
-    private val _dataFlow = MutableStateFlow<MutableList<NutritionDao>>(mutableListOf<NutritionDao>())
-    val dataFlow: StateFlow<MutableList<NutritionDao>> = _dataFlow.asStateFlow()
+    private val _dataFlow = MutableStateFlow<MutableList<NutritionVO>>(mutableListOf<NutritionVO>())
+    val dataFlow: StateFlow<MutableList<NutritionVO>> = _dataFlow.asStateFlow()
 
-    fun setData(newData: NutritionDao) {
+    fun setData(newData: NutritionVO) {
         _dataFlow.value.clear()
         _dataFlow.value.add(newData)
     }
@@ -18,9 +18,9 @@ object NutritionRepository {
         _dataFlow.value.removeAt(index)
     }
 
-    fun fetchDefaultEntries(): List<NutritionDao>{
+    fun fetchDefaultEntries(): List<NutritionVO>{
         return listOf(
-            NutritionDao(
+            NutritionVO(
                 fat = 20.0,
                 carbon = 10.0,
                 protein = 5.0,
@@ -29,7 +29,7 @@ object NutritionRepository {
                 sodium = 4.0,
                 calories = 6.0,
             ),
-            NutritionDao(
+            NutritionVO(
                 fat = 30.0,
                 carbon = 20.0,
                 protein = 15.0,
