@@ -1,5 +1,7 @@
 package com.example.healthhelper.signuplogin
 
+import com.example.healthhelper.R
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,14 +25,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -40,13 +41,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.healthhelper.R
-
 
 @Composable
-fun LoginScreen(navController: NavHostController = rememberNavController()) {
-    // 使用 SignUpProperty 來管理表單狀態
-    val formState = remember { mutableStateOf(SignUpProperty()) }
+fun LoginScreen(
+    navController: NavHostController = rememberNavController(),
+    viewModel: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -63,7 +66,7 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
         ) {
             Spacer(modifier = Modifier.height(150.dp))
             Text(
-                text = "會員註冊",
+                text = "會員登入",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -72,8 +75,8 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
 
             // 帳號輸入框
             TextField(
-                value = formState.value.account,
-                onValueChange = { formState.value = formState.value.copy(account = it) },
+                value = uiState.formState.account,
+                onValueChange = { viewModel.updateAccount(it) },
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,15 +91,19 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
 
             // 密碼輸入框
             TextField(
-                value = formState.value.password,
-                onValueChange = { formState.value = formState.value.copy(password = it) },
+                value = uiState.formState.password,
+                onValueChange = { viewModel.updatePassword(it) },
                 label = { Text("密碼") },
-                visualTransformation = if (formState.value.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.formState.passwordVisible)
+                    VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { formState.value = formState.value.copy(passwordVisible = !formState.value.passwordVisible) }) {
+                    IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                         Icon(
-                            painter = if (formState.value.passwordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
-                            contentDescription = if (formState.value.passwordVisible) "隱藏密碼" else "顯示密碼",
+                            painter = if (uiState.formState.passwordVisible)
+                                painterResource(id = R.drawable.eyeshow)
+                            else painterResource(id = R.drawable.eyenoshow),
+                            contentDescription = if (uiState.formState.passwordVisible)
+                                "隱藏密碼" else "顯示密碼",
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -121,9 +128,7 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
             ) {
                 // 註冊按鈕
                 Button(
-                    onClick = {
-                        navController.navigate("SignUpScreen")
-                    },
+                    onClick = { navController.navigate("SignUpScreen") },
                     modifier = Modifier
                         .width(150.dp)
                         .height(48.dp)
@@ -135,14 +140,32 @@ fun LoginScreen(navController: NavHostController = rememberNavController()) {
 
                 // 登入按鈕
                 Button(
-                    onClick = { /* 這裡可以放登入按鈕的邏輯 */ },
+                    onClick = {
+                        viewModel.submitLogin(
+                            onSuccess = {
+                                navController.navigate("SignUpScreen")
+                                Toast.makeText(context, "登入成功", Toast.LENGTH_SHORT).show()
+                            },
+                            onError = { error ->
+                                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    },
                     modifier = Modifier
                         .width(150.dp)
                         .height(48.dp)
                         .clip(RoundedCornerShape(14.dp)),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFAEAD1))
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFAEAD1)),
+                    enabled = !isLoading
                 ) {
-                    Text(text = "登入", fontSize = 18.sp, color = Color(0xFFD75813))
+                    if (isLoading) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color(0xFFD75813)
+                        )
+                    } else {
+                        Text(text = "登入", fontSize = 18.sp, color = Color(0xFFD75813))
+                    }
                 }
             }
         }

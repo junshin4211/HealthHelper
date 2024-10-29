@@ -34,12 +34,8 @@ import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,13 +57,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import java.time.Instant
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SignUpScreen(navController: NavHostController = rememberNavController()) {
-    val formState = remember { mutableStateOf(SignUpProperty()) }
+fun SignUpScreen(
+    navController: NavHostController = rememberNavController(),
+    viewModel: SignUpViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
 
     val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
@@ -102,8 +100,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
 
             // 帳號
             TextField(
-                value = formState.value.account,
-                onValueChange = { formState.value = formState.value.copy(account = it) },
+                value = uiState.formState.account,
+                onValueChange = { viewModel.updateAccount(it) },
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -115,24 +113,19 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
 
             // 密碼
             TextField(
-                value = formState.value.password,
-                onValueChange = { newPassword ->
-                    formState.value = formState.value.copy(
-                        password = newPassword,
-                        passwordErrorMessage = if (formState.value.confirmPassword.isNotEmpty() && formState.value.confirmPassword != newPassword) {
-                            "密碼錯誤"
-                        } else {
-                            ""
-                        }
-                    )
-                },
+                value = uiState.formState.password,
+                onValueChange = { viewModel.updatePassword(it) },
                 label = { Text("密碼") },
-                visualTransformation = if (formState.value.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.formState.passwordVisible)
+                    VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { formState.value = formState.value.copy(passwordVisible = !formState.value.passwordVisible) }) {
+                    IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                         Icon(
-                            painter = if (formState.value.passwordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
-                            contentDescription = if (formState.value.passwordVisible) "隱藏密碼" else "顯示密碼",
+                            painter = if (uiState.formState.passwordVisible)
+                                painterResource(id = R.drawable.eyeshow)
+                            else painterResource(id = R.drawable.eyenoshow),
+                            contentDescription = if (uiState.formState.passwordVisible)
+                                "隱藏密碼" else "顯示密碼",
                             modifier = Modifier.size(20.dp),
                             tint = Color.Gray
                         )
@@ -148,24 +141,19 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
 
             // 確認密碼
             TextField(
-                value = formState.value.confirmPassword,
-                onValueChange = { newConfirmPassword ->
-                    formState.value = formState.value.copy(
-                        confirmPassword = newConfirmPassword,
-                        passwordErrorMessage = if (formState.value.confirmPassword != formState.value.password) {
-                            "密碼錯誤"
-                        } else {
-                            ""
-                        }
-                    )
-                },
+                value = uiState.formState.confirmPassword,
+                onValueChange = { viewModel.updateConfirmPassword(it) },
                 label = { Text("確認密碼") },
-                visualTransformation = if (formState.value.confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (uiState.formState.confirmPasswordVisible)
+                    VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { formState.value = formState.value.copy(confirmPasswordVisible = !formState.value.confirmPasswordVisible) }) {
+                    IconButton(onClick = { viewModel.toggleConfirmPasswordVisibility() }) {
                         Icon(
-                            painter = if (formState.value.confirmPasswordVisible) painterResource(id = R.drawable.iconbkshow) else painterResource(id = R.drawable.iconbknoshow),
-                            contentDescription = if (formState.value.confirmPasswordVisible) "隱藏密碼" else "顯示密碼",
+                            painter = if (uiState.formState.confirmPasswordVisible)
+                                painterResource(id = R.drawable.eyeshow)
+                            else painterResource(id = R.drawable.eyenoshow),
+                            contentDescription = if (uiState.formState.confirmPasswordVisible)
+                                "隱藏密碼" else "顯示密碼",
                             modifier = Modifier.size(20.dp),
                             tint = Color.Gray
                         )
@@ -177,13 +165,13 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors,
-                isError = formState.value.passwordErrorMessage.isNotEmpty()
+                isError = uiState.formState.passwordErrorMessage.isNotEmpty()
             )
 
             // 密碼錯誤訊息
-            if (formState.value.passwordErrorMessage.isNotEmpty()) {
+            if (uiState.formState.passwordErrorMessage.isNotEmpty()) {
                 Text(
-                    text = formState.value.passwordErrorMessage,
+                    text = uiState.formState.passwordErrorMessage,
                     color = Color.Red,
                     modifier = Modifier.padding(top = 1.dp)
                 )
@@ -195,8 +183,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
             ) {
                 // 姓名
                 TextField(
-                    value = formState.value.username,
-                    onValueChange = { formState.value = formState.value.copy(username = it) },
+                    value = uiState.formState.username,
+                    onValueChange = { viewModel.updateUsername(it) },
                     label = { Text("姓名") },
                     modifier = Modifier
                         .weight(1f)
@@ -217,7 +205,7 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                         .clip(RoundedCornerShape(16.dp))
                         .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .background(Color.White)
-                        .clickable { formState.value = formState.value.copy(expanded = true) }
+                        .clickable { viewModel.toggleGenderDropdown() }
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
                     Row(
@@ -226,7 +214,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if (formState.value.gender.isEmpty()) "性別" else formState.value.gender,
+                            text = if (uiState.formState.gender.isEmpty()) "性別"
+                            else uiState.formState.gender,
                             color = Color.Gray,
                             fontSize = 16.sp
                         )
@@ -239,17 +228,17 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                     }
 
                     DropdownMenu(
-                        expanded = formState.value.expanded,
-                        onDismissRequest = { formState.value = formState.value.copy(expanded = false) }
+                        expanded = uiState.formState.expanded,
+                        onDismissRequest = { viewModel.toggleGenderDropdown() }
                     ) {
                         DropdownMenuItem(onClick = {
-                            formState.value = formState.value.copy(gender = "男", expanded = false)
+                            viewModel.updateGender("男")
                         }) { Text("男") }
                         DropdownMenuItem(onClick = {
-                            formState.value = formState.value.copy(gender = "女", expanded = false)
+                            viewModel.updateGender("女")
                         }) { Text("女") }
                         DropdownMenuItem(onClick = {
-                            formState.value = formState.value.copy(gender = "不提供", expanded = false)
+                            viewModel.updateGender("不提供")
                         }) { Text("不提供") }
                     }
                 }
@@ -257,19 +246,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
 
             // 電話
             TextField(
-                value = formState.value.phone,
-                onValueChange = { newPhone ->
-                    formState.value = formState.value.copy(
-                        phone = newPhone,
-                        phoneErrorMessage = if (newPhone.startsWith("09") && newPhone.length == 10) {
-                            ""
-                        } else if (newPhone.isNotEmpty()) {
-                            "電話號碼必須以09開頭且為10碼"
-                        } else {
-                            ""
-                        }
-                    )
-                },
+                value = uiState.formState.phone,
+                onValueChange = { viewModel.updatePhone(it) },
                 label = { Text("電話") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -277,12 +255,12 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors,
-                isError = formState.value.phoneErrorMessage.isNotEmpty()
+                isError = uiState.formState.phoneErrorMessage.isNotEmpty()
             )
 
-            if (formState.value.phoneErrorMessage.isNotEmpty()) {
+            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
                 Text(
-                    text = formState.value.phoneErrorMessage,
+                    text = uiState.formState.phoneErrorMessage,
                     color = Color.Red,
                     modifier = Modifier.padding(top = 1.dp)
                 )
@@ -290,8 +268,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
 
             // 信箱
             TextField(
-                value = formState.value.email,
-                onValueChange = { formState.value = formState.value.copy(email = it) },
+                value = uiState.formState.email,
+                onValueChange = { viewModel.updateEmail(it) },
                 label = { Text("信箱") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -303,11 +281,11 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
 
             // 生日
             TextField(
-                value = formState.value.birthDate,
-                onValueChange = { formState.value = formState.value.copy(birthDate = it) },
+                value = uiState.formState.birthDate,
+                onValueChange = { viewModel.updateBirthDate(it) },
                 label = { Text("生日") },
                 trailingIcon = {
-                    IconButton(onClick = { formState.value = formState.value.copy(showDatePicker = true) }) {
+                    IconButton(onClick = { viewModel.toggleDatePicker() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.calender),
                             contentDescription = "生日",
@@ -324,15 +302,17 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                 colors = textFieldColors
             )
 
-            if (formState.value.showDatePicker) {
+            if (uiState.formState.showDatePicker) {
                 MyDatePickerDialog(
                     onConfirm = { selectedDateMillis ->
                         selectedDateMillis?.let {
-                            val selectedDate = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                            formState.value = formState.value.copy(birthDate = selectedDate.toString(), showDatePicker = false)
+                            val selectedDate = Instant.ofEpochMilli(it)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            viewModel.updateBirthDate(selectedDate.toString())
                         }
                     },
-                    onDismiss = { formState.value = formState.value.copy(showDatePicker = false) }
+                    onDismiss = { viewModel.toggleDatePicker() }
                 )
             }
 
@@ -343,15 +323,23 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
-                Text("註冊身份", fontSize = 16.sp, modifier = Modifier.padding(end = 16.dp), color = Color(0xFF555555))
-                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceAround) {
+                Text(
+                    "註冊身份",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(end = 16.dp),
+                    color = Color(0xFF555555)
+                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         RadioButton(
-                            selected = !formState.value.isNutritionist,
-                            onClick = { formState.value = formState.value.copy(isNutritionist = false) },
+                            selected = !uiState.formState.isNutritionist,
+                            onClick = { viewModel.updateIsNutritionist(false) },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = Color(0xFF555555),
                                 unselectedColor = Color(0xFF555555)
@@ -364,8 +352,8 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                         modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         RadioButton(
-                            selected = formState.value.isNutritionist,
-                            onClick = { formState.value = formState.value.copy(isNutritionist = true) },
+                            selected = uiState.formState.isNutritionist,
+                            onClick = { viewModel.updateIsNutritionist(true) },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = Color(0xFF555555),
                                 unselectedColor = Color(0xFF555555)
@@ -377,26 +365,21 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
             }
 
             // 營養師證書
-            if (formState.value.isNutritionist) {
+            if (uiState.formState.isNutritionist) {
                 var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
-
-                // 文件選擇器啟動器，接受任何檔案類型
                 val pickFileLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.GetContent(),
-                    onResult = { uri: Uri? ->
-                        selectedFileUri = uri
-                        formState.value = formState.value.copy(certificate = uri?.lastPathSegment ?: "未選擇檔案")
-                    }
-                )
+                    contract = ActivityResultContracts.GetContent()
+                ) { uri: Uri? ->
+                    selectedFileUri = uri
+                    viewModel.updateCertificate(uri)
+                }
 
                 TextField(
-                    value = formState.value.certificate,
-                    onValueChange = { formState.value = formState.value.copy(certificate = it) },
+                    value = uiState.formState.certificate,
+                    onValueChange = { viewModel.updateCertificate(null) },
                     label = { Text("營養師證書") },
                     trailingIcon = {
-                        IconButton(onClick = {
-                            pickFileLauncher.launch("*/*")
-                        }) {
+                        IconButton(onClick = { pickFileLauncher.launch("*/*") }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.upload),
                                 contentDescription = "上傳證書",
@@ -413,88 +396,45 @@ fun SignUpScreen(navController: NavHostController = rememberNavController()) {
                 )
             }
 
+            // 註冊按鈕
             Button(
                 onClick = {
-
-                    navController.navigate("Plan")
+                    viewModel.submitForm(
+                        onSuccess = {
+                            navController.navigate("LoginScreen")
+                        },
+                        onError = { errorMessage ->
+                            android.widget.Toast.makeText(
+                                context,
+                                errorMessage,
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
                 },
                 modifier = Modifier
                     .width(150.dp)
                     .padding(vertical = 16.dp)
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFD75813))
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFD75813)),
+                enabled = !isLoading
             ) {
-                Text(text = "註冊", fontSize = 16.sp, color = Color.White)
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MyDatePickerDialog(
-    onConfirm: (message: Long?) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val today = Instant.now().truncatedTo(ChronoUnit.DAYS).toEpochMilli()
-    val datePickerState = rememberDatePickerState()
-
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            // 如果所選日期小於或等於今天，啟用「確認」按鈕
-            androidx.compose.material3.Button(
-                onClick = {
-                    onConfirm(datePickerState.selectedDateMillis)
-                },
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = if (datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! <= today) {
-                        Color(0xFFD75813)
-                    } else {
-                        Color.Gray // 禁用按鈕
-                    }
-                ),
-                enabled = datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! <= today // 禁用超過今天的日期
-            ) {
-                androidx.compose.material3.Text(
-                    text = "確認",
-                    color = Color.White
-                )
-            }
-        },
-        dismissButton = {
-            androidx.compose.material3.Button(
-                onClick = onDismiss,
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFFEED)
-                )
-            ) {
-                androidx.compose.material3.Text(
-                    text = "取消",
-                    color = Color(0xFFD75813)
-                )
-            }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFEFE9F4))
-        ) {
-            DatePicker(
-                state = datePickerState,
-                modifier = Modifier.background(Color(0xFFEFE9F4)),
-                colors = DatePickerDefaults.colors(
-                    selectedDayContentColor = Color.White,
-                    selectedDayContainerColor = Color(0xFFF19204),
-                    todayContentColor = Color(0xFFFFA500),
-                    todayDateBorderColor = Color(0xFFFFA500),
-
+                if (isLoading) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
                     )
-            )
+                } else {
+                    Text(text = "註冊", fontSize = 16.sp, color = Color.White)
+                }
+            }
         }
     }
 }
+
+
+
+
 
 @Preview(showBackground = true)
 @Composable
