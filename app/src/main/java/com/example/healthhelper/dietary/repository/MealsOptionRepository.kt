@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 object MealsOptionRepository {
     private val _dataFlow: MutableStateFlow<MutableList<MealsOptionVO>>
         @Composable
-        get() = MutableStateFlow<MutableList<MealsOptionVO>>(fetchMealsOption().toMutableList())
+        get() = MutableStateFlow(fetchMealsOption().toMutableList())
     val dataFlow: StateFlow<MutableList<MealsOptionVO>>
         @Composable
         get() = _dataFlow.asStateFlow()

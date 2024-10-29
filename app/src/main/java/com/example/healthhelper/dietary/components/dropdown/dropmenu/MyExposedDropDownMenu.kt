@@ -8,6 +8,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -21,9 +22,10 @@ import androidx.compose.ui.Modifier
 fun MyExposedDropDownMenu(
     mutableStateValue : MutableState<String>,
     options: List<String>,
+    modifier: Modifier = Modifier,
     label: @Composable () -> Unit,
     onValueChangedEvent: (String) -> Unit,
-    modifier: Modifier = Modifier
+    outlinedTextFieldColor: TextFieldColors = OutlinedTextFieldDefaults.colors(),
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -40,7 +42,7 @@ fun MyExposedDropDownMenu(
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
-            colors = OutlinedTextFieldDefaults.colors(),
+            colors = outlinedTextFieldColor,
             modifier = Modifier
                 .menuAnchor()
                 .fillMaxWidth()

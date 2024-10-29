@@ -13,10 +13,9 @@ import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 @Composable
 fun SearchIcon(
     navController: NavHostController,
-    argument0: String,
 ) {
     IconButton(onClick = {
-        navController.navigate("${DietDiaryScreenEnum.DietDiaryMealFrame.name}/${argument0}")
+        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }) {
         Icon(
             imageVector = Icons.Filled.Search,

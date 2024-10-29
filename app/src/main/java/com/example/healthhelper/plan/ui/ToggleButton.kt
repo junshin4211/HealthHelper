@@ -1,7 +1,7 @@
 package com.example.healthhelper.plan.ui
 
-import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthhelper.R
-import com.example.healthhelper.plan.PlanPage
 
 @Composable
-fun createToggleButton(
-    context: Context,
+fun CreateToggleButton(
+    onLeftClick: () -> Unit,
+    onRightClick: () -> Unit,
     backgroundColor: Int = R.color.light_gray,
     leftButtonColor: Int = R.color.primarycolor,
     rightButtonColor: Int = R.color.light_gray,
@@ -52,7 +52,10 @@ fun createToggleButton(
             Modifier
                 .size(140.dp)
                 .clip(RoundedCornerShape(30))
-                .background(colorResource(id = leftButtonColor)),
+                .background(colorResource(id = leftButtonColor))
+                .clickable {
+                    onLeftClick()
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.CenterVertically)
         ) {
@@ -73,7 +76,10 @@ fun createToggleButton(
             Modifier
                 .size(140.dp)
                 .clip(RoundedCornerShape(30))
-                .background(colorResource(id = rightButtonColor)),
+                .background(colorResource(id = rightButtonColor))
+                .clickable {
+                    onRightClick()
+                },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.CenterVertically)
         ) {

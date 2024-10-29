@@ -5,8 +5,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+
+
 @Composable
-fun Main() {
+fun LoginMain() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "LoginScreen") {
@@ -16,11 +18,16 @@ fun Main() {
         composable("SignUpScreen") {
             SignUpScreen(navController)
         }
+
+//        composable("Plan") {
+//           Plan()
+//        }
+
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MainPreview() {
-    Main()
+fun PreviewLoginMain() {
+    LoginMain()
 }
