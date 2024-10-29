@@ -3,25 +3,38 @@ package com.example.healthhelper.dietary.repository
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
+import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object MealsOptionRepository {
-    private val _dataFlow : MutableStateFlow<MutableList<String>>
+    private val _dataFlow: MutableStateFlow<MutableList<MealsOptionVO>>
         @Composable
-        get() = MutableStateFlow<MutableList<String>>(fetchMealsOption().toMutableList())
-    val dataFlow: StateFlow<MutableList<String>>
+        get() = MutableStateFlow(fetchMealsOption().toMutableList())
+    val dataFlow: StateFlow<MutableList<MealsOptionVO>>
         @Composable
         get() = _dataFlow.asStateFlow()
 
     @Composable
-    fun fetchMealsOption():List<String>{
+    fun fetchMealsOption(): List<MealsOptionVO> {
         return listOf(
-            stringResource(R.string.breakfast),
-            stringResource(R.string.lunch),
-            stringResource(R.string.dinner),
-            stringResource(R.string.supper),
+            MealsOptionVO(
+                R.drawable.breakfast_leading_icon,
+                stringResource(R.string.breakfast),
+            ),
+            MealsOptionVO(
+                R.drawable.lunch_leading_icon,
+                stringResource(R.string.lunch),
+            ),
+            MealsOptionVO(
+                R.drawable.dinner_leading_icon,
+                stringResource(R.string.dinner),
+            ),
+            MealsOptionVO(
+                R.drawable.supper_leading_icon,
+                stringResource(R.string.supper),
+            ),
         )
     }
 }

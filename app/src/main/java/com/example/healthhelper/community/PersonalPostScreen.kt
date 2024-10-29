@@ -1,7 +1,6 @@
 package com.example.healthhelper.community
 
-<<<<<<< Updated upstream
-=======
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -108,4 +107,3 @@ fun PersonalPostScreenPreview() {
         PersonalPostScreen(rememberNavController())
     }
 }
->>>>>>> Stashed changes

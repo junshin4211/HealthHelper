@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 import com.example.healthhelper.dietary.gson.toJson
 import com.example.healthhelper.dietary.util.file.savingfile.SavingFile
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -30,12 +31,8 @@ fun DownloadButton(
     val diaries by diaryViewModel.data.collectAsState()
 
     IconButton(
-        colors = IconButtonColors(
-            containerColor = Color.Blue,
-            contentColor = Color.Blue,
-            disabledContainerColor = Color.Gray,
-            disabledContentColor = Color.Gray,
-        ), onClick = {
+        colors = DefaultColorViewModel.iconButtonColors,
+        onClick = {
             savingFileFlag = true
         }) {
         Image(

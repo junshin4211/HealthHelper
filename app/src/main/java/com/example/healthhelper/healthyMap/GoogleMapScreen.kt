@@ -326,9 +326,9 @@ fun FloatBackButton(modifier: Modifier = Modifier, navController: NavHostControl
     ) {
         Icon(
             modifier = Modifier
-                .size(50.dp)
+                .size(40.dp)
                 .align(Alignment.Center),
-            painter = painterResource(R.drawable.baseline_arrow_back_ios_24),
+            painter = painterResource(R.drawable.arrow_back_ios_new),
             tint = colorResource(R.color.white),
             contentDescription = stringResource(R.string.back_button),
         )

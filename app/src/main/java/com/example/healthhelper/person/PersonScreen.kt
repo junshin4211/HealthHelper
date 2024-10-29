@@ -27,14 +27,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.model.UserData
 
 @Composable
 fun PersonScreen(
@@ -57,9 +61,18 @@ fun PersonScreen(
                 Box(
                     modifier = Modifier.size(250.dp)
                 ) {
-                    Image(
+
+                    UserData.photoUri?.let { bitmap ->
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = stringResource(R.string.choosePicture),
+                            modifier = Modifier
+                                .size(250.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    } ?: Image(
                         painter = painterResource(id = R.drawable.person),
-                        contentDescription = "image",
+                        contentDescription = stringResource(R.string.defaultPhoto),
                         modifier = Modifier
                             .size(250.dp),
                         contentScale = ContentScale.Fit
@@ -73,10 +86,10 @@ fun PersonScreen(
                             .size(40.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.edit),
+                            painter = painterResource(R.drawable.editperson),
                             contentDescription = stringResource(R.string.editPhoto)
                         )
-                        PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false })
+                        PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false }, navController)
                     }
                 }
 
@@ -108,7 +121,9 @@ fun PersonScreen(
                         .height(60.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-                    onClick = {}
+                    onClick = {
+                        navController.navigate(PersonScreenEnum.achivementScreen.name)
+                    }
                 ) {
                     Text(stringResource(R.string.achievement), fontSize = 28.sp)
                 }
@@ -129,7 +144,7 @@ fun PersonScreen(
 }
 
 @Composable
-fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
+fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: NavHostController) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { onDismiss() },
@@ -144,6 +159,7 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
             },
             text = { Text(stringResource(R.string.takePicture)) },
             onClick = {
+                navController.navigate(PersonScreenEnum.cameraPreviewScreen.name)
                 onDismiss()
             }
         )
@@ -156,9 +172,14 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit) {
             },
             text = { Text(stringResource(R.string.choosePicture)) },
             onClick = {
-                onDismiss()
+                navController.navigate(PersonScreenEnum.pickPhotoScreen.name)
             }
         )
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PersonPreview() {
+    PersonScreen(rememberNavController())
+}

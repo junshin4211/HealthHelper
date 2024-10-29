@@ -109,6 +109,7 @@ fun MainMapSearchScreen(
                 )
             }
         },
+        containerColor = colorResource(R.color.backgroundcolor)
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -170,7 +171,7 @@ fun MapSearchAppBar(
             }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = colorResource(R.color.backgroundcolor)
         ),
         modifier = modifier,
         navigationIcon = {

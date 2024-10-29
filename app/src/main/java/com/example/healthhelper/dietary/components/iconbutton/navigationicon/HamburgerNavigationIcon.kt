@@ -11,8 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
-import com.example.healthhelper.dietary.components.navigationrail.ActionNavigationRail
-import com.example.healthhelper.dietary.components.sidesheetdialog.SideSheetDialogTestUi
 
 @Composable
 fun HamburgerNavigationIcon(){
@@ -24,9 +22,5 @@ fun HamburgerNavigationIcon(){
             imageVector = Icons.Filled.Menu,
             contentDescription = stringResource(R.string.hamburger_icon),
         )
-    }
-
-    if(shouldShowSideSheetDialog) {
-        SideSheetDialogTestUi()
     }
 }
