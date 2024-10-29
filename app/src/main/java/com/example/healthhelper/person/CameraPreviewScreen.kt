@@ -12,9 +12,12 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -47,6 +51,7 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
+
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             factory = { ctx ->
@@ -58,19 +63,27 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
             },
             modifier = Modifier.fillMaxSize()
         )
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val circleDiameter = 350.dp.toPx()
-            val circleRadius = circleDiameter / 2
-            val centerX = size.width / 2
-            val centerY = size.height / 2
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = stringResource(R.string.photoClipRange), fontSize = 30.sp, color = colorResource(R.color.primarycolor))
+            Canvas(modifier = Modifier.padding(8.dp)) {
+                val circleDiameter = 350.dp.toPx()
+                val circleRadius = circleDiameter / 2
+                val centerX = size.width / 2
+                val centerY = size.height / 2
 
-            drawCircle(
-                color = Color.Black.copy(alpha = 0.5f),
-                radius = circleRadius,
-                center = Offset(centerX, centerY),
-                style = Stroke(width = 5.dp.toPx())
-            )
+                drawCircle(
+                    color = Color(context.getColor(R.color.primarycolor)),
+                    radius = circleRadius,
+                    center = Offset(centerX, centerY),
+                    style = Stroke(width = 5.dp.toPx())
+                )
+            }
         }
+
         Row(modifier = Modifier.align(Alignment.BottomCenter)) {
             Button(modifier = Modifier
                 .weight(1f)
