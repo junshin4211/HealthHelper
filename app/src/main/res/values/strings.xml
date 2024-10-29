@@ -144,4 +144,19 @@
     <string name="supper">supper</string>
     <string name="calendar">日曆</string>
     <string name="food_item_info_frame">Food Item Info Frame</string>
+    <string name="drag_and_zoom">移動與縮放</string>
+    <string name="defaultPhoto">預設照片</string>
+    <string name="totalAcievement">全部</string>
+    <string name="foodAcievementList">食物記錄</string>
+    <string name="weightAcievementList">體重記錄</string>
+    <string name="planAcievementList">計畫完成</string>
+    <string name="myAchievement">我的成就</string>
+    <string name="foodAcievement">食物記錄勳章</string>
+    <string name="foodAcievementContent">在日記中記錄食物來獲得這些勳章</string>
+    <string name="weightAcievement">體重記錄勳章</string>
+    <string name="weightAcievementContent">紀錄您的體重來獲得這些勳章</string>
+    <string name="planAcievement">計畫完成勳章</string>
+    <string name="planAcievementContent">完成飲食計畫來獲得這些勳章</string>
+    <string name="finishDate">完成日期:</string>
+    <string name="close">關閉</string>
 </resources>

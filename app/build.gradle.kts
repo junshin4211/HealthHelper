@@ -50,6 +50,18 @@ android {
 }
 
 dependencies {
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.compose.material3:material3:1.0.0-alpha10")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
+    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("mysql:mysql-connector-java:8.0.33")
+    implementation("androidx.compose.ui:ui:1.5.1")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.material:material:1.5.1")
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,8 +82,20 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
     implementation(libs.charty)
+
+    implementation(libs.coil.compose)
+
+//    camera
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.extensions)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+//    implementation(libs.compose.theme.adapter)
+
     implementation(libs.material)
-    //implementation(libs.compose.theme.adapter)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,18 +104,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Google Maps SDK -- these are here for the data model.  Remove these dependencies and replace
-    // with the compose versions.
+//Google Map
     implementation("com.google.android.gms:play-services-maps:19.0.0")
-    // KTX for the Maps SDK for Android library
     implementation("com.google.maps.android:maps-ktx:5.1.1")
-    // KTX for the Maps SDK for Android Utility Library
     implementation("com.google.maps.android:maps-utils-ktx:5.1.1")
-    // Google Maps Compose library
     val mapsComposeVersion = "6.1.2"
     implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
-    // Google Maps Compose utility library
     implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
-    // Google Maps Compose widgets library
     implementation("com.google.maps.android:maps-compose-widgets:$mapsComposeVersion")
 }
