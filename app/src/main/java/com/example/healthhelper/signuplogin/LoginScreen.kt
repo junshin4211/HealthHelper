@@ -83,14 +83,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp)),
-                /*
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFFD75813),
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    backgroundColor = Color.White
-                )
-                 */
+
                 colors = DefaultColorViewModel.outlinedTextFieldDefaultColors,
             )
 

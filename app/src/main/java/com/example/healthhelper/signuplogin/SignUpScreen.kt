@@ -1,38 +1,19 @@
 package com.example.healthhelper.signuplogin
 
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,8 +30,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
+import java.time.Instant
+import java.time.ZoneId
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUpScreen(
@@ -62,50 +45,13 @@ fun SignUpScreen(
     val context = LocalContext.current
 
     val textFieldColors = TextFieldDefaults.colors(
-        focusedTextColor = Color.Black,
-        unfocusedTextColor = Color.Gray,
-        disabledTextColor = Color.Gray,
-        errorTextColor = Color.Red,
-        focusedContainerColor = Color.White,
-        unfocusedContainerColor = Color.White,
-        disabledContainerColor = Color.LightGray,
         errorContainerColor = Color(0xFFFFCDD2),  // 淺紅色代表錯誤
         cursorColor = Color(0xFFD75813),
-        errorCursorColor = Color.Red,
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
-        disabledIndicatorColor = Color.Gray,
-        errorIndicatorColor = Color.Red,
-        focusedLeadingIconColor = Color.Black,
-        unfocusedLeadingIconColor = Color.Gray,
-        disabledLeadingIconColor = Color.LightGray,
-        errorLeadingIconColor = Color.Red,
-        focusedTrailingIconColor = Color.Black,
-        unfocusedTrailingIconColor = Color.Gray,
-        disabledTrailingIconColor = Color.LightGray,
-        errorTrailingIconColor = Color.Red,
-        focusedLabelColor = Color.Gray,
-        unfocusedLabelColor = Color.Gray,
-        disabledLabelColor = Color.LightGray,
-        errorLabelColor = Color.Red,
-        focusedPlaceholderColor = Color.Gray,
-        unfocusedPlaceholderColor = Color.Gray,
-        disabledPlaceholderColor = Color.LightGray,
-        errorPlaceholderColor = Color.Red,
-        focusedSupportingTextColor = Color.Gray,
-        unfocusedSupportingTextColor = Color.Gray,
-        disabledSupportingTextColor = Color.LightGray,
-        errorSupportingTextColor = Color.Red,
-        focusedPrefixColor = Color.Black,
-        unfocusedPrefixColor = Color.Gray,
-        disabledPrefixColor = Color.LightGray,
-        errorPrefixColor = Color.Red,
-        focusedSuffixColor = Color.Black,
-        unfocusedSuffixColor = Color.Gray,
-        disabledSuffixColor = Color.LightGray,
-        errorSuffixColor = Color.Red
+        unfocusedContainerColor = Color.White,
+        focusedContainerColor = Color.White
     )
-
 
     Box(
         modifier = Modifier
@@ -122,7 +68,7 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = stringResource(R.string.member_signup_title),
+                text = "會員註冊",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFD75813),
@@ -199,54 +145,230 @@ fun SignUpScreen(
                 isError = uiState.formState.passwordErrorMessage.isNotEmpty()
             )
 
-            // 性別下拉選單
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
-                    .background(Color.White)
-                    .clickable { viewModel.toggleGenderDropdown() }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            // 密碼錯誤訊息
+            if (uiState.formState.passwordErrorMessage.isNotEmpty()) {
+                Text(
+                    text = uiState.formState.passwordErrorMessage,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 1.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (uiState.formState.gender.isEmpty()) "性別"
-                        else uiState.formState.gender,
-                        color = Color.Gray,
-                        fontSize = 16.sp
-                    )
+                // 姓名
+                TextField(
+                    value = uiState.formState.username,
+                    onValueChange = { viewModel.updateUsername(it) },
+                    label = { Text("姓名") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White),
+                    colors = textFieldColors
+                )
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.dropdown),
-                        contentDescription = "下拉選單",
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.width(16.dp))
 
-                DropdownMenu(
-                    expanded = uiState.formState.expanded,
-                    onDismissRequest = { viewModel.toggleGenderDropdown() }
+                // 性別下拉選單
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .clickable { viewModel.toggleGenderDropdown() }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
-                    DropdownMenuItem(text = { Text("男") },
-                        onClick = {
-                            viewModel.updateGender("男")
-                        })
-                    DropdownMenuItem(text = { Text("女") },
-                        onClick = {
-                            viewModel.updateGender("女")
-                        })
-                    DropdownMenuItem(text = { Text("不提供") },
-                        onClick = {
-                            viewModel.updateGender("不提供")
-                        })
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (uiState.formState.gender.isEmpty()) "性別"
+                            else uiState.formState.gender,
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                        )
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.dropdown),
+                            contentDescription = "下拉選單",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = uiState.formState.expanded,
+                        onDismissRequest = { viewModel.toggleGenderDropdown() }
+                    ) {
+                        DropdownMenuItem(text = { Text("男") }, onClick = { viewModel.updateGender("男") })
+                        DropdownMenuItem(text = { Text("女") }, onClick = { viewModel.updateGender("女") })
+                        DropdownMenuItem(text = { Text("不提供") }, onClick = { viewModel.updateGender("不提供") })
+                    }
                 }
             }
+
+            TextField(
+                value = uiState.formState.phone,
+                onValueChange = { viewModel.updatePhone(it) },
+                label = { Text("電話") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors,
+                isError = uiState.formState.phoneErrorMessage.isNotEmpty()
+            )
+
+            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
+                Text(
+                    text = uiState.formState.phoneErrorMessage,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 1.dp)
+                )
+            }
+
+            TextField(
+                value = uiState.formState.email,
+                onValueChange = { viewModel.updateEmail(it) },
+                label = { Text("信箱") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
+            )
+            // 生日選擇
+            // In SignUpScreen.kt
+
+// Inside the Composable function of SignUpScreen
+            TextField(
+                value = uiState.formState.birthDate,
+                onValueChange = { /* Do nothing since this field is readonly */ },
+                label = { Text("生日") },
+                trailingIcon = {
+                    IconButton(onClick = { viewModel.toggleDatePicker() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.calender),
+                            contentDescription = "生日",
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                },
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
+            )
+
+// Show the DatePickerDialog when needed
+            if (uiState.formState.showDatePicker) {
+                MyDatePickerDialog(
+                    onConfirm = { selectedDateMillis ->
+                        selectedDateMillis?.let {
+                            val selectedDate = Instant.ofEpochMilli(it)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            viewModel.updateBirthDate(selectedDate.toString())
+                        }
+                    },
+                    onDismiss = { viewModel.toggleDatePicker() }
+                )
+            }
+
+
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "註冊身份",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(end = 16.dp),
+                    color = Color(0xFF555555)
+                )
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+                        RadioButton(
+                            selected = !uiState.formState.isNutritionist,
+                            onClick = { viewModel.updateIsNutritionist(false) },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color(0xFF555555),
+                                unselectedColor = Color(0xFF555555)
+                            )
+                        )
+                        Text("一般用戶", fontSize = 16.sp, color = Color(0xFF555555))
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ) {
+                        RadioButton(
+                            selected = uiState.formState.isNutritionist,
+                            onClick = { viewModel.updateIsNutritionist(true) },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color(0xFF555555),
+                                unselectedColor = Color(0xFF555555)
+                            )
+                        )
+                        Text("營養師", fontSize = 16.sp, color = Color(0xFF555555))
+                    }
+                }
+            }
+
+            // 營養師證書
+            if (uiState.formState.isNutritionist) {
+                var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
+                val pickFileLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent()
+                ) { uri: Uri? ->
+                    selectedFileUri = uri
+                    viewModel.updateCertificate(uri)
+                }
+
+                TextField(
+                    value = uiState.formState.certificate,
+                    onValueChange = { viewModel.updateCertificate(null) },
+                    label = { Text("營養師證書") },
+                    trailingIcon = {
+                        IconButton(onClick = { pickFileLauncher.launch("*/*") }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.upload),
+                                contentDescription = "上傳證書",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White),
+                    colors = textFieldColors
+                )
+            }
+
 
             // 註冊按鈕
             Button(
@@ -268,7 +390,7 @@ fun SignUpScreen(
                     .width(150.dp)
                     .padding(vertical = 16.dp)
                     .height(48.dp),
-                colors = ButtonDefaults.buttonColors(Color(0xFFD75813)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD75813)),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
