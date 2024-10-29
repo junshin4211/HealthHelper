@@ -1,20 +1,20 @@
 package com.example.healthhelper.dietary.repository
 
-import com.example.healthhelper.dietary.dataclasses.dao.DiaryDao
+import com.example.healthhelper.dietary.dataclasses.vo.DiaryVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object DiaryRepository {
-    private val _dataFlow = MutableStateFlow<MutableList<DiaryDao>>(mutableListOf<DiaryDao>())
-    val dataFlow: StateFlow<MutableList<DiaryDao>> = _dataFlow.asStateFlow()
+    private val _dataFlow = MutableStateFlow<MutableList<DiaryVO>>(mutableListOf<DiaryVO>())
+    val dataFlow: StateFlow<MutableList<DiaryVO>> = _dataFlow.asStateFlow()
 
-    fun setData(newData: DiaryDao) {
+    fun setData(newData: DiaryVO) {
         _dataFlow.value.clear()
         _dataFlow.value.add(newData)
     }
 
-    fun addData(newData: DiaryDao){
+    fun addData(newData: DiaryVO){
         _dataFlow.value.add(newData)
     }
 

@@ -34,7 +34,7 @@ import com.example.healthhelper.dietary.components.dialog.alertdialog.MyAlertDia
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.DateTextField
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.FoodTextField
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.NameTextField
-import com.example.healthhelper.dietary.dataclasses.dao.DiaryDao
+import com.example.healthhelper.dietary.dataclasses.vo.DiaryVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.DiaryRepository
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TimeTextField
@@ -85,7 +85,7 @@ fun AddNewDietDiaryItemFrame(
                         dateText.value.isNotBlank() &&
                         timeText.value.isNotBlank()
                     ) {
-                        val diary = DiaryDao(
+                        val diary = DiaryVO(
                             name = name.value,
                             foodName = foodText.value,
                             date = dateText.value,

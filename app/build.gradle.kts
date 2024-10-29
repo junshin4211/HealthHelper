@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
     implementation(libs.charty)
+
     implementation(libs.coil.compose)
 
 //    camera
@@ -80,6 +81,9 @@ dependencies {
     implementation(libs.androidx.camera.view)
 
 //    implementation(libs.compose.theme.adapter)
+
+    implementation(libs.material)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
