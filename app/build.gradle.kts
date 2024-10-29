@@ -70,6 +70,15 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
     implementation(libs.charty)
+    implementation(libs.coil.compose)
+
+//    camera
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.extensions)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
 //    implementation(libs.compose.theme.adapter)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -79,18 +88,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Google Maps SDK -- these are here for the data model.  Remove these dependencies and replace
-    // with the compose versions.
+//Google Map
     implementation("com.google.android.gms:play-services-maps:19.0.0")
-    // KTX for the Maps SDK for Android library
     implementation("com.google.maps.android:maps-ktx:5.1.1")
-    // KTX for the Maps SDK for Android Utility Library
     implementation("com.google.maps.android:maps-utils-ktx:5.1.1")
-    // Google Maps Compose library
     val mapsComposeVersion = "6.1.2"
     implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
-    // Google Maps Compose utility library
     implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
-    // Google Maps Compose widgets library
     implementation("com.google.maps.android:maps-compose-widgets:$mapsComposeVersion")
 }

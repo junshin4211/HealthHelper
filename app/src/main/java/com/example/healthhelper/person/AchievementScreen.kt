@@ -1,19 +1,23 @@
 package com.example.healthhelper.person
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
@@ -34,25 +38,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.healthhelper.person.model.AchievementData
+import com.example.healthhelper.person.model.Achievement
+import com.example.healthhelper.person.personVM.AchievementViewModel
 import com.example.healthhelper.person.widget.CustomAchievTabRow
 import com.example.healthhelper.person.widget.CustomTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AchievementScreen(navController: NavHostController) {
+fun AchievementScreen(
+    achievementVM: AchievementViewModel = viewModel(),
+    navController: NavHostController,
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabLabels = listOf(
@@ -61,8 +72,7 @@ fun AchievementScreen(navController: NavHostController) {
         stringResource(R.string.weightAcievementList),
         stringResource(R.string.planAcievementList),
     )
-    var isShowDetailDialog by remember { mutableStateOf(false) }
-    var selectedAchievement by remember { mutableStateOf<AchievementData?>(null) }
+    var selectedAchievement by remember { mutableStateOf<Achievement?>(null) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -71,16 +81,17 @@ fun AchievementScreen(navController: NavHostController) {
                 title = stringResource(R.string.myAchievement),
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
-                scrollBehavior = scrollBehavior,
-                actions = {}
+                scrollBehavior = scrollBehavior
             )
         },
         containerColor = colorResource(R.color.backgroundcolor)
-    ) { innerpadding ->
+    ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerpadding),
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CustomAchievTabRow(
@@ -88,62 +99,83 @@ fun AchievementScreen(navController: NavHostController) {
                 onTabSelected = { selectedTab = it },
                 tabLabels = tabLabels
             )
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                when (selectedTab) {
-                    0 -> TotalAchievementList()
-                    1 -> FoodAchievementList(
-                        foodAchievements = generateSampleAchievements(),
-                        onItemClick = { achievement ->
-                            selectedAchievement = achievement
-                        }
-                    )
-
-                    2 -> WeightAchievementList()
-                    3 -> PlanAchievementList()
-                }
-                selectedAchievement?.let { achievement ->
-                    AchievementDetailDialog(
-                        achievementData = achievement,
-                        onDismiss = { selectedAchievement = null }
-                    )
-                }
-
-//                Text(
-//                    stringResource(R.string.weightAcievement),
-//                    fontSize = 18.sp,
-//                    fontWeight = FontWeight.Bold
-//                )
-//                Text(
-//                    stringResource(R.string.weightAcievementContent),
-//                    fontSize = 12.sp,
-//                    color = Color.DarkGray
-//                )
-//                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-//                Text(
-//                    stringResource(R.string.planAcievement),
-//                    fontSize = 18.sp,
-//                    fontWeight = FontWeight.Bold
-//                )
-//                Text(
-//                    stringResource(R.string.planAcievementContent),
-//                    fontSize = 12.sp,
-//                    color = Color.DarkGray
-//                )
-//                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            AchievementContent(
+                selectedTab = selectedTab,
+                achievementVM = achievementVM,
+                onItemClick = { selectedAchievement = it }
+            )
+            selectedAchievement?.let {
+                AchievementDetailDialog(achievementData = it) { selectedAchievement = null }
             }
-
         }
     }
-
 }
 
 @Composable
+fun AchievementContent(
+    selectedTab: Int,
+    achievementVM: AchievementViewModel,
+    onItemClick: (Achievement) -> Unit,
+) {
+    val foodAchievements = achievementVM.getAchievementsByType(listOf(1))
+    val weightAchievements = achievementVM.getAchievementsByType(listOf(2))
+    val planAchievements = achievementVM.getAchievementsByType(listOf(3, 4, 5, 6))
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        when (selectedTab) {
+            0 -> {
+                AchievementList(
+                    title = stringResource(R.string.foodAcievement),
+                    description = stringResource(R.string.foodAcievementContent),
+                    achievements = foodAchievements,
+                    onItemClick = onItemClick
+                )
+                AchievementList(
+                    title = stringResource(R.string.weightAcievement),
+                    description = stringResource(R.string.weightAcievementContent),
+                    achievements = weightAchievements,
+                    onItemClick = onItemClick
+                )
+                AchievementList(
+                    title = stringResource(R.string.planAcievement),
+                    description = stringResource(R.string.planAcievementContent),
+                    achievements = planAchievements,
+                    onItemClick = onItemClick
+                )
+            }
+
+            1 -> AchievementList(
+                title = stringResource(R.string.foodAcievement),
+                description = stringResource(R.string.foodAcievementContent),
+                achievements = foodAchievements,
+                onItemClick = onItemClick
+            )
+
+            2 -> AchievementList(
+                title = stringResource(R.string.weightAcievement),
+                description = stringResource(R.string.weightAcievementContent),
+                achievements = weightAchievements,
+                onItemClick = onItemClick
+            )
+
+            3 -> AchievementList(
+                title = stringResource(R.string.planAcievement),
+                description = stringResource(R.string.planAcievementContent),
+                achievements = planAchievements,
+                onItemClick = onItemClick
+            )
+        }
+    }
+}
+
+
+@Composable
 fun AchievementDetailDialog(
-    achievementData: AchievementData,
+    achievementData: Achievement,
     onDismiss: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
@@ -155,7 +187,7 @@ fun AchievementDetailDialog(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(colorResource(R.color.backgroundcolor))
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement =Arrangement.End){
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 IconButton(onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -165,15 +197,27 @@ fun AchievementDetailDialog(
             }
             Column(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Image(
-                    painter = painterResource(id = achievementData.aIcon),
+                achievementData.photo?.let { base64String ->
+
+                    val imageBytes = Base64.decode(base64String, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(90.dp)
+                            .padding(bottom = 8.dp)
+                    )
+                } ?: Image(
+                    painter = painterResource(id = R.drawable.baseline_photo_24),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(70.dp)
                         .padding(bottom = 8.dp)
                 )
                 Text(
@@ -182,105 +226,95 @@ fun AchievementDetailDialog(
                     fontSize = 20.sp,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
-                Text(text = achievementData.acontent, fontSize = 16.sp)
                 Text(
-                    text = stringResource(R.string.finishDate) + " ${achievementData.finishDate}",
+                    text = achievementData.content,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Text(
+                    text = stringResource(R.string.finishDate) + " ${achievementData.finishtime}",
                     fontSize = 14.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-
             }
         }
     }
 }
 
-
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TotalAchievementList() {
-
-}
-
-@Composable
-fun FoodAchievementList(
-    foodAchievements: List<AchievementData>,
-    onItemClick: (AchievementData) -> Unit,
+fun AchievementList(
+    title: String,
+    description: String,
+    achievements: List<Achievement>,
+    onItemClick: (Achievement) -> Unit,
 ) {
-    Text(
-        stringResource(R.string.foodAcievement),
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold
-    )
-    Text(
-        stringResource(R.string.foodAcievementContent),
-        fontSize = 12.sp,
-        color = Color.DarkGray
-    )
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 100.dp),
-    ) {
-        items(foodAchievements) { foodAchievement ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable { onItemClick(foodAchievement) }
-            ) {
-                Image(
-//                    bitmap = foodAchievement.aIcon.asImageBitmap(),
-                    painter = painterResource(foodAchievement.aIcon),
-                    contentDescription = "",
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Text(text = foodAchievement.aname)
-            }
-        }
-    }
-    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-}
-
-@Composable
-fun WeightAchievementList() {
-}
-
-@Composable
-fun PlanAchievementList() {
-}
-
-
-fun generateSampleAchievements(): List<AchievementData> {
-    return listOf(
-        AchievementData(
-            id = "1",
-            atype = "food",
-            aIcon = R.drawable.baseline_photo_24,
-            aname = "健康飲食達人",
-            acontent = "成功記錄了30天的健康飲食。",
-            finishDate = "2023-10-01"
-        ),
-        AchievementData(
-            id = "2",
-            atype = "food",
-            aIcon = R.drawable.baseline_photo_24,
-            aname = "素食挑戰者",
-            acontent = "成功完成了7天的素食挑戰。",
-            finishDate = "2023-09-15"
-        ),
-        AchievementData(
-            id = "3",
-            atype = "food",
-            aIcon = R.drawable.baseline_photo_24,
-            aname = "新手廚師",
-            acontent = "學會了10道健康食譜。",
-            finishDate = "2023-08-20"
+    Column {
+        Text(
+            title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
         )
-    )
+        Text(
+            description,
+            fontSize = 12.sp,
+            color = Color.DarkGray
+        )
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            maxItemsInEachRow = 3
+        ) {
+            val count = 3 - achievements.size % 3
+            achievements.forEach { achievement ->
+                AchievementItem(
+                    achievement = achievement,
+                    onClick = { onItemClick(achievement) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            repeat(count) { Spacer(modifier = Modifier.weight(1f)) }
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+    }
+
+
 }
+
+@Composable
+fun AchievementItem(
+    achievement: Achievement,
+    onClick: (Achievement) -> Unit,
+    modifier: Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .clickable { onClick(achievement) }
+    ) {
+        achievement.photo?.let { base64String ->
+            val imageBytes = Base64.decode(base64String, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        } ?: Image(
+            painter = painterResource(id = R.drawable.baseline_photo_24),
+            contentDescription = null,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+        Text(text = achievement.aname)
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun AchievementScreenPreview() {
-    AchievementScreen(rememberNavController())
+    AchievementScreen(navController = rememberNavController())
 }

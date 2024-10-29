@@ -8,5 +8,5 @@ enum class PersonScreenEnum {
     weightReviseScreen,
     pickPhotoScreen,
     cameraPreviewScreen,
-
+    photoPreviewScreen
 }
