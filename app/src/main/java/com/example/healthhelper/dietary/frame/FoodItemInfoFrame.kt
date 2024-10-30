@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,7 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -78,55 +82,64 @@ fun FoodItemInfoFrame(
                     .fillMaxSize()
                     .padding(innerPadding),
             ) {
-                Spacer(
-                    modifier = Modifier
-                        .height(10.dp)
-                        .fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp, 0.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
+                Column(
+
                 ) {
-                    OutlinedTextField(
-                        value = selectedFoodItem.grams.toInt().toString(),
-                        modifier = Modifier.width(200.dp),
-                        onValueChange = {},
-                        colors = DefaultColorViewModel.outlinedTextFieldDefaultColors,
-                    )
-                    Text(
-                        text = "grams",
+                    Spacer(
                         modifier = Modifier
-                            .padding(16.dp, 0.dp),
+                            .height(10.dp)
+                            .fillMaxWidth()
                     )
-                }
-                Spacer(
-                    modifier = Modifier
-                        .height(10.dp)
-                        .fillMaxWidth()
-                )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp, 0.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    MyExposedDropDownMenu(
-                        mutableStateValue = mutableStateString,
-                        label = {},
-                        modifier = Modifier.width(200.dp),
-                        onValueChangedEvent = { mutableStateString.value = it },
-                        options = options,
-                        outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
-                    )
-                    Text(
-                        text = "grams",
+                    Row(
                         modifier = Modifier
-                            .padding(16.dp, 0.dp),
+                            .fillMaxWidth()
+                            .padding(20.dp, 0.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        OutlinedTextField(
+                            value = selectedFoodItem.grams.toInt().toString(),
+                            onValueChange = {},
+                            textStyle = LocalTextStyle.current.copy(
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            modifier = Modifier.width(200.dp),
+                            colors = DefaultColorViewModel.outlinedTextFieldDefaultColors,
+                        )
+                        Text(
+                            text = "grams",
+                            modifier = Modifier
+                                .padding(16.dp, 0.dp),
+                        )
+                    }
+                    Spacer(
+                        modifier = Modifier
+                            .height(10.dp)
+                            .fillMaxWidth()
                     )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp, 0.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        MyExposedDropDownMenu(
+                            mutableStateValue = mutableStateString,
+                            label = {},
+                            modifier = Modifier.width(200.dp),
+                            onValueChangedEvent = { mutableStateString.value = it },
+                            options = options,
+                            outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
+                        )
+                        Image(
+                            painter = painterResource(R.drawable.meal_icon),
+                            contentDescription = stringResource(R.string.meal_icon),
+                            modifier = Modifier
+                                .padding(16.dp, 0.dp),
+                        )
+                    }
                 }
                 Spacer(
                     modifier = Modifier
@@ -157,9 +170,11 @@ fun FoodItemInfoFrame(
                         buttonColors = DefaultColorViewModel.buttonColors,
                     )
                 }
-                Spacer(modifier = Modifier
-                    .height(10.dp)
-                    .fillMaxWidth())
+                Spacer(
+                    modifier = Modifier
+                        .height(10.dp)
+                        .fillMaxWidth()
+                )
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -171,13 +186,30 @@ fun FoodItemInfoFrame(
                         text = "${stringResource(R.string.nutrition)}${stringResource(R.string.ingredient)}",
                         fontSize = 36.sp,
                     )
-                    TextFieldWithText(leadingText = stringResource(R.string.calories), trailingText = "75 kcal")
-                    TextFieldWithText(leadingText = stringResource(R.string.fat), trailingText = "5 g")
-                    TextFieldWithText(leadingText = stringResource(R.string.carb), trailingText = "75 kcal")
-                    TextFieldWithText(leadingText = stringResource(R.string.protein), trailingText = "75 kcal")
-                    TextFieldWithText(leadingText = stringResource(R.string.cholesterol), trailingText = "75 kcal")
-                    TextFieldWithText(leadingText = stringResource(R.string.natrium), trailingText = "75 kcal")
-                    TextFieldWithText(leadingText = "卡路里", trailingText = "75 kcal")
+                    TextFieldWithText(
+                        leadingText = stringResource(R.string.calories),
+                        trailingText = "75 kcal"
+                    )
+                    TextFieldWithText(
+                        leadingText = stringResource(R.string.fat),
+                        trailingText = "5 g"
+                    )
+                    TextFieldWithText(
+                        leadingText = stringResource(R.string.carb),
+                        trailingText = "5 g"
+                    )
+                    TextFieldWithText(
+                        leadingText = stringResource(R.string.protein),
+                        trailingText = "7 g "
+                    )
+                    TextFieldWithText(
+                        leadingText = stringResource(R.string.cholesterol),
+                        trailingText = "186 mg"
+                    )
+                    TextFieldWithText(
+                        leadingText = stringResource(R.string.natrium),
+                        trailingText = "200 mg"
+                    )
                 }
             }
         }

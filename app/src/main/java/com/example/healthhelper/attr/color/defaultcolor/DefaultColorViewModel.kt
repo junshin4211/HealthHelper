@@ -7,6 +7,7 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -107,5 +108,53 @@ object DefaultColorViewModel {
             contentColor = Color.White,
             disabledContainerColor = Color.Gray,
             disabledContentColor = Color.White,
+        )
+
+    val textFieldWithTextColors: TextFieldColors
+        @Composable
+        get() = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            disabledTextColor = colorResource(R.color.very_light_black),
+            errorTextColor = Color.Red,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            disabledContainerColor = colorResource(R.color.very_light_black),
+            errorContainerColor = Color.Red,
+            cursorColor = colorResource(R.color.blue01),
+            errorCursorColor = Color.Red,
+            selectionColors = null,
+            focusedBorderColor = colorResource(R.color.primarycolor),
+            unfocusedBorderColor = colorResource(R.color.primarycolor),
+            disabledBorderColor = colorResource(R.color.very_light_black),
+            errorBorderColor = Color.Red,
+            focusedLeadingIconColor = Color.Black,
+            unfocusedLeadingIconColor = Color.Black,
+            disabledLeadingIconColor = colorResource(R.color.very_light_black),
+            errorLeadingIconColor = Color.Red,
+            focusedTrailingIconColor = Color.Black,
+            unfocusedTrailingIconColor = Color.Black,
+            disabledTrailingIconColor = colorResource(R.color.very_light_black),
+            errorTrailingIconColor = Color.Red,
+            focusedLabelColor = Color.Black,
+            unfocusedLabelColor = Color.Gray,
+            disabledLabelColor = colorResource(R.color.very_light_black),
+            errorLabelColor = Color.Red,
+            focusedPlaceholderColor = Color.Black,
+            unfocusedPlaceholderColor = Color.Gray,
+            disabledPlaceholderColor = colorResource(R.color.very_light_black),
+            errorPlaceholderColor = Color.Red,
+            focusedSupportingTextColor = Color.Gray,
+            unfocusedSupportingTextColor = Color.Black,
+            disabledSupportingTextColor = colorResource(R.color.very_light_black),
+            errorSupportingTextColor = Color.Red,
+            focusedPrefixColor = Color.Black,
+            unfocusedPrefixColor = Color.Black,
+            disabledPrefixColor = colorResource(R.color.very_light_black),
+            errorPrefixColor = Color.Red,
+            focusedSuffixColor = Color.Black,
+            unfocusedSuffixColor = Color.Black,
+            disabledSuffixColor = colorResource(R.color.very_light_black),
+            errorSuffixColor = Color.Red,
         )
 }

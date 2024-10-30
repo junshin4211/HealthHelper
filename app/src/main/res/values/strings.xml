@@ -163,4 +163,5 @@
     <string name="nutrition">營養</string>
     <string name="cholesterol">膽固醇</string>
     <string name="natrium">鈉</string>
+    <string name="meal_icon">meal icon</string>
 </resources>

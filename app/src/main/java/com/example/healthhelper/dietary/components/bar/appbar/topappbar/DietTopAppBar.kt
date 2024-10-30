@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.navigationicon.HamburgerNavigationIcon
+import com.example.healthhelper.dietary.components.iconbutton.navigationicon.NavigateUpNavigationIcon
 import com.example.healthhelper.dietary.gson.toJson
 import com.example.healthhelper.dietary.util.sharedata.ShareData
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -51,7 +52,7 @@ fun DietAppTopBar(
         colors = DefaultColorViewModel.topAppBarColors,
         title = title,
         navigationIcon = {
-            HamburgerNavigationIcon()
+            NavigateUpNavigationIcon(navController)
         },
 
         actions = {

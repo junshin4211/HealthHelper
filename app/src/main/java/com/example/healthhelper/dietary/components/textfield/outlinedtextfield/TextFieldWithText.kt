@@ -3,14 +3,17 @@ package com.example.healthhelper.dietary.components.textfield.outlinedtextfield
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 
 @Composable
 fun TextFieldWithText(
     leadingText: String,
     trailingText: String,
+    textFieldColors: TextFieldColors = DefaultColorViewModel.textFieldWithTextColors,
 ) {
     TextField(
         value = "",
@@ -30,5 +33,6 @@ fun TextFieldWithText(
             )
         },
         readOnly = true,
+        colors = textFieldColors,
     )
 }
