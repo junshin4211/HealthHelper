@@ -64,10 +64,10 @@ import java.util.Locale
 fun MainMapSearchScreen(
     navController: NavHostController = rememberNavController(),
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = MapScreenEnum.valueOf(
-        backStackEntry?.destination?.route?.split("/")?.first() ?: MapScreenEnum.MapSearchScreen.name
-    )
+//    val backStackEntry by navController.currentBackStackEntryAsState()
+//    val currentScreen = MapScreenEnum.valueOf(
+//        backStackEntry?.destination?.route?.split("/")?.first() ?: MapScreenEnum.MapSearchScreen.name
+//    )
     val destination = navController.currentBackStackEntryAsState().value?.destination
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val viewModel: RestaurantViewModel = viewModel()

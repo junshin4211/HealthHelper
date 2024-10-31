@@ -2,6 +2,10 @@ package com.example.healthhelper.person
 
 import android.content.ContentValues
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
@@ -17,7 +21,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -41,16 +45,20 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+import com.example.healthhelper.person.model.UserData
+import com.example.healthhelper.screen.TabViewModel
 
 @Composable
-fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Unit) {
+fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Unit, tabViewModel: TabViewModel = viewModel()) {
     val tag = "tag_CameraPreviewScreen"
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
+    tabViewModel.setTabVisibility(false)
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -63,26 +71,6 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
             },
             modifier = Modifier.fillMaxSize()
         )
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(text = stringResource(R.string.photoClipRange), fontSize = 30.sp, color = colorResource(R.color.primarycolor))
-            Canvas(modifier = Modifier.padding(8.dp)) {
-                val circleDiameter = 350.dp.toPx()
-                val circleRadius = circleDiameter / 2
-                val centerX = size.width / 2
-                val centerY = size.height / 2
-
-                drawCircle(
-                    color = Color(context.getColor(R.color.primarycolor)),
-                    radius = circleRadius,
-                    center = Offset(centerX, centerY),
-                    style = Stroke(width = 5.dp.toPx())
-                )
-            }
-        }
 
         Row(modifier = Modifier.align(Alignment.BottomCenter)) {
             Button(modifier = Modifier
@@ -110,9 +98,13 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                         ContextCompat.getMainExecutor(context),
                         object : ImageCapture.OnImageSavedCallback {
                             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                imageUri = outputFileResults.savedUri
-                                Log.d(tag, "imageUri: $imageUri")
-                                onPictureTaken(imageUri)
+                                val savedUri = outputFileResults.savedUri
+                                if (savedUri != null) {
+                                    imageUri = outputFileResults.savedUri
+                                    UserData.photoUri = imageUri
+                                    Log.d(tag, "imageUri: $imageUri")
+                                    onPictureTaken(imageUri)
+                                }
                             }
                             override fun onError(exception: ImageCaptureException) {
                                 val msg = "Picture capture failed: ${exception.message}"
@@ -176,3 +168,4 @@ private fun startCamera(
 
     return imageCapture
 }
+

@@ -32,7 +32,7 @@ class AchievementViewModel : ViewModel() {
         return achievementState.value.filter { it.aTypeId in typeId }
     }
 
-    private suspend fun fetchAchievementList(): List<Achievement> {
+    suspend fun fetchAchievementList(): List<Achievement> {
         val url = "${serverUrl}/achievement/getlist"
         val gson = Gson()
 

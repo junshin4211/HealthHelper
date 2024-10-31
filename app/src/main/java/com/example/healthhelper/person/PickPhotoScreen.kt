@@ -58,6 +58,8 @@ import com.example.healthhelper.R
 import com.example.healthhelper.person.model.UserData
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.SaveButton
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -211,7 +213,7 @@ fun PickPhotoScreen(
 //    return outputBitmap
 //}
 
-fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offset, size: Int): Bitmap? {
+fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offset, size: Int): Uri? {
     val sourceBitmap = try {
         ImageDecoder.decodeBitmap(
             ImageDecoder.createSource(context.contentResolver, uri)
@@ -253,7 +255,23 @@ fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offs
     canvas.drawBitmap(sourceBitmap, matrix, null)
     sourceBitmap.recycle()
 
-    return outputBitmap
+    return saveBitmapToFile(context, outputBitmap)
+}
+
+private fun saveBitmapToFile(context: Context, bitmap: Bitmap): Uri? {
+    val filename = "cropped_image_${System.currentTimeMillis()}.png"
+    val file = File(context.cacheDir, filename)
+
+    return FileOutputStream(file).use { outputStream ->
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            Uri.fromFile(file)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
 }
 
 

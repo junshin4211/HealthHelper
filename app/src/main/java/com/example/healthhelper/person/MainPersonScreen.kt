@@ -10,10 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.healthhelper.person.personVM.WeightViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -23,8 +25,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 fun MainPersonScreen(
     navController: NavHostController = rememberNavController(),
+    weightViewModel: WeightViewModel = viewModel(),
 ) {
-//    val backStackEntry by navController.currentBackStackEntryAsState()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     NavHost(
@@ -50,17 +52,30 @@ fun MainPersonScreen(
                 )
             })
         }
+        composable(route = PersonScreenEnum.photoPreviewScreen.name) {
+            PhotoPreviewScreen(
+                imageUri = imageUri,
+                onAcceptClick = {
+                    navController.popBackStack(
+                        PersonScreenEnum.personScreen.name,
+                        false
+                    )
+                },
+                onRejectClick = { navController.popBackStack() }
+            )
+        }
         composable(route = PersonScreenEnum.pickPhotoScreen.name) {
             PickPhotoScreen(navController)
         }
         composable(route = PersonScreenEnum.weightScreen.name) {
-            WeightScreen(navController)
+            WeightScreen(navController, weightViewModel = weightViewModel)
         }
         composable(route = PersonScreenEnum.weightSettingScreen.name) {
-            WeightSettingScreen(navController)
+            WeightSettingScreen(navController, weightViewModel =  weightViewModel)
         }
-        composable(route = PersonScreenEnum.weightReviseScreen.name) {
-            WeightReviseScreen(navController)
+        composable(route = "${PersonScreenEnum.weightReviseScreen.name}/{recordId}") { backStackEntry ->
+            val recordId = backStackEntry.arguments?.getString("recordId")
+            WeightReviseScreen(navController,  weightViewModel =  weightViewModel, recordId = recordId)
         }
         composable(route = PersonScreenEnum.achivementScreen.name) {
             AchievementScreen(navController = navController)
@@ -72,7 +87,7 @@ fun MainPersonScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestCameraPermission(
-    onGrant: @Composable () -> Unit
+    onGrant: @Composable () -> Unit,
 ) {
     val cameraPermissionState = rememberPermissionState(
         Manifest.permission.CAMERA

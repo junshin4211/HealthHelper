@@ -31,17 +31,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
+import com.example.healthhelper.person.model.WeightData
 import com.himanshoe.charty.common.ChartDataCollection
 import com.himanshoe.charty.common.ChartSurface
 import com.himanshoe.charty.common.config.AxisConfig
-import com.himanshoe.charty.common.config.ChartDefaults
 import com.himanshoe.charty.common.maxYValue
 import com.himanshoe.charty.common.minYValue
-import com.himanshoe.charty.common.toChartDataCollection
-import com.himanshoe.charty.common.ui.drawGridLines
-import com.himanshoe.charty.common.ui.drawXAxis
-import com.himanshoe.charty.common.ui.drawYAxis
-import com.himanshoe.charty.line.config.LineChartColors
 import com.himanshoe.charty.line.config.LineChartDefaults
 import com.himanshoe.charty.line.config.LineConfig
 import com.himanshoe.charty.line.model.LineData
@@ -51,10 +46,9 @@ fun LineChart(
     dataCollection: ChartDataCollection,
     modifier: Modifier = Modifier,
     padding: Dp = 12.dp,
-    axisConfig: AxisConfig = ChartDefaults.axisConfigDefaults(),
+    axisConfig: AxisConfig = axisConfigDefaults(),
     radiusScale: Float = 0.01f,
     lineConfig: LineConfig = LineChartDefaults.defaultConfig(),
-    chartColors: LineChartColors = LineChartDefaults.defaultColor(),
 ) {
     val points = dataCollection.data
 
@@ -69,18 +63,11 @@ fun LineChart(
     val lineColor = Brush.linearGradient(listOf(Color(0xFFFFCC80), Color(0xFFFFE0B2)))
     val backgroundColor = Brush.linearGradient(listOf(Color(0xFFFFF3E0), Color(0xFFFFF8E1)))
     val dotColor = Brush.linearGradient(listOf(Color(0xFFFFA726), Color(0xFFFFA726)))
-    val borderColor = Color(0xFFFFA726)
 
     ChartSurface(
         padding = padding,
         chartData = dataCollection,
-        modifier = modifier.drawBehind {
-//            drawRect(
-//                color = borderColor,
-//                size = size,
-//                style = Stroke(width = 2.dp.toPx()) ,
-//            )
-        },
+        modifier = modifier.drawBehind {},
         axisConfig = axisConfig
     ) {
         val minYValue = dataCollection.minYValue()
@@ -92,20 +79,25 @@ fun LineChart(
                 .onSizeChanged { size ->
                     chartWidth = size.width.toFloat()
                     chartHeight = size.height.toFloat()
-                    pointBound = size.width.div(
-                        points
-                            .count()
-                            .times(1.2F)
-                    )
+                    pointBound = size.width.div(points.count().times(1.2F))
                 }
                 .drawBehind {
-                    if (axisConfig.showAxes) {
-                        drawYAxis(axisConfig.axisColor, axisConfig.axisStroke)
-                        drawXAxis(axisConfig.axisColor, axisConfig.axisStroke)
-                    }
-//                    if (axisConfig.showGridLines) {
-//                        drawGridLines(chartWidth, chartHeight, padding.toPx())
-//                    }
+                        val minValue = dataCollection.minYValue()
+                        val maxValue = dataCollection.maxYValue()
+                        drawYAxis(
+                            color = axisConfig.axisColor,
+                            stroke = axisConfig.axisStroke,
+                            minValue = minValue,
+                            maxValue = maxValue,
+                            verticalScale = verticalScale
+                        )
+
+                        drawYAxisLabels(
+                            values = points.map { it.yValue },
+                            spacing = padding.toPx(),
+                            textColor = axisConfig.axisColor
+                        )
+
                 }
         ) {
             val graphPathPoints = mutableListOf<PointF>()
@@ -125,11 +117,9 @@ fun LineChart(
                         data.yValue,
                         horizontalScale,
                     )
-
                     val x = centerOffset.x
                     val y = size.height - ((data.yValue - minYValue) * verticalScale)
-                    val innerX =
-                        x.coerceIn(centerOffset.x - radius / 2, centerOffset.x + radius / 2)
+                    val innerX = x.coerceIn(centerOffset.x - radius / 2, centerOffset.x + radius / 2)
                     val innerY = y.coerceIn(radius, size.height - radius)
 
                     graphPathPoints.add(PointF(innerX, innerY))
@@ -152,8 +142,7 @@ fun LineChart(
                     }
                 }
 
-                val pathEffect =
-                    if (lineConfig.hasSmoothCurve) PathEffect.cornerPathEffect(radius) else null
+                val pathEffect = if (lineConfig.hasSmoothCurve) PathEffect.cornerPathEffect(radius) else null
                 drawPath(
                     path = this,
                     brush = lineColor,
@@ -174,35 +163,19 @@ fun LineChart(
 }
 
 
-@Composable
-@Preview
-private fun LineChartPreview(modifier: Modifier = Modifier) {
-    Column(modifier) {
-        LineChart(
-            dataCollection = generateMockPointList().toChartDataCollection(),
-            modifier = Modifier
-                .size(450.dp),
-        )
-    }
-}
 
-fun generateMockPointList(): List<LineData> {
+
+
+fun generateMockWeightDataList(): List<WeightData> {
     return listOf(
-        LineData(0F, "Jan"),
-        LineData(10F, "Feb"),
-        LineData(05F, "Mar"),
-        LineData(50F, "Apr"),
-        LineData(03F, "June"),
-        LineData(9F, "July"),
-        LineData(40F, "Aug"),
-        LineData(60F, "Sept"),
-        LineData(33F, "Oct"),
-        LineData(11F, "Nov"),
-        LineData(27F, "Dec"),
-        LineData(10F, "Jan"),
-        LineData(13F, "Oct"),
-        LineData(0F, "Dec"),
-        LineData(10F, "Jan"),
+        WeightData(2, 170.0, 70.0, 14.5, "2023-02-01", 23.5),
+        WeightData(3, 170.0, 65.0, 14.0, "2023-03-01", 22.5),
+        WeightData(4, 170.0, 67.0, 14.8, "2023-04-01", 23.1),
+        WeightData(5, 170.0, 66.0, 14.6, "2023-05-01", 22.9),
+        WeightData(6, 170.0, 64.0, 13.8, "2023-06-01", 22.3),
+        WeightData(7, 170.0, 63.0, 13.5, "2023-07-01", 22.0),
+        WeightData(8, 170.0, 62.0, 13.2, "2023-08-01", 21.7),
+        WeightData(9, 170.0, 55.0, 12.9, "2023-09-01", 21.5),
     )
 }
 
@@ -245,3 +218,91 @@ internal fun DrawScope.drawXAxisLabels(
         textPaint
     )
 }
+
+fun DrawScope.drawYAxis(
+    color: Color,
+    stroke: Float,
+    minValue: Float,
+    maxValue: Float,
+    verticalScale: Float
+) {
+    val minYPosition = size.height - ((minValue - minValue) * verticalScale)
+    val maxYPosition = size.height - ((maxValue - minValue) * verticalScale)
+
+    drawLine(
+        start = Offset(0f, minYPosition),
+        end = Offset(0f, maxYPosition),
+        color = color,
+        strokeWidth = stroke
+    )
+
+    drawLine(
+        start = Offset(0f, minYPosition),
+        end = Offset(size.width, minYPosition),
+        color = color,
+        strokeWidth = stroke
+    )
+}
+
+fun axisConfigDefaults() = AxisConfig(
+    showGridLabel = false,
+    showAxes = false,
+    showGridLines = false,
+    axisStroke = 2F,
+    axisColor = Color.Black,
+    minLabelCount = 2
+)
+
+fun DrawScope.drawYAxisLabels(
+    values: List<Float>,
+    spacing: Float,
+    textColor: Color = Color.Black,
+) {
+    val maxLabelCount = 4
+    val maxLabelValue = values.maxOrNull() ?: return
+    val minLabelValue = values.minOrNull() ?: return
+    val labelRange = maxLabelValue - minLabelValue
+
+    val textPaint = Paint().apply {
+        color = textColor.toArgb()
+        textSize = size.width / 30
+        textAlign = Paint.Align.CENTER
+    }
+
+    val labelSpacing = size.height / (maxLabelCount - 1)
+
+    repeat(maxLabelCount) { i ->
+        val y = size.height - (i * labelSpacing)
+        val x = 0F.minus(spacing)
+        val labelValue = minLabelValue + ((i * labelRange) / (maxLabelCount - 1))
+
+        val text = if (labelValue.toString().length > 4) {
+            labelValue.toString().take(4)
+        } else {
+            labelValue.toString()
+        }
+
+        drawContext.canvas.nativeCanvas.drawText(
+            text,
+            x,
+            y,
+            textPaint
+        )
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun LineChartPreview(modifier: Modifier = Modifier) {
+    Column(modifier) {
+        val weightData = generateMockWeightDataList()
+        val chartDataCollection = ChartDataCollection(weightData.map { LineData(it.weight.toFloat(), it.recordDate) })
+        LineChart(
+            dataCollection = chartDataCollection,
+            modifier = Modifier
+                .size(450.dp),
+        )
+    }
+}
+
+

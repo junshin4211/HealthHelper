@@ -45,7 +45,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 import com.example.healthhelper.dietary.screen.DietDiaryMainScreen
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()
