@@ -59,11 +59,11 @@ fun FoodItemInfoFrame(
 
     val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemViewModel.data.collectAsState()
+
     val mealOption by mealOptionViewModel.data.collectAsState()
 
     val mutableStateString = remember { mutableStateOf(selectedMealOption.name) }
-
-    val options by remember { mutableStateOf(mutableListOf<String>()) }
+    val options by remember { mutableStateOf(mutableListOf("")) }
 
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var saveButtonIsClicked by remember { mutableStateOf(false) }

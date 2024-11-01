@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 
 @Composable
 fun FoodTextField(
@@ -14,6 +13,7 @@ fun FoodTextField(
     onValueChange: (String)-> Unit,
     label: @Composable ()->Unit,
 ){
+    /*
     val options = listOf("Apple","Banana")
     MyExposedDropDownMenu(
         navController = navController,
@@ -23,4 +23,6 @@ fun FoodTextField(
         modifier = modifier,
         label = label,
     )
+    
+     */
 }

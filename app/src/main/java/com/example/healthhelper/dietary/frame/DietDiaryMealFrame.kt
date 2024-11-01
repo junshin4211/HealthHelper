@@ -1,7 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,12 +45,11 @@ import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
 import com.example.healthhelper.dietary.components.button.DeleteButton
 import com.example.healthhelper.dietary.components.button.DownloadButton
+import com.example.healthhelper.dietary.components.iconbutton.AddIcon
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.SelectedFoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
-import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,8 +57,6 @@ import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 @Composable
 fun DietDiaryMealFrame(
     navController: NavHostController = rememberNavController(),
-    diaryViewModel: DiaryViewModel = viewModel(),
-    selectedFoodItemViewModel: SelectedFoodItemViewModel = viewModel(),
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
     title: @Composable () -> Unit,
 ) {
@@ -72,167 +68,158 @@ fun DietDiaryMealFrame(
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
     val selectedFoodItems = remember { mutableStateOf(foodItems) }
 
+    var hasFound by remember { mutableStateOf(false) }
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
+    var addIconButtonIsClicked by remember { mutableStateOf(false) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            DietAppTopBar(
-                navController = navController,
-                title = title
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        DietAppTopBar(
+            navController = navController, title = title
+        )
+    }, floatingActionButton = {
+        Row() {
+            DownloadButton(
+                context = context,
             )
-        },
-        floatingActionButton = {
-            Row() {
-                DownloadButton(
-                    context = context,
-                )
-                DeleteButton(
-                    onClick = { deleteButtonIsClicked = true },
-                    buttonColors = DefaultColorViewModel.buttonColors,
-                )
-            }
-        },
-        content = { innerPadding ->
+            DeleteButton(
+                onClick = { deleteButtonIsClicked = true },
+                buttonColors = DefaultColorViewModel.buttonColors,
+            )
+            AddIcon(
+                navController = navController,
+                onClick = { addIconButtonIsClicked = true },
+                iconButtonColors = DefaultColorViewModel.iconButtonColors
+            )
+        }
+    }, content = { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
+                    .weight(0.95f)
+                    .verticalScroll(verticalScrollState)
             ) {
-                Column(
+                SearchTextFieldWithDropDownMenuItem(
+                    navController = navController,
                     modifier = Modifier
-                        .weight(0.95f)
-                        .verticalScroll(verticalScrollState)
-                ) {
-                    SearchTextFieldWithDropDownMenuItem(
-                        navController = navController,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp, 0.dp),
-                        label = { Text(stringResource(R.string.search_label)) },
-                    )
+                        .fillMaxWidth()
+                        .padding(16.dp, 0.dp),
+                    label = { Text(stringResource(R.string.search_label)) },
+                )
 
-                    if (selectedFoodItems.value.isNotEmpty()) {
-                        selectedFoodItems.value.forEach { foodItem ->
-                            Box(
-                                modifier = Modifier
-                                    .requiredWidth(width = 360.dp)
-                                    .requiredHeight(height = 41.dp),
+                hasFound = (selectedFoodItems.value.isNotEmpty() && selectedFoodItems.value.filter { it.isCheckedWhenSelection.value }.any{ it.isCheckedWhenSelection.value })
+                if (hasFound) {
+                    selectedFoodItems.value.filter { it.isCheckedWhenSelection.value }.forEach { foodItem ->
+                        Box(
+                            modifier = Modifier
+                                .requiredWidth(width = 360.dp)
+                                .requiredHeight(height = 41.dp),
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.requiredWidth(width = 360.dp),
                             ) {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        16.dp, Alignment.CenterHorizontally
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
-                                        .requiredWidth(width = 360.dp),
+                                        .fillMaxWidth()
+                                        .requiredHeight(height = 40.dp)
+                                        .padding(horizontal = 16.dp)
                                 ) {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(
-                                            16.dp,
-                                            Alignment.CenterHorizontally
-                                        ),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .requiredHeight(height = 40.dp)
-                                            .padding(horizontal = 16.dp)
-                                    ) {
-                                        Column(
-                                            verticalArrangement = Arrangement.Center,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .weight(weight = 1f),
-                                        ) {
-                                            Row() {
-                                                Checkbox(
-                                                    checked = foodItem.isSelected.value,
-                                                    onCheckedChange = {
-                                                        Log.d(
-                                                            TAG,
-                                                            "onCheckedChange of foodItem:${foodItem}"
-                                                        )
-                                                        Log.d(TAG, "onCheckedChange of it:${it}")
-                                                        SelectedFoodItemsRepository.setSelectedState(
-                                                            foodItem,
-                                                            it
-                                                        )
-                                                        Log.d(TAG, "foodItems:${foodItems}")
-                                                    }
-                                                )
-
-                                                Text(
-                                                    text = foodItem.name,
-                                                    color = colorResource(R.color.primarycolor),
-                                                    lineHeight = 1.27.em,
-                                                    style = MaterialTheme.typography.titleLarge,
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .wrapContentHeight(align = Alignment.CenterVertically)
-                                                )
-                                            }
-                                        }
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(
-                                                10.dp,
-                                                Alignment.Start
-                                            )
-                                        ) {
-                                            IconButton(
-                                                onClick = {
-                                                    SelectedFoodItemRepository.setData(foodItem)
-                                                    navController.navigate(DietDiaryScreenEnum.FoodItemInfoFrame.name)
-                                                }
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowRight,
-                                                    contentDescription = "arrow_right",
-                                                    tint = colorResource(R.color.primarycolor)
-                                                )
-                                            }
-                                        }
-                                    }
                                     Column(
                                         verticalArrangement = Arrangement.Center,
                                         modifier = Modifier
-                                            .fillMaxWidth()
+                                            .fillMaxSize()
+                                            .weight(weight = 1f),
                                     ) {
-                                        HorizontalDivider(
-                                            color = colorResource(R.color.primarycolor),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
+                                        Row() {
+                                            Checkbox(
+                                                checked = foodItem.isCheckingWhenSelection.value,
+                                                onCheckedChange = {
+                                                    SelectedFoodItemsRepository.setCheckingWhenSelectionState(foodItem, it)
+                                                })
+
+                                            Text(
+                                                text = foodItem.name,
+                                                color = colorResource(R.color.primarycolor),
+                                                lineHeight = 1.27.em,
+                                                style = MaterialTheme.typography.titleLarge,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .wrapContentHeight(align = Alignment.CenterVertically)
+                                            )
+                                        }
+                                    }
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(
+                                            10.dp, Alignment.Start
                                         )
+                                    ) {
+                                        IconButton(onClick = {
+                                            SelectedFoodItemRepository.setData(foodItem)
+                                            navController.navigate(DietDiaryScreenEnum.FoodItemInfoFrame.name)
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Default.KeyboardArrowRight,
+                                                contentDescription = "arrow_right",
+                                                tint = colorResource(R.color.primarycolor)
+                                            )
+                                        }
                                     }
                                 }
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                )
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    HorizontalDivider(
+                                        color = colorResource(R.color.primarycolor),
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
                             }
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
-                    }else{
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ){
-                            Text(text = "No data found.")
-                        }
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = stringResource(R.string.result_not_found))
                     }
                 }
             }
         }
-    )
+    })
     if (deleteButtonIsClicked) {
-        val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isSelected.value }) }
-        Log.d(TAG, "selectedFoodItemVOs:$selectedFoodItemVOs")
+        val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isCheckingWhenSelection.value }) }
+        SelectedFoodItemsRepository.setAllCheckedWhenQueryState(false)
         if (selectedFoodItemVOs.isNotEmpty()) {
-            SelectedFoodItemsRepository.removeAll(selectedFoodItemVOs)
-            SelectedFoodItemsRepository.unchecked()
-            Log.d(TAG, "Delete item successfully")
-            Log.d(TAG, "foodItems:${foodItems}")
-            Toast.makeText(context, "Delete item successfully", Toast.LENGTH_LONG).show()
+            selectedFoodItemVOs.forEach{ selectedFoodItemVo ->
+                SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItemVo,false)
+            }
+            Toast.makeText(context, stringResource(R.string.delete_data_successfully), Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(context, "No item selected", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, stringResource(R.string.no_item_selected), Toast.LENGTH_LONG).show()
         }
         deleteButtonIsClicked = false
+    } else if (addIconButtonIsClicked) {
+        val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isCheckingWhenQuery.value }) }
+        SelectedFoodItemsRepository.setAllCheckedWhenQueryState(false)
+        if (selectedFoodItemVOs.isNotEmpty()) {
+            Toast.makeText(context, stringResource(R.string.add_data_successfully), Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(context, stringResource(R.string.no_item_selected), Toast.LENGTH_LONG).show()
+        }
+        addIconButtonIsClicked = false
     }
 }

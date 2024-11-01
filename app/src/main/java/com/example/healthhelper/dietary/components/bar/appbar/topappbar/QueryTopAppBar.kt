@@ -40,7 +40,7 @@ fun QueryTopAppBar(
         actions = {
             SearchIcon(
                 navController = navController,
-                onClick = {navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)}
+                onClick = {navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)},
             )
         },
         scrollBehavior = scrollBehavior,

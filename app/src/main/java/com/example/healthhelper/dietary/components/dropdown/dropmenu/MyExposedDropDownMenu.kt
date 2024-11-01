@@ -1,11 +1,12 @@
 package com.example.healthhelper.dietary.components.dropdown.dropmenu
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -20,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
@@ -37,7 +39,6 @@ fun MyExposedDropDownMenu(
     readOnly: Boolean = true,
 ) {
     var expanded by remember { mutableStateOf(false) }
-
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
@@ -51,9 +52,8 @@ fun MyExposedDropDownMenu(
             trailingIcon = {
                 SearchIcon(
                     navController = navController,
-                    onClick = {expanded=!expanded}
+                    onClick = {expanded=!expanded},
                 )
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
             textStyle = LocalTextStyle.current.copy(
                 fontSize = 18.sp,
@@ -66,20 +66,21 @@ fun MyExposedDropDownMenu(
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option: String ->
+            options.forEach { option ->
                 DropdownMenuItem(
                     text = {
-                        Box(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = option,
                                 textAlign = TextAlign.Center,
-                                fontSize = 18.sp
+                                fontSize = 18.sp,
+                                modifier = Modifier.width(100.dp)
                             )
                         }
-
                     },
                     onClick = {
                         expanded = false

@@ -21,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,24 +40,25 @@ import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTop
 import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
+import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedMealOptionVO
 import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
-import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
-import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun DietDiaryMainFrame(
     navController: NavHostController,
-    diaryViewModel: DiaryViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
-    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
 ) {
     val context = LocalContext.current
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
+
+    var mealsButtonIsClicked by remember { mutableStateOf(false) }
+
+    var selectedMealOptionVO by remember { mutableStateOf(MealsOptionVO(innerIconId = 0, mealsOptionText = "早餐")) }
 
     val verticalScrollState = rememberScrollState()
 
@@ -127,7 +131,8 @@ fun DietDiaryMainFrame(
                             outerIconButtonModifier = outerIconButtonModifier,
                             outerIconButtonColor = outerIconButtonColor,
                             onClick = {
-                                SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = mealsOption.mealsOptionText))
+                                mealsButtonIsClicked = true
+                                selectedMealOptionVO = mealsOption
                             },
                             innerIconId = innerIconId,
                             spacerModifier = spacerModifier,
@@ -138,6 +143,10 @@ fun DietDiaryMainFrame(
             }
         }
     )
+    if(mealsButtonIsClicked){
+        SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = selectedMealOptionVO.mealsOptionText))
+        mealsButtonIsClicked = false
+    }
 }
 
 @Preview(showBackground = true)

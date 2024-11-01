@@ -15,8 +15,10 @@ object SelectedFoodItemsRepository {
 
     private fun fetchData():MutableList<SelectedFoodItemVO> {
         val foodItems = mutableListOf<SelectedFoodItemVO>(
-            SelectedFoodItemVO("Apple", 20.0),
-            SelectedFoodItemVO("Banana", 30.0)
+            SelectedFoodItemVO(name = "Apple",grams = 1.0),
+            SelectedFoodItemVO(name = "Banana",grams = 1.0),
+            SelectedFoodItemVO(name = "Grape",grams = 1.0),
+            SelectedFoodItemVO(name = "Orange",grams = 1.0),
         )
         return foodItems
     }
@@ -32,12 +34,36 @@ object SelectedFoodItemsRepository {
        }
     }
 
-    fun setSelectedState(name: String,state:Boolean){
-        _dataFlow.value.find { it.name == name }?.isSelected?.value = state
+    fun setCheckedWhenQueryState(selectedFoodItemVO: SelectedFoodItemVO,state:Boolean){
+        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.isCheckedWhenQuery.value = state}
     }
 
-    fun setSelectedState(selectedFoodItemVO: SelectedFoodItemVO,state:Boolean){
-        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.isSelected.value = state}
+    fun setAllCheckedWhenQueryState(state:Boolean){
+        _dataFlow.value.forEach{ it.isCheckedWhenQuery.value = state}
+    }
+
+    fun setCheckedWhenSelectionState(selectedFoodItemVO: SelectedFoodItemVO,state:Boolean){
+        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.isCheckedWhenSelection.value = state}
+    }
+
+    fun setAllCheckedWhenSelectionState(state:Boolean){
+        _dataFlow.value.forEach{ it.isCheckedWhenSelection.value = state}
+    }
+
+    fun setCheckingWhenQueryState(selectedFoodItemVO: SelectedFoodItemVO,state:Boolean){
+        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.isCheckingWhenQuery.value = state}
+    }
+
+    fun setAllCheckingWhenQueryState(state:Boolean){
+        _dataFlow.value.forEach{ it.isCheckingWhenQuery.value = state}
+    }
+
+    fun setCheckingWhenSelectionState(selectedFoodItemVO: SelectedFoodItemVO,state:Boolean){
+        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.isCheckingWhenSelection.value = state}
+    }
+
+    fun setAllCheckingWhenSelectionState(state:Boolean){
+        _dataFlow.value.forEach{ it.isCheckingWhenSelection.value = state}
     }
 
     fun remove(selectedFoodItemVO: SelectedFoodItemVO){
@@ -46,25 +72,5 @@ object SelectedFoodItemsRepository {
 
     fun removeAll(selectedFoodItemVOs: List<SelectedFoodItemVO>){
         _dataFlow.value.removeAll(selectedFoodItemVOs)
-    }
-
-    fun checked(){
-        _dataFlow.value.forEach{
-            it.isSelected.value = true
-        }
-    }
-
-    fun checked(selectedFoodItemVO: SelectedFoodItemVO){
-       _dataFlow.value.firstOrNull()?.let{it.isSelected.value = true}
-    }
-
-    fun unchecked(){
-        _dataFlow.value.forEach{
-            it.isSelected.value = false
-        }
-    }
-
-    fun unchecked(selectedFoodItemVO: SelectedFoodItemVO){
-        _dataFlow.value.firstOrNull()?.let{it.isSelected.value = false}
     }
 }

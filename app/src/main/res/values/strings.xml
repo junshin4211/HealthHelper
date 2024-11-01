@@ -164,4 +164,9 @@
     <string name="cholesterol">膽固醇</string>
     <string name="natrium">鈉</string>
     <string name="meal_icon">meal icon</string>
+    <string name="add_icon">Add icon</string>
+    <string name="result_not_found">找不到結果</string>
+    <string name="delete_data_successfully">刪除資料成功</string>
+    <string name="no_item_selected">沒有勾選項目</string>
+    <string name="add_data_successfully">新增資料成功</string>
 </resources>

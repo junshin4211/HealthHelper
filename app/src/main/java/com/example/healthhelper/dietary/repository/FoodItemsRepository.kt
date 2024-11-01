@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object FoodItemsRepository {
-    private val _dataFlow = MutableStateFlow<MutableList<FoodItemVO>>(fetchData())
+    private val _dataFlow = MutableStateFlow<MutableList<FoodItemVO>>(mutableListOf())
     val dataFlow: StateFlow<MutableList<FoodItemVO>> = _dataFlow.asStateFlow()
 
     fun fetchData():MutableList<FoodItemVO>{
@@ -22,7 +22,11 @@ object FoodItemsRepository {
         _dataFlow.value.add(newData)
     }
 
-    fun removeAt(index:Int){
-        _dataFlow.value.removeAt(index)
+    fun addData(newData: FoodItemVO){
+        _dataFlow.value.add(newData)
+    }
+
+    fun addDatas(newDatas: List<FoodItemVO>){
+        _dataFlow.value.addAll(newDatas)
     }
 }
