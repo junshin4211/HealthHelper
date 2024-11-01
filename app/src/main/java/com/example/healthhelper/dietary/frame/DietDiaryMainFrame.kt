@@ -43,6 +43,7 @@ import com.example.healthhelper.dietary.components.picker.datepicker.CustomDateP
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedMealOptionVO
 import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
+import com.example.healthhelper.dietary.util.downloaddata.DownloadData
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +58,7 @@ fun DietDiaryMainFrame(
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
+    var downloadButtonIsClicked by remember { mutableStateOf(false) }
 
     var selectedMealOptionVO by remember { mutableStateOf(MealsOptionVO(innerIconId = 0, mealsOptionText = "早餐")) }
 
@@ -74,6 +76,7 @@ fun DietDiaryMainFrame(
             Row{
                 DownloadButton(
                     context = context,
+                    onClick = { downloadButtonIsClicked = true }
                 )
             }
         },
@@ -146,6 +149,12 @@ fun DietDiaryMainFrame(
     if(mealsButtonIsClicked){
         SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = selectedMealOptionVO.mealsOptionText))
         mealsButtonIsClicked = false
+    }else if(downloadButtonIsClicked){
+        DownloadData(
+            context = context,
+            vo = mealsOptions,
+        )
+        downloadButtonIsClicked = false
     }
 }
 

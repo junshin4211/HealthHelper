@@ -50,6 +50,7 @@ import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.S
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.SelectedFoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
+import com.example.healthhelper.dietary.util.downloaddata.DownloadData
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,8 +70,10 @@ fun DietDiaryMealFrame(
     val selectedFoodItems = remember { mutableStateOf(foodItems) }
 
     var hasFound by remember { mutableStateOf(false) }
+
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var addIconButtonIsClicked by remember { mutableStateOf(false) }
+    var downloadButtonIsClicked by remember { mutableStateOf(false) }
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
@@ -80,6 +83,7 @@ fun DietDiaryMealFrame(
         Row() {
             DownloadButton(
                 context = context,
+                onClick = { downloadButtonIsClicked = true}
             )
             DeleteButton(
                 onClick = { deleteButtonIsClicked = true },
@@ -221,5 +225,11 @@ fun DietDiaryMealFrame(
             Toast.makeText(context, stringResource(R.string.no_item_selected), Toast.LENGTH_LONG).show()
         }
         addIconButtonIsClicked = false
+    }else if(downloadButtonIsClicked){
+        DownloadData(
+            context = context,
+            vo = foodItems
+        )
+        downloadButtonIsClicked = false
     }
 }
