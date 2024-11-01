@@ -61,18 +61,16 @@ fun CustomDatePicker() {
 
     val scrollState = rememberScrollState()
 
-    Log.d(TAG, "selectedDateMillis:$selectedDateMillis")
-    Log.d(TAG, "selectedDate:$selectedDate")
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
+            .padding(16.dp,16.dp,16.dp,0.dp)
             .verticalScroll(scrollState),
         shape = RoundedCornerShape(15.dp),
     ) {
         DatePicker(
-            modifier = Modifier.padding(),
+
             state = datePickerState,
             showModeToggle = false,
             title = {

@@ -96,7 +96,7 @@ object DefaultColorViewModel {
         @Composable
         get() = IconButtonColors(
             containerColor = colorResource(R.color.primarycolor),
-            contentColor = colorResource(R.color.primarycolor),
+            contentColor = Color.Black,
             disabledContainerColor = Color.Gray,
             disabledContentColor = Color.Gray,
         )
