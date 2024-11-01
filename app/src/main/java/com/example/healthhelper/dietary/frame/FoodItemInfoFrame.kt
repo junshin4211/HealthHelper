@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
@@ -24,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +42,7 @@ import com.example.healthhelper.dietary.components.button.DeleteButton
 import com.example.healthhelper.dietary.components.button.SaveButton
 import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
+import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
@@ -50,6 +55,8 @@ fun FoodItemInfoFrame(
     selectedFoodItemViewModel: SelectedFoodItemViewModel = viewModel(),
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
+
     val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemViewModel.data.collectAsState()
     val mealOption by mealOptionViewModel.data.collectAsState()
@@ -58,8 +65,8 @@ fun FoodItemInfoFrame(
 
     val options by remember { mutableStateOf(mutableListOf<String>()) }
 
-    var deleteButtonClicked by remember { mutableStateOf(false) }
-    var saveButtonClicked by remember { mutableStateOf(false) }
+    var deleteButtonIsClicked by remember { mutableStateOf(false) }
+    var saveButtonIsClicked by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mealOption.forEach {
@@ -126,6 +133,7 @@ fun FoodItemInfoFrame(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         MyExposedDropDownMenu(
+                            navController = navController,
                             mutableStateValue = mutableStateString,
                             label = {},
                             modifier = Modifier.width(200.dp),
@@ -153,21 +161,21 @@ fun FoodItemInfoFrame(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
+
                     DeleteButton(
                         onClick = {
-                            deleteButtonClicked = true
-                            saveButtonClicked = false
+                            deleteButtonIsClicked = true
+                            saveButtonIsClicked = false
                         },
                         buttonColors = DefaultColorViewModel.buttonColors,
                     )
                     Spacer(modifier = Modifier.width(20.dp))
-
-                    SaveButton(
+                    SaveButton (
                         onClick = {
-                            saveButtonClicked = true
-                            deleteButtonClicked = false
+                            saveButtonIsClicked = true
+                            saveButtonIsClicked = false
                         },
-                        buttonColors = DefaultColorViewModel.buttonColors,
+                        buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
                     )
                 }
                 Spacer(
@@ -215,11 +223,15 @@ fun FoodItemInfoFrame(
         }
     )
 
-    if (deleteButtonClicked) {
+    if (deleteButtonIsClicked) {
+        SelectedFoodItemsRepository.remove(selectedFoodItem)
+        deleteButtonIsClicked = false
+        Toast.makeText(context,"delete item successfully",Toast.LENGTH_LONG).show()
+        navController.navigateUp()
+    } else if (saveButtonIsClicked) {
         // TODO
-        deleteButtonClicked = false
-    } else if (saveButtonClicked) {
-        // TODO
-        saveButtonClicked = false
+        SelectedFoodItemsRepository.updateData(selectedFoodItem,selectedFoodItem)
+        saveButtonIsClicked = false
+        Toast.makeText(context,"save item successfully",Toast.LENGTH_LONG).show()
     }
 }

@@ -8,15 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 
 @Composable
 fun SearchIcon(
     navController: NavHostController,
+    onClick: ()->Unit,
 ) {
-    IconButton(onClick = {
-        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
-    }) {
+    IconButton(onClick = onClick
+    ) {
         Icon(
             imageVector = Icons.Filled.Search,
             contentDescription = stringResource(R.string.search_icon),

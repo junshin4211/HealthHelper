@@ -138,10 +138,10 @@
     <string name="navigate_up_button_text">Navigate Up</string>
     <string name="diet_diary_main_frame_title">飲食日記</string>
     <string name="diet_diary_meal_frame">diet diary meal frame</string>
-    <string name="breakfast">breakfast</string>
-    <string name="lunch">lunch</string>
-    <string name="dinner">dinner</string>
-    <string name="supper">supper</string>
+    <string name="breakfast">早餐</string>
+    <string name="lunch">午餐</string>
+    <string name="dinner">晚餐</string>
+    <string name="supper">小食/宵夜</string>
     <string name="calendar">日曆</string>
     <string name="food_item_info_frame">Food Item Info Frame</string>
     <string name="drag_and_zoom">移動與縮放</string>

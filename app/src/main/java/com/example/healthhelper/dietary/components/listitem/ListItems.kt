@@ -14,11 +14,5 @@ fun ListItems(
     modifier: Modifier = Modifier,
     foodItems: List<SelectedFoodItemVO>,
 ){
-    foodItems.forEach{ foodItem ->
-        ListItem(
-            navController = navController,
-            modifier = modifier,
-            foodItem = foodItem,
-        )
-    }
+
 }

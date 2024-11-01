@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
 import com.example.healthhelper.dietary.components.iconbutton.navigationicon.NavigateUpNavigationIcon
+import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
 
@@ -35,7 +36,10 @@ fun FoodItemTopAppBar(
             NavigateUpNavigationIcon(navController)
         },
         actions = {
-            SearchIcon(navController)
+            SearchIcon(
+                navController = navController,
+                onClick = {navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)},
+            )
         },
         scrollBehavior = scrollBehavior,
     )

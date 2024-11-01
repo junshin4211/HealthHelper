@@ -1,9 +1,7 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,9 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +34,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTopAppBar
-import com.example.healthhelper.dietary.components.button.AddNewDietDiaryItemButton
 import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
@@ -48,7 +42,6 @@ import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
@@ -72,6 +65,13 @@ fun DietDiaryMainFrame(
                 navController = navController,
                 title = { Text(stringResource(R.string.diet_diary_main_frame_title)) },
             )
+        },
+        floatingActionButton = {
+            Row{
+                DownloadButton(
+                    context = context,
+                )
+            }
         },
         content = { innerPadding ->
             Column(
@@ -133,52 +133,6 @@ fun DietDiaryMainFrame(
                             spacerModifier = spacerModifier,
                             innerText = innerText,
                         )
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .weight(0.05f)
-                        .fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(0.75f)
-                        ) {
-
-                        }
-                        Column(
-                            modifier = Modifier
-                                .weight(0.25f)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .weight(0.5f),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    DownloadButton(
-                                        context = context,
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .weight(0.5f),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    AddNewDietDiaryItemButton(navController)
-                                }
-                            }
-                        }
                     }
                 }
             }

@@ -21,16 +21,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyExposedDropDownMenu(
+    navController: NavHostController,
     mutableStateValue: MutableState<String>,
     options: List<String>,
     modifier: Modifier = Modifier,
     label: @Composable () -> Unit,
     onValueChangedEvent: (String) -> Unit,
     outlinedTextFieldColor: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+    readOnly: Boolean = true,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -40,11 +44,15 @@ fun MyExposedDropDownMenu(
         modifier = modifier,
     ) {
         OutlinedTextField(
-            readOnly = true,
+            readOnly = readOnly,
             value = mutableStateValue.value,
-            onValueChange = { mutableStateValue.value = it },
+            onValueChange = { onValueChangedEvent(it) },
             label = label,
             trailingIcon = {
+                SearchIcon(
+                    navController = navController,
+                    onClick = {expanded=!expanded}
+                )
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },
             textStyle = LocalTextStyle.current.copy(

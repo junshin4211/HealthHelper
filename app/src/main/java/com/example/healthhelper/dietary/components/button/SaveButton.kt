@@ -10,7 +10,7 @@ import com.example.healthhelper.R
 @Composable
 fun SaveButton(
     onClick: ()->Unit,
-    buttonColors: ButtonColors,
+    buttonColors:ButtonColors,
 ){
     Button(
         onClick = onClick,
