@@ -14,11 +14,11 @@ object SelectedFoodItemsRepository {
     val dataFlow: StateFlow<List<SelectedFoodItemVO>> = _dataFlow.asStateFlow()
 
     private fun fetchData():MutableList<SelectedFoodItemVO> {
-        val foodItems = mutableListOf<SelectedFoodItemVO>(
-            SelectedFoodItemVO(name = "Apple",grams = 1.0),
-            SelectedFoodItemVO(name = "Banana",grams = 1.0),
-            SelectedFoodItemVO(name = "Grape",grams = 1.0),
-            SelectedFoodItemVO(name = "Orange",grams = 1.0),
+        val foodItems = mutableListOf(
+            SelectedFoodItemVO(name = "Apple"),
+            SelectedFoodItemVO(name = "Banana"),
+            SelectedFoodItemVO(name = "Grape"),
+            SelectedFoodItemVO(name = "Orange"),
         )
         return foodItems
     }

@@ -169,4 +169,6 @@
     <string name="delete_data_successfully">刪除資料成功</string>
     <string name="no_item_selected">沒有勾選項目</string>
     <string name="add_data_successfully">新增資料成功</string>
+    <string name="grams">克</string>
+    <string name="save_data_successfully">儲存資料成功</string>
 </resources>

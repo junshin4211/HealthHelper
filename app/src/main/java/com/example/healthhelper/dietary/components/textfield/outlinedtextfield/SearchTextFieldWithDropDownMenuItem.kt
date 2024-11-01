@@ -1,8 +1,6 @@
 package com.example.healthhelper.dietary.components.textfield.outlinedtextfield
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,9 +28,6 @@ fun SearchTextFieldWithDropDownMenuItem(
 
     val queryText = remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        Log.d(TAG,"availableOptions:${availableOptions}")
-    }
     MyExposedDropDownMenuWithCheckBox(
         navController = navController,
         mutableStateValue = queryText,

@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
@@ -55,6 +56,9 @@ fun FoodItemInfoFrame(
     selectedFoodItemViewModel: SelectedFoodItemViewModel = viewModel(),
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
+
+    val TAG = "tag_FoodItemInfoFrame"
+
     val context = LocalContext.current
 
     val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
@@ -105,8 +109,13 @@ fun FoodItemInfoFrame(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         OutlinedTextField(
-                            value = selectedFoodItem.grams.toInt().toString(),
-                            onValueChange = {},
+                            //value = gramsText,
+                            value = selectedFoodItem.grams.value.toInt().toString(),
+                            onValueChange = {
+                                if (it.isNotBlank() && it.isDigitsOnly()) {
+                                    selectedFoodItem.grams.value = it.toDouble()
+                                }
+                            },
                             textStyle = LocalTextStyle.current.copy(
                                 fontSize = 18.sp,
                                 textAlign = TextAlign.Center,
@@ -115,7 +124,7 @@ fun FoodItemInfoFrame(
                             colors = DefaultColorViewModel.outlinedTextFieldDefaultColors,
                         )
                         Text(
-                            text = "grams",
+                            text = stringResource(R.string.grams),
                             modifier = Modifier
                                 .padding(16.dp, 0.dp),
                         )
@@ -140,6 +149,7 @@ fun FoodItemInfoFrame(
                             onValueChangedEvent = { mutableStateString.value = it },
                             options = options,
                             outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
+                            readOnly = false,
                         )
                         Image(
                             painter = painterResource(R.drawable.meal_icon),
@@ -161,7 +171,6 @@ fun FoodItemInfoFrame(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
-
                     DeleteButton(
                         onClick = {
                             deleteButtonIsClicked = true
@@ -170,10 +179,10 @@ fun FoodItemInfoFrame(
                         buttonColors = DefaultColorViewModel.buttonColors,
                     )
                     Spacer(modifier = Modifier.width(20.dp))
-                    SaveButton (
+                    SaveButton(
                         onClick = {
                             saveButtonIsClicked = true
-                            saveButtonIsClicked = false
+                            deleteButtonIsClicked = false
                         },
                         buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
                     )
@@ -226,12 +235,18 @@ fun FoodItemInfoFrame(
     if (deleteButtonIsClicked) {
         SelectedFoodItemsRepository.remove(selectedFoodItem)
         deleteButtonIsClicked = false
-        Toast.makeText(context,"delete item successfully",Toast.LENGTH_LONG).show()
+        Toast.makeText(
+            context,
+            stringResource(R.string.delete_data_successfully),
+            Toast.LENGTH_LONG
+        ).show()
         navController.navigateUp()
     } else if (saveButtonIsClicked) {
-        // TODO
-        SelectedFoodItemsRepository.updateData(selectedFoodItem,selectedFoodItem)
+        //TODO
+        SelectedFoodItemsRepository.updateData(selectedFoodItem, selectedFoodItem)
         saveButtonIsClicked = false
-        Toast.makeText(context,"save item successfully",Toast.LENGTH_LONG).show()
+        Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
+            .show()
+        navController.navigateUp()
     }
 }
