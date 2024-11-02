@@ -95,6 +95,9 @@ dependencies {
 //    implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
+    implementation(libs.hikaricp)
+    implementation(libs.mysql.connector.j)
+    implementation(libs.slf4j.api)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
