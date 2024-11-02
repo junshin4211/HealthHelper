@@ -1,6 +1,7 @@
 package com.example.healthhelper.plan.screen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -12,6 +13,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +46,9 @@ fun Plan(
     navController: NavHostController = rememberNavController(),
     tabViewModel: TabViewModel = viewModel(),
     planViewModel: PlanVM = viewModel(),
+    managePlanViewModel: ManagePlanVM = viewModel()
 ) {
+    val tag = "tag_PlanNav"
     val context = LocalContext.current
     val backStackEntry by navController.currentBackStackEntryAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -52,6 +56,7 @@ fun Plan(
     val currentScreen = PlanPage.valueOf(
         backStackEntry?.destination?.route ?: PlanPage.DietPlan.name
     )
+
     tabViewModel.setTabVisibility(true)
     Scaffold(
         topBar = {
@@ -121,6 +126,7 @@ fun Plan(
                 ManagePlan(
                     navcontroller = navController,
                     planViewModel = planViewModel,
+                    managePlanViewModel = managePlanViewModel,
                     onShowDelete = {
                         when(showdeleteicon){
                             true -> {

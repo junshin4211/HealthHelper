@@ -1,6 +1,7 @@
 package com.example.healthhelper.plan.screen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -34,17 +36,42 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
+import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun PlanMain(context: Context = LocalContext.current,
              navcontroller: NavHostController = rememberNavController(),
              tabViewModel: TabViewModel = viewModel(),
-             planViewModel: PlanVM
+             planViewModel: PlanVM,
 ) {
+    val tag = "tag_PlanMain"
     tabViewModel.setTabVisibility(true)
+    val formatter = PlanUCImpl()::DateTimeformat;
+
+    val myPlan by planViewModel.myPlanState.collectAsState()
+    val completePlan by planViewModel.completePlanState.collectAsState()
+
+//    val myPlan by planViewModel.myPlanState.collectAsState(initial = emptyList())
+//    Log.d(tag, "get list $myPlan")
+//    val completePlan by planViewModel.completePlanState.collectAsState(initial = emptyList())
+//    Log.d(tag, "get list $completePlan")
+//
+//    val myPlanName = myPlan.firstOrNull()?.categoryName ?: "No Category"
+//    val myPlanStartTime = myPlan.firstOrNull()?.startDateTime
+//    val myPlanEndTime = myPlan.firstOrNull()?.endDateTime
+//    Log.d(tag,"get myPlan: $myPlanName startTime: $myPlanStartTime endTime: $myPlanEndTime")
+//    val completePlanName = completePlan.firstOrNull()?.categoryName ?: "No Category"
+//    val completePlanStartTime = completePlan.firstOrNull()?.startDateTime
+//    val completePlanEndTime = completePlan.firstOrNull()?.endDateTime
+//    Log.d(tag,"get completePlan: $completePlanName startTime: $completePlanStartTime endTime: $completePlanEndTime")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -116,7 +143,7 @@ fun PlanMain(context: Context = LocalContext.current,
             ) {
                 Text(
                     //放SQL最新計畫的名稱
-                    text = "${PlanPage.HighProtein.getPlanTitle(context)}飲食",
+                    text = myPlan.categoryName,
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -130,9 +157,10 @@ fun PlanMain(context: Context = LocalContext.current,
                         //.padding(start = 15.dp)
                 )
 
+
                 Text(
                     //放SQL最新計畫的時間
-                    text = "2024/10/18~2024/10/31",
+                    text = "${formatter(myPlan.startDateTime)}~${formatter(myPlan.endDateTime)}",
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -223,8 +251,8 @@ fun PlanMain(context: Context = LocalContext.current,
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    //放SQL最新計畫的名稱
-                    text = "${PlanPage.HighProtein.getPlanTitle(context)}飲食",
+                    //放SQL最近已完成計畫的名稱
+                    text = completePlan.categoryName,
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -240,7 +268,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
                 Text(
                     //放SQL最新計畫的時間
-                    text = "2024/10/18~2024/10/31",
+                    text = "${formatter(completePlan.startDateTime)}~${formatter(completePlan.endDateTime)}",
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -347,15 +375,14 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
 
         }
     }
-
-
 }
+
 
 @Preview
 @Composable
 fun PlanMainScreenPreview() {
     HealthHelperTheme {
-        PlanMain(planViewModel = viewModel())
+        //PlanMain(planViewModel = viewModel(), myPlan = emptyList(), completePlan = emptyList())
 
     }
 }

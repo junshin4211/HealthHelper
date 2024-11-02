@@ -1,30 +1,74 @@
 package com.example.healthhelper.plan.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.plan.PlanPage
-import com.example.healthhelper.plan.model.PlanProperty
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.healthhelper.plan.PlanRepository
+import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.web.httpPost
+import com.example.healthhelper.web.serverUrl
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class PlanVM: ViewModel() {
-    private val _planState = MutableStateFlow(emptyList<PlanProperty>())
-    val planState :StateFlow<List<PlanProperty>> = _planState.asStateFlow()
-    var panneelname:String = PlanPage.MyPlan.name
-    var showdelete:Boolean = false
+class PlanVM : ViewModel() {
+    private val url = "$serverUrl/Plan"
+    private val tag = "tag_PlanVM"
+
+    private val repository = PlanRepository
+    val myPlanState: StateFlow<PlanModel> = repository.myPlan
+    val completePlanState: StateFlow<PlanModel> = repository.completePlan
+//    val myPlanState: StateFlow<List<PlanModel>> = repository.myPlan
+//    val completePlanState: StateFlow<List<PlanModel>> = repository.completePlan
+
+    var panneelname: String = PlanPage.MyPlan.name
+    var showdelete: Boolean = false
+
     init {
-        _planState.update { fetchPlanData() }
+        viewModelScope.launch {
+            try {
+                val myPlan = fetchPlanData(2, 0)
+                repository.setMyPlan(myPlan)
+                Log.d(tag, "Fetched myPlanState: ${myPlanState.value}")
+            } catch (e: Exception) {
+                Log.e(tag, "Error fetching myPlanState: ${e.message}")
+            }
+        }
+        viewModelScope.launch {
+            try {
+                val completePlan = fetchPlanData(2, 1)
+                repository.setCompletePlan(completePlan)
+                Log.d(tag, "Fetched completePlanState: ${completePlanState.value}")
+            } catch (e: Exception) {
+                Log.e(tag, "Error fetching completePlanState: ${e.message}")
+            }
+        }
     }
 
+    private suspend fun fetchPlanData(
+        userId: Int,
+        finishstate: Int,
+    ): PlanModel {
+        return try {
+            val gson = GsonBuilder()
+                .setDateFormat("MMM dd, yyyy, HH:mm:ss") // 設置為 API 返回的日期格式
+                .create()
+            val jsonObject = JsonObject().apply {
+                addProperty("userId", userId)
+                addProperty("finishstate", finishstate)
 
-    private fun fetchPlanData():List<PlanProperty> {
-        return listOf(
-            PlanProperty(0,0,"高蛋白飲食","2024-10-18","2024-10-18",100f,100f,100f,100f),
-            PlanProperty(0,0,"低碳水飲食","2024-10-18","2024-10-18",100f,100f,100f,100f),
-            PlanProperty(0,0,"生酮飲食","2024-10-18","2024-10-18",100f,100f,100f,100f),
-            PlanProperty(0,0,"地中海飲食","2024-10-18","2024-10-18",100f,100f,100f,100f),
-            PlanProperty(0,0,"自訂","2024-10-18","2024-10-18",100f,100f,100f,100f)
-        )
+            }
+
+            val result = httpPost(url, jsonObject.toString())
+            val collectionType = object : TypeToken<PlanModel>() {}.type
+            gson.fromJson(result, collectionType) ?: PlanModel()
+        } catch (e: Exception) {
+            Log.e(tag, "Error in fetchPlanData: ${e.message}")
+            return PlanModel()
+        }
     }
 }

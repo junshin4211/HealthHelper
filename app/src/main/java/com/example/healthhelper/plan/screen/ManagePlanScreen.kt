@@ -1,5 +1,6 @@
 package com.example.healthhelper.plan.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -19,13 +20,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CreateToggleButton
-import com.example.healthhelper.plan.ui.CustomIcon
 import com.example.healthhelper.plan.ui.CustomList
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
@@ -36,11 +35,28 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 fun ManagePlan(
     navcontroller: NavHostController = rememberNavController(),
     planViewModel: PlanVM,
+    managePlanViewModel: ManagePlanVM,
     onShowDelete: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
+    val tag = "tag_ManagePlan"
     var activatepannel by remember { mutableStateOf(planViewModel.panneelname) }
-    val plan by planViewModel.planState.collectAsState()
+    val myPlanList by managePlanViewModel.myPlanListState.collectAsState(initial = emptyList())
+    Log.d(tag, "get list $myPlanList")
+    val completePlanList by managePlanViewModel.completePlanListState.collectAsState(initial = emptyList())
+    Log.d(tag, "get list $completePlanList")
+//    var myPlanList by remember { mutableStateOf(myPlan) }
+//    var completeList by remember { mutableStateOf(completePlan)}
+
+//    if(myPlan.isEmpty())
+//    {
+//        myPlanList = listOf(PlanModel())
+//    }
+//    if(completePlan.isEmpty())
+//    {
+//        completeList = listOf(PlanModel())
+//    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,6 +73,23 @@ fun ManagePlan(
                     },
                     leftText = PlanPage.MyPlan.getPlanTitle(context),
                     rightText = PlanPage.CompletedPlan.getPlanTitle(context)
+                )
+
+                CustomList().ItemList(
+                    inputList = myPlanList,
+                    onItemClick = {
+                        //TODO 導入到計畫詳細頁面
+                    },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.protein),
+                            contentDescription = "planType",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    },
+                    trialingIcon = {
+                        onShowDelete()
+                    }
                 )
             }
 
@@ -75,23 +108,26 @@ fun ManagePlan(
                     leftText = PlanPage.MyPlan.getPlanTitle(context),
                     rightText = PlanPage.CompletedPlan.getPlanTitle(context)
                 )
+
+                CustomList().ItemList(
+                    inputList = completePlanList,
+                    onItemClick = {
+                        //TODO 導入到計畫詳細頁面
+                    },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.protein),
+                            contentDescription = "planType",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    },
+                    trialingIcon = {
+                        onShowDelete()
+                    }
+                )
             }
         }
 
-        CustomList().PlanList(
-            plans = plan,
-            onItemClick = { },
-            leadingicon = {
-                Image(
-                    painter = painterResource(id = R.drawable.protein),
-                    contentDescription = "plantype",
-                    modifier = Modifier.padding(16.dp)
-                )
-            },
-            trialingicon = {
-                onShowDelete()
-            }
-        )
     }
 
 }
