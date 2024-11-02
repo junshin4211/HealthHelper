@@ -32,6 +32,7 @@
     //dark blue
     <color name = "dark_blue">#3F68A7</color>
     <color name = "heavy_dark_blue">#2A579F</color>
+    <color name="dark_blue_100">#565973</color>
 
     //gray color
     //light gray
