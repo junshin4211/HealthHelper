@@ -1,6 +1,7 @@
 package com.example.healthhelper.dietary.repository
 
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
+import com.example.healthhelper.dietary.gson.gson
 import com.example.healthhelper.dietary.servlet.url.DietDiaryUrl
 import com.example.healthhelper.web.httpGet
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,9 +27,11 @@ object SelectedFoodItemsRepository {
     }
 
     private fun fetchDataFromDatabase():MutableList<SelectedFoodItemVO> {
-        val foodItems = httpGet(
-            url = DietDiaryUrl.
+        val dataIn = httpGet(
+            url = DietDiaryUrl.listAvailableFoodsNameAndGramsUrl,
+            dataOut = "",
         )
+        val foodItems = gson.fromJson(dataIn,SelectedFoodItemVO.class)
         return foodItems
     }
 
