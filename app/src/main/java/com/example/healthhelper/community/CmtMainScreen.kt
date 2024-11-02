@@ -25,12 +25,9 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,16 +58,16 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 fun CmtMainScreen(navController: NavHostController) {
     var inputText by remember { mutableStateOf("") }
     val filteredPosts = fetchPosts().filter { it.title.contains(inputText, true) }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    var selectedFilter by remember { mutableStateOf("熱門") } // 新增篩選狀態
-    val posts = remember(selectedFilter, filteredPosts) {
-        when (selectedFilter) {
-            "熱門" -> filteredPosts.sortedByDescending { it.likesAmount } // 按照按讚數排序
-            "最新" -> filteredPosts.sortedByDescending { it.postTime } // 按照貼文時間排序
-            else -> filteredPosts.sortedByDescending { it.postTime }
-        }
-    }
+
+//    var selectedFilter by remember { mutableStateOf("熱門") } // 新增篩選狀態
+//    val posts = remember(selectedFilter, filteredPosts) {
+//        when (selectedFilter) {
+//            "熱門" -> filteredPosts.sortedByDescending { it.likesAmount } // 按照按讚數排序
+//            "最新" -> filteredPosts.sortedByDescending { it.postTime } // 按照貼文時間排序
+//            else -> filteredPosts.sortedByDescending { it.postTime }
+//        }
+//    }
 
     Box(
         modifier = Modifier
@@ -79,79 +75,85 @@ fun CmtMainScreen(navController: NavHostController) {
             .background(colorResource(id = R.color.backgroundcolor))
     ) {
         Column {
-            CmtNavbarComponent(navController = navController)
-            Spacer(modifier = Modifier.height(24.dp))
+
             //chat 新增
             // 篩選按鈕
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .background(colorResource(id = R.color.backgroundcolor)),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = { selectedFilter = "熱門" },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedFilter == "熱門") colorResource(R.color.primarycolor) else colorResource(R.color.dark_gray)
-                    )
-                ) {
-                    Text("熱門")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = { selectedFilter = "最新" },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (selectedFilter == "最新") colorResource(R.color.primarycolor) else colorResource(R.color.dark_gray)
-                    )
-                ) {
-                    Text("最新")
-                }
-            }
+
             Scaffold(
-                modifier = Modifier
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                    .background(colorResource(id = R.color.backgroundcolor)),
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        title = {
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(4.dp)
-                                    .border(
-                                        4.dp,
-                                        colorResource(R.color.primarycolor),
-                                        shape = RoundedCornerShape(15.dp)
-                                    )
-                                    .background(colorResource(id = R.color.backgroundcolor)),
-                                value = inputText,
-                                onValueChange = { inputText = it },
-                                placeholder = { Text(text = "請輸入關鍵字") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "search",
-                                        tint = colorResource(R.color.primarycolor)
-                                    )
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Clear,
-                                        contentDescription = stringResource(R.string.clearSearch),
-                                        modifier = Modifier.clickable { inputText = "" },
-                                        tint = colorResource(R.color.primarycolor)
-                                    )
-                                },
-                                shape = RoundedCornerShape(15.dp),
-                                singleLine = true,
+                modifier = Modifier.background(colorResource(id = R.color.backgroundcolor)),
+                topBar = { CmtNavbarComponent(navController = navController) }) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .background(colorResource(R.color.backgroundcolor))
+                        .padding(innerPadding)
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .border(
+                                4.dp,
+                                colorResource(R.color.primarycolor),
+                                shape = RoundedCornerShape(15.dp)
+                            )
+                            .background(colorResource(id = R.color.backgroundcolor)),
+                        value = inputText,
+                        onValueChange = { inputText = it },
+                        placeholder = { Text(text = "請輸入關鍵字") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "search",
+                                tint = colorResource(R.color.primarycolor)
                             )
                         },
-                        scrollBehavior = scrollBehavior,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = stringResource(R.string.clearSearch),
+                                modifier = Modifier.clickable { inputText = "" },
+                                tint = colorResource(R.color.primarycolor)
+                            )
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        singleLine = true,
                     )
-                },
-            ) { innerPadding ->
-                PostLists(posts = filteredPosts, innerPadding = innerPadding, navController = navController)
+//                    Row(
+//                        modifier = Modifier
+//                            .background(colorResource(id = R.color.backgroundcolor))
+//                            .fillMaxWidth()
+//                            .padding(vertical = 8.dp),
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//                        Button(
+//                            onClick = { selectedFilter = "熱門" },
+//                            colors = ButtonDefaults.buttonColors(
+//                                containerColor = if (selectedFilter == "熱門") colorResource(R.color.primarycolor) else colorResource(
+//                                    R.color.dark_gray
+//                                )
+//                            )
+//                        ) {
+//                            Text("熱門")
+//                        }
+//                        Spacer(modifier = Modifier.width(8.dp))
+//                        Button(
+//                            onClick = { selectedFilter = "最新" },
+//                            colors = ButtonDefaults.buttonColors(
+//                                containerColor = if (selectedFilter == "最新") colorResource(R.color.primarycolor) else colorResource(
+//                                    R.color.dark_gray
+//                                )
+//                            )
+//                        ) {
+//                            Text("最新")
+//                        }
+//                    }
+                    PostLists(
+                        posts = filteredPosts,
+                        navController = navController
+                    )
+
+                }
+
             }
         }
 
@@ -165,8 +167,7 @@ fun CmtMainScreen(navController: NavHostController) {
                 .padding(16.dp)
                 .offset(y = -16.dp)
                 .background(
-                    color = colorResource(id = R.color.white),
-                    shape = CircleShape
+                    color = colorResource(id = R.color.white), shape = CircleShape
                 )
         ) {
             Icon(
@@ -179,17 +180,15 @@ fun CmtMainScreen(navController: NavHostController) {
 }
 
 
-
 @Composable
 fun PostLists(
+    modifier: Modifier = Modifier,
     posts: List<Post>,
-    innerPadding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(innerPadding)
             .verticalScroll(rememberScrollState())
             .background(colorResource(id = R.color.backgroundcolor))
 
@@ -200,6 +199,7 @@ fun PostLists(
         }
     }
 }
+
 /**
  * 載入測試需要資料
  * @return 多貼文資訊
@@ -215,8 +215,7 @@ fun fetchPosts(): List<Post> {
             30,
             R.drawable.postpic,
             "2024-02-27"
-        ),
-        Post(
+        ), Post(
             R.drawable.profile,
             "John",
             "2高蛋白午餐分享!熱量低又美味!",
@@ -225,8 +224,7 @@ fun fetchPosts(): List<Post> {
             18,
             R.drawable.postpic,
             "2024-06-03"
-        ),
-        Post(
+        ), Post(
             R.drawable.profile,
             "John",
             "3高蛋白午餐分享!熱量低又美味!",
@@ -235,8 +233,7 @@ fun fetchPosts(): List<Post> {
             26,
             R.drawable.postpic,
             "2024-04-17"
-        ),
-        Post(
+        ), Post(
             R.drawable.profile,
             "John",
             "4高蛋白午餐分享!熱量低又美味!",
@@ -245,8 +242,7 @@ fun fetchPosts(): List<Post> {
             6,
             R.drawable.postpic,
             "2024-08-05"
-        ),
-        Post(
+        ), Post(
             R.drawable.profile,
             "John",
             "5高蛋白午餐分享!熱量低又美味!",
