@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.repository
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
@@ -21,6 +22,7 @@ object SelectedMealOptionRepository {
         return SelectedMealOptionVO( name = stringResource(R.string.breakfast),)
     }
 
+    @SuppressLint("StateFlowValueCalledInComposition")
     @Composable
     fun setData(newData:SelectedMealOptionVO){
         _dataFlow.value = newData

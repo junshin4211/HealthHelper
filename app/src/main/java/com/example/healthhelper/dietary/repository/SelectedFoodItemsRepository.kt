@@ -1,6 +1,8 @@
 package com.example.healthhelper.dietary.repository
 
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
+import com.example.healthhelper.dietary.servlet.url.DietDiaryUrl
+import com.example.healthhelper.web.httpGet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +12,7 @@ object SelectedFoodItemsRepository {
 
     val TAG = "tag_SelectedFoodItemsRepository"
 
-    private val _dataFlow = MutableStateFlow<MutableList<SelectedFoodItemVO>>(fetchData())
+    private val _dataFlow = MutableStateFlow<MutableList<SelectedFoodItemVO>>(fetchDataFromDatabase())
     val dataFlow: StateFlow<List<SelectedFoodItemVO>> = _dataFlow.asStateFlow()
 
     private fun fetchData():MutableList<SelectedFoodItemVO> {
@@ -19,6 +21,13 @@ object SelectedFoodItemsRepository {
             SelectedFoodItemVO(name = "Banana"),
             SelectedFoodItemVO(name = "Grape"),
             SelectedFoodItemVO(name = "Orange"),
+        )
+        return foodItems
+    }
+
+    private fun fetchDataFromDatabase():MutableList<SelectedFoodItemVO> {
+        val foodItems = httpGet(
+            url = DietDiaryUrl.
         )
         return foodItems
     }

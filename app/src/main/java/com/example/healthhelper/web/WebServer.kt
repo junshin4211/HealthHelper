@@ -10,9 +10,10 @@ const val serverUrl = "http://10.0.2.2:8080/HealthyHelperServer"
 
 private const val myTag = "tag_Common"
 
-suspend fun httpPost(
+suspend fun sendHttpRequest(
     url: String,
-    dataOut: String
+    dataOut: String,
+    method: String = "POST",
 ): String {
     var dataIn = ""
     withContext(Dispatchers.IO) {
@@ -22,13 +23,12 @@ suspend fun httpPost(
             doOutput = true
             setChunkedStreamingMode(0)
             useCaches = false
-            requestMethod = "POST"
+            requestMethod = method
             setRequestProperty("content-type", "application/json")
             setRequestProperty("charset", "utf-8")
             Log.d(myTag, "dataOut: $dataOut")
             Log.d(myTag, "dataOut: ${url}")
             outputStream.bufferedWriter().use { it.write(dataOut) }
-//            Log.d(myTag, "dataOut: $responseCode")
 
             if (responseCode == 200) {
                 inputStream.bufferedReader().useLines { lines ->
@@ -40,3 +40,18 @@ suspend fun httpPost(
     }
     return dataIn
 }
+
+suspend fun httpPost(
+    url: String,
+    dataOut: String
+): String {
+    return sendHttpRequest(url,dataOut,"POST")
+}
+
+suspend fun httpGet(
+    url: String,
+    dataOut: String
+): String {
+    return sendHttpRequest(url,dataOut,"GET")
+}
+
