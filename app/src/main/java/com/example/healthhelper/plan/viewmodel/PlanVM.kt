@@ -8,7 +8,6 @@ import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
@@ -22,31 +21,13 @@ class PlanVM : ViewModel() {
     private val repository = PlanRepository
     val myPlanState: StateFlow<PlanModel> = repository.myPlan
     val completePlanState: StateFlow<PlanModel> = repository.completePlan
-//    val myPlanState: StateFlow<List<PlanModel>> = repository.myPlan
-//    val completePlanState: StateFlow<List<PlanModel>> = repository.completePlan
 
     var panneelname: String = PlanPage.MyPlan.name
     var showdelete: Boolean = false
 
     init {
-        viewModelScope.launch {
-            try {
-                val myPlan = fetchPlanData(2, 0)
-                repository.setMyPlan(myPlan)
-                Log.d(tag, "Fetched myPlanState: ${myPlanState.value}")
-            } catch (e: Exception) {
-                Log.e(tag, "Error fetching myPlanState: ${e.message}")
-            }
-        }
-        viewModelScope.launch {
-            try {
-                val completePlan = fetchPlanData(2, 1)
-                repository.setCompletePlan(completePlan)
-                Log.d(tag, "Fetched completePlanState: ${completePlanState.value}")
-            } catch (e: Exception) {
-                Log.e(tag, "Error fetching completePlanState: ${e.message}")
-            }
-        }
+        getPlan()
+        getCompletePlan()
     }
 
     private suspend fun fetchPlanData(
@@ -69,6 +50,30 @@ class PlanVM : ViewModel() {
         } catch (e: Exception) {
             Log.e(tag, "Error in fetchPlanData: ${e.message}")
             return PlanModel()
+        }
+    }
+
+    fun getPlan(){
+        viewModelScope.launch {
+            try {
+                val myPlan = fetchPlanData(2, 0)
+                repository.setMyPlan(myPlan)
+                Log.d(tag, "Fetched myPlanState: ${myPlanState.value}")
+            } catch (e: Exception) {
+                Log.e(tag, "Error fetching myPlanState: ${e.message}")
+            }
+        }
+    }
+
+    fun getCompletePlan(){
+        viewModelScope.launch {
+            try {
+                val completePlan = fetchPlanData(2, 1)
+                repository.setCompletePlan(completePlan)
+                Log.d(tag, "Fetched completePlanState: ${completePlanState.value}")
+            } catch (e: Exception) {
+                Log.e(tag, "Error fetching completePlanState: ${e.message}")
+            }
         }
     }
 }

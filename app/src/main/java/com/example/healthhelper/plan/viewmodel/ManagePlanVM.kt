@@ -14,7 +14,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ManagePlanVM: ViewModel() {
+class ManagePlanVM : ViewModel() {
     private val tag = "tag_ManageVM"
 
     private val repository = PlanRepository
@@ -66,29 +66,50 @@ class ManagePlanVM: ViewModel() {
         }
     }
 
-    suspend fun deletePlan(
+    private suspend fun deletePlanRequest(
         userId: Int,
         userDietPlanID: Int,
         finishState: Int,
-    ):Boolean{
+    ): Boolean {
         try {
             val url = "$serverUrl/Plan/DeletePlan"
             val gson = Gson()
             var jsonObject = JsonObject()
 
             jsonObject.addProperty("userId", userId)
-            jsonObject.addProperty("userDietPlanID", userDietPlanID)
-            jsonObject.addProperty("finishState", finishState)
+            jsonObject.addProperty("userDietPlanId", userDietPlanID)
+            jsonObject.addProperty("finishstate", finishState)
 
 
             val result = httpPost(url, jsonObject.toString())
             jsonObject = gson.fromJson(result, JsonObject::class.java)
             Log.d(tag, "deletePlan: $result")
             return jsonObject.get("result").asBoolean
-        }catch (e:Exception){
+        } catch (e: Exception) {
             Log.e(tag, "Error to delete plan: ${e.message}")
             return false
         }
+    }
 
+    suspend fun deletePlan(
+        plan: PlanModel,
+        userId: Int,
+        userDietPlanID: Int,
+        finishState: Int,
+    ):String {
+        if (deletePlanRequest(userId, userDietPlanID, finishState)) {
+            when (finishState) {
+                0 ->{
+                    repository.removeMyPlan(plan)
+                    return "delete myPlan success"
+                }
+                1 ->{
+                    repository.removeCompletePlan(plan)
+                    return "delete completePlan success"
+                }
+            }
+
+        }
+        return "delete failed"
     }
 }

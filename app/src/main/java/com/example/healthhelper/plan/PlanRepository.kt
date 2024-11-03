@@ -34,6 +34,15 @@ object PlanRepository {
         }
     }
 
+    //remove mtPlan from list
+    fun removeMyPlan(plan: PlanModel) {
+        _myPlanList.update {
+            val plans = it.toMutableList()
+            plans.remove(plan)
+            plans
+        }
+    }
+
     private val _completePlanList = MutableStateFlow(emptyList<PlanModel>())
     val completePlanList: StateFlow<List<PlanModel>> = _completePlanList.asStateFlow()
 
@@ -42,4 +51,14 @@ object PlanRepository {
            list
        }
     }
+
+    //remove CompletePlan from list
+    fun removeCompletePlan(plan: PlanModel) {
+        _completePlanList.update {
+            val plans = it.toMutableList()
+            plans.remove(plan)
+            plans
+        }
+    }
+
 }

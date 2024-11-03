@@ -10,15 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.plan.usecase.PlanUCImpl
@@ -29,7 +24,7 @@ class CustomList {
         inputList: List<PlanModel>,
         onItemClick: (PlanModel) -> Unit,
         leadingIcon: @Composable () -> Unit,
-        trialingIcon: @Composable () -> Unit,
+        trialingIcon: @Composable (PlanModel) -> Unit,
     ) {
         val formatter = PlanUCImpl()::DateTimeformat;
         LazyColumn(
@@ -57,7 +52,7 @@ class CustomList {
                         leadingIcon()
                     },
                     trailingContent = {
-                       trialingIcon()
+                       trialingIcon(plan)
                     },
                     colors = ListItemDefaults.colors(colorResource(R.color.primarycolor))
                 )
