@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.model.ErrorMsg
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.SaveButton
@@ -69,9 +72,11 @@ fun WeightSettingScreen(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
     var selectDate by remember { mutableStateOf(LocalDate.now().format(dateFormatter)) }
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var bodyFat by remember { mutableStateOf("") }
+    val weightData by weightViewModel.weightDataState.collectAsState()
+    val latestWeightData = weightData.maxByOrNull { it.recordDate }
+    var height by remember { mutableStateOf(latestWeightData?.height?.toString() ?: "") }
+    var weight by remember { mutableStateOf(latestWeightData?.weight?.toString() ?: "") }
+    var bodyFat by remember { mutableStateOf(latestWeightData?.bodyFat?.toString() ?: "") }
     var errMsg by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
@@ -108,10 +113,14 @@ fun WeightSettingScreen(
             }
 
             Box(
-                modifier = Modifier.height(270.dp).width(412.dp)
+                modifier = Modifier
+                    .height(270.dp)
+                    .width(412.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp).fillMaxSize(),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -173,7 +182,7 @@ fun WeightSettingScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text =  stringResource(R.string.body_fat), fontSize = 24.sp)
+                        Text(text = stringResource(R.string.body_fat), fontSize = 24.sp)
                         Spacer(modifier = Modifier.padding(end = 10.dp))
                         OutlinedTextField(
                             value = bodyFat,
@@ -192,6 +201,8 @@ fun WeightSettingScreen(
                     }
                 }
             }
+            Text(stringResource(R.string.lastWeightRecord), color = colorResource(R.color.primarycolor))
+            Spacer(modifier = Modifier.padding(bottom = 8.dp))
             SaveButton(
                 onClick = {
                     val heightValue = height.toDoubleOrNull()
@@ -205,7 +216,8 @@ fun WeightSettingScreen(
                                 val result = weightViewModel.insertBodyDataJson(
                                     heightValue, weightValue, fatValue, selectDate, bmi
                                 )
-                                if(result) navController.navigateUp()                            }
+                                if (result) navController.navigateUp()
+                            }
                         }
                     } else {
                         errMsg = context.getString(R.string.failValueHeightWeight)
@@ -222,7 +234,7 @@ fun WeightSettingScreen(
                     selectDate = utcTimeMillis?.let {
                         Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
                             .toLocalDate().format(dateFormatter)
-                    } ?: "未選擇"
+                    } ?: context.getString(R.string.noChoose)
                     showDatePickerDialog = false
                 },
                 onDismiss = { showDatePickerDialog = false }
@@ -283,7 +295,6 @@ fun CustomDatePickerDialog(
         )
     }
 }
-
 
 
 //@Preview(showBackground = true)

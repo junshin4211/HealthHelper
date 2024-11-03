@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.person.model.DateRange
+import com.example.healthhelper.person.model.ErrorMsg
 import com.example.healthhelper.person.model.WeightData
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
@@ -21,6 +22,8 @@ class WeightViewModel : ViewModel() {
     val weightDataState: StateFlow<List<WeightData>> = _weightDataState.asStateFlow()
     private val _dateRangeState = MutableStateFlow(DateRange())
     val dateRangeState: StateFlow<DateRange> = _dateRangeState.asStateFlow()
+
+    val errMsg = ErrorMsg()
 
     init {
         viewModelScope.launch {
@@ -93,6 +96,10 @@ class WeightViewModel : ViewModel() {
         val result = httpPost(url, jsonObject.toString())
         val response = gson.fromJson(result, JsonObject::class.java)
         Log.d("dataout", response.get("errMsg").toString())
+        if (response.get("result").asBoolean) {
+            refreshWeightData()
+        }
+        errMsg.errMsg = response.get("errMsg").toString()
         return response.get("result").asBoolean
     }
 

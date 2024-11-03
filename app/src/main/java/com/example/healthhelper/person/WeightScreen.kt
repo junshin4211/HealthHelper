@@ -74,19 +74,13 @@ fun WeightScreen(
         mutableStateOf("${dateRange.startDate} ~ ${dateRange.endDate}")
     }
     var showLineChart by remember { mutableStateOf(false) }
-    if (weightData.size >= 2) { showLineChart = true }
     var selectedTab by remember { mutableIntStateOf(0) }
-    when (selectedTab) {
-        0 -> LineChartWeightData(weightData, valueSelector = { it.weight.toFloat() }, showLineChart)
-        1 -> LineChartWeightData(weightData, valueSelector = { it.bmi.toFloat() }, showLineChart)
-        2 -> LineChartWeightData(weightData, valueSelector = { it.bodyFat.toFloat() }, showLineChart)
-    }
+
     val labels = listOf(
         stringResource(R.string.weight),
         stringResource(R.string.BMI),
         stringResource(R.string.body_fat)
     )
-
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -94,7 +88,7 @@ fun WeightScreen(
             CustomTopBar(
                 title = "",
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() },
+                navigateUp = { navController.navigate(PersonScreenEnum.personScreen.name) },
                 scrollBehavior = scrollBehavior,
                 actions = {
                     IconButton(onClick = {
@@ -119,7 +113,6 @@ fun WeightScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 日期範圍選擇器
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -153,9 +146,8 @@ fun WeightScreen(
                 )
             }
 
-            LazyColumn {
+            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                 item {
-                    // Linechart
                     CustomTabRow(
                         selectedTab = selectedTab,
                         onTabSelected = { newTab -> selectedTab = newTab },
@@ -164,34 +156,56 @@ fun WeightScreen(
                         labels = labels
                     )
 
-                    if (weightData.size<=2) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("此區間尚未有資料", color = Color.Red, textAlign = TextAlign.Center, fontSize = 24.sp)
-                        }
-                    }
-                    if(weightData.size>2){
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                stringResource(R.string.historyRecord),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                textDecoration = TextDecoration.Underline
+
+                    if (weightData.size < 2) {
+                        Text(
+                            stringResource(R.string.noBodyData),
+                            color = Color.Red,
+                            textAlign = TextAlign.Center,
+                            fontSize = 24.sp
+                        )
+                    } else {
+                        showLineChart = true
+                        when (selectedTab) {
+                            0 -> LineChartWeightData(
+                                weightData,
+                                valueSelector = { it.weight.toFloat() },
+                                showLineChart
+                            )
+
+                            1 -> LineChartWeightData(
+                                weightData,
+                                valueSelector = { it.bmi.toFloat() },
+                                showLineChart
+                            )
+
+                            2 -> LineChartWeightData(
+                                weightData,
+                                valueSelector = { it.bodyFat.toFloat() },
+                                showLineChart
                             )
                         }
-                        ListItem(
-                            { HeaderRow() },
-                            colors = ListItemDefaults.colors(containerColor = colorResource(R.color.backgroundcolor)),
+                        Text(stringResource(R.string.month))
+                    }
+                }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            stringResource(R.string.historyRecord),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline
                         )
                     }
+                    ListItem(
+                        { HeaderRow() },
+                        colors = ListItemDefaults.colors(containerColor = colorResource(R.color.backgroundcolor)),
+                    )
                 }
                 items(weightData) { item ->
                     WeightDataRow(item, navController = navController)
@@ -200,6 +214,7 @@ fun WeightScreen(
                         thickness = 1.dp
                     )
                 }
+
             }
         }
     }
@@ -258,14 +273,17 @@ fun WeightDataRow(data: WeightData, navController: NavHostController) {
 fun LineChartWeightData(
     weightData: List<WeightData>,
     valueSelector: (WeightData) -> Float,
-    showLineChart: Boolean = false
+    showLineChart: Boolean = false,
 ) {
     if (weightData.isNotEmpty() && showLineChart) {
+        val sortedWeightData = weightData.sortedBy {
+            SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).parse(it.recordDate)
+        }
         val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val monthFormatter = SimpleDateFormat("MM", Locale.getDefault())
 
         val chartDataCollection = ChartDataCollection(
-            weightData.map {
+            sortedWeightData.map {
                 val date = dateFormatter.parse(it.recordDate)
                 val month = monthFormatter.format(date ?: "")
                 LineData(valueSelector(it), month)
@@ -281,7 +299,6 @@ fun LineChartWeightData(
         Log.e("LineChart", "No Weightdata")
     }
 }
-
 
 
 //

@@ -54,12 +54,10 @@ fun WeightReviseScreen(
     val context = LocalContext.current
     val weightData = recordId?.toInt()
         ?.let { weightViewModel.filterWeightDataByRecordId(it).firstOrNull() }
-
     var recordDate = weightData?.recordDate ?: ""
     var height by remember { mutableStateOf(weightData?.height?.toString() ?: "") }
     var weight by remember { mutableStateOf(weightData?.weight?.toString() ?: "") }
     var bodyFat by remember { mutableStateOf(weightData?.bodyFat?.toString() ?: "") }
-
 
     var errMsg by remember { mutableStateOf("") }
     var isShowDeleteDialog by remember { mutableStateOf(false) }

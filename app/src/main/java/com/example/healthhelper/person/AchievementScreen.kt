@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -265,17 +266,14 @@ fun AchievementList(
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            maxItemsInEachRow = 3
         ) {
-            val count = 3 - achievements.size % 3
             achievements.forEach { achievement ->
                 AchievementItem(
+                    modifier = Modifier.fillMaxWidth(1f/3f),
                     achievement = achievement,
                     onClick = { onItemClick(achievement) },
-                    modifier = Modifier.weight(1f)
                 )
             }
-            repeat(count) { Spacer(modifier = Modifier.weight(1f)) }
         }
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
     }
@@ -299,9 +297,9 @@ fun AchievementItem(
             val imageBytes = Base64.decode(base64String, Base64.DEFAULT)
             val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
             Image(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = null,
-                modifier = Modifier.padding(top = 16.dp)
             )
         } ?: Image(
             painter = painterResource(id = R.drawable.baseline_photo_24),

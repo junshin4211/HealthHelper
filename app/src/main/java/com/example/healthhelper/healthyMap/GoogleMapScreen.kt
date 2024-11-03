@@ -4,6 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
@@ -34,12 +37,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -49,14 +57,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
+import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
 import com.example.healthhelper.healthyMap.model.MapState
 import com.example.healthhelper.healthyMap.model.RestaurantInfo
-import com.example.healthhelper.healthyMap.model.ResturantsFavorList
-import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
-
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -68,11 +74,13 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun GoogleMapScreen(
+    favorListViewModel: FavorListViewModel,
     restaurantId: String?,
     restaurants: List<RestaurantInfo>,
     onError: (String) -> Unit = {},
@@ -80,12 +88,12 @@ fun GoogleMapScreen(
     userLat: Double,
     userLng: Double,
 ) {
+    val favorResturants by favorListViewModel.favorResturantsState.collectAsState()
     val context = LocalContext.current
     var mapState by remember { mutableStateOf(MapState()) }
-    val restaurant = restaurants.find { it.id == restaurantId }
+    val restaurant = restaurants.find { it.rID == restaurantId?.toInt() }
     val bottomSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(true) }
-    val viewModel: FavorListViewModel = viewModel()
 
     LaunchedEffect(restaurant) {
         if (restaurantId != null && restaurant == null) {
@@ -106,7 +114,7 @@ fun GoogleMapScreen(
             navController = navController
         )
         if (restaurant != null) {
-            val restaurantLatLng = LatLng(restaurant.latitude, restaurant.longitude)
+            val restaurantLatLng = LatLng(restaurant.rlatitude, restaurant.rlongitude)
             val markerState = rememberMarkerState(position = restaurantLatLng)
             val cameraPositionState = rememberCameraPositionState {
                 position = CameraPosition.fromLatLngZoom(restaurantLatLng, 15f)
@@ -132,7 +140,6 @@ fun GoogleMapScreen(
                 cameraPositionState = cameraPositionState,
                 onMapLoaded = { mapState = mapState.copy(isLoading = false) },
                 properties = MapProperties(
-                    isMyLocationEnabled = locationPermission.status.isGranted,
                     latLngBoundsForCameraTarget = LatLngBounds(
                         LatLng(22.045858, 119.426224),
                         LatLng(25.161124, 122.343094)
@@ -150,8 +157,8 @@ fun GoogleMapScreen(
             ) {
                 Marker(
                     state = markerState,
-                    title = restaurant.name,
-                    snippet = restaurant.address,
+                    title = restaurant.rname,
+                    snippet = restaurant.raddress,
                     onClick = {
                         mapState = mapState.copy(selectedRestaurant = restaurant)
                         showBottomSheet = true
@@ -165,7 +172,7 @@ fun GoogleMapScreen(
                 onDismissRequest = {
                     mapState = mapState.copy(error = null)
                 },
-                title = { Text("錯誤") },
+                title = { Text(stringResource(R.string.error)) },
                 text = { Text(error) },
                 confirmButton = {
                     TextButton(onClick = {
@@ -188,10 +195,11 @@ fun GoogleMapScreen(
                         distance = calculateDistance(
                             userLat,
                             userLng,
-                            restaurant.latitude,
-                            restaurant.longitude
+                            restaurant.rlatitude,
+                            restaurant.rlongitude
                         ),
-                        viewModel = viewModel
+                        viewModel = favorListViewModel,
+                        favorResturants = favorResturants
                     )
                 }
 
@@ -206,12 +214,17 @@ fun RestaurantDetailsBottomSheet(
     restaurant: RestaurantInfo,
     distance: String,
     viewModel: FavorListViewModel,
+    favorResturants: List<RestaurantInfo>
 ) {
-    var isFavor by remember { mutableStateOf(false) }
+    var isFavor by remember { mutableStateOf(favorResturants.any { it.rID == restaurant.rID })}
+    val scope = rememberCoroutineScope()
+    val favoriteColor = animateColorAsState(
+        targetValue = if (isFavor) colorResource(R.color.primarycolor) else colorResource(R.color.footer),
+        animationSpec = tween(durationMillis = 300) )
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.6f),
+            .fillMaxHeight(0.7f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -219,61 +232,78 @@ fun RestaurantDetailsBottomSheet(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            Text(text = restaurant.rname, fontSize = 28.sp, lineHeight = 30.sp)
+            Spacer(modifier = Modifier.height(12.dp))
             Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = restaurant.name, fontSize = 32.sp)
-                Spacer(modifier = Modifier.padding(horizontal = 10.dp))
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = colorResource(R.color.primarycolor),
-                            shape = RoundedCornerShape(20.dp)
-                        )
-                        .padding(5.dp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = colorResource(R.color.primarycolor),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            .padding(5.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(restaurant.rrating.toString())
+                            Icon(
+                                Icons.Filled.Star,
+                                contentDescription = stringResource(R.string.rating),
+                                tint = colorResource(R.color.footer)
+                            )
+                        }
+                    }
                     Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(restaurant.rating.toString())
                         Icon(
-                            Icons.Filled.Star,
-                            contentDescription = stringResource(R.string.rating),
-                            tint = colorResource(R.color.footer)
+                            imageVector = Icons.Default.Phone,
+                            contentDescription = stringResource(R.string.distance),
+                            tint = colorResource(R.color.primarycolor)
                         )
+                        Text(restaurant.rphone, fontSize = 14.sp)
                     }
                 }
-                Spacer(modifier = Modifier.padding(horizontal = 20.dp))
                 IconButton(onClick = {
-                    isFavor = true
-                    viewModel.addLike(
-                        ResturantsFavorList(
-                            id = restaurant.id,
-                            resturantsName = restaurant.name,
-                            address = restaurant.address,
-                            city = restaurant.city,
-                            reigion = restaurant.region,
-                            like = 1
-                        )
-                    )
+                    isFavor = !isFavor
+                    scope.launch{
+                        if (isFavor) {
+                            viewModel.insertFavorRestaurant(2, restaurant.rID)
+                        } else {
+                            viewModel.deleteFavor(restaurant.rID)
+                        }
+                    }
                 }) {
                     Icon(
                         Icons.Filled.Favorite,
                         contentDescription = stringResource(R.string.addFavor),
                         modifier = Modifier.size(50.dp),
-                        tint = if (isFavor) colorResource(R.color.primarycolor) else colorResource(
-                            R.color.footer
-                        )
+                        tint = favoriteColor.value
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top,
             ) {
-                Text(text = restaurant.address, fontSize = 16.sp)
-                Spacer(modifier = Modifier.padding(horizontal = 20.dp))
+                Text(
+                    modifier = Modifier.width(250.dp),
+                    text = restaurant.raddress,
+                    fontSize = 16.sp,
+                    lineHeight = 26.sp
+                )
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
@@ -283,30 +313,24 @@ fun RestaurantDetailsBottomSheet(
                         contentDescription = stringResource(R.string.distance),
                         tint = colorResource(R.color.footer)
                     )
-                    Text(distance, color = colorResource(R.color.footer), fontSize = 14.sp)
+                    Text(distance, color = colorResource(R.color.footer), fontSize = 16.sp)
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(R.string.web) + (restaurant.rweb?.ifEmpty { stringResource(R.string.noData) }
+                ?: stringResource(R.string.noData)))
             Spacer(modifier = Modifier.height(18.dp))
-            Text(stringResource(R.string.web) + "${restaurant.web}")
-            Spacer(modifier = Modifier.height(18.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = stringResource(R.string.distance),
-                    tint = colorResource(R.color.primarycolor)
-                )
-                Text(restaurant.homePhone, fontSize = 14.sp)
-                Spacer(modifier = Modifier.padding(horizontal = 20.dp))
-                Icon(
-                    imageVector = Icons.Default.Phone,
-                    contentDescription = stringResource(R.string.distance),
-                    tint = colorResource(R.color.primarycolor)
-                )
-                Text(restaurant.phone, fontSize = 14.sp)
-            }
+            Image(
+                painter = rememberAsyncImagePainter(
+                    restaurant.rphotoUrl?.ifEmpty { "https://images.pexels.com/photos/2741448/pexels-photo-2741448.jpeg?auto=compress&cs=tinysrgb&w=640&h=427&dpr=1" }
+                ),
+                contentDescription = stringResource(R.string.restaurant_image),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.FillWidth
+            )
 
         }
     }
@@ -326,7 +350,7 @@ fun FloatBackButton(modifier: Modifier = Modifier, navController: NavHostControl
     ) {
         Icon(
             modifier = Modifier
-                .size(40.dp)
+                .size(30.dp)
                 .align(Alignment.Center),
             painter = painterResource(R.drawable.arrow_back_ios_new),
             tint = colorResource(R.color.white),
@@ -355,14 +379,15 @@ fun DirectButton(
                     context,
                     userLat,
                     userLng,
-                    restaurant.latitude,
-                    restaurant.longitude,
+                    restaurant.rlatitude,
+                    restaurant.rlongitude,
                 )
             })
     ) {
         Icon(
             modifier = Modifier
-                .size(50.dp)
+                .size(40.dp)
+                .rotate(45f)
                 .align(Alignment.Center),
             painter = painterResource(R.drawable.baseline_navigation_24),
             tint = colorResource(R.color.white),

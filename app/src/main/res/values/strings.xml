@@ -164,5 +164,10 @@
     <string name="close">關閉</string>
     <string name="photoClipRange">影像擷取範圍</string>
     <string name="failValueHeightWeight">請輸入有效的身高和體重</string>
-    <string name="noBodyData">此區間尚未有資料</string>
+    <string name="noBodyData">資料不足繪圖</string>
+    <string name="month">月份</string>
+    <string name="error">錯誤</string>
+    <string name="noData">尚無資料</string>
+    <string name="restaurant_image">餐廳照片</string>
+    <string name="lastWeightRecord">上次最後輸入的資料</string>
 </resources>
