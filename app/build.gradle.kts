@@ -98,6 +98,7 @@ dependencies {
     implementation(libs.hikaricp)
     implementation(libs.mysql.connector.j)
     implementation(libs.slf4j.api)
+    implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

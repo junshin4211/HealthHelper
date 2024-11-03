@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -37,44 +38,51 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.FoodItemTopAppBar
 import com.example.healthhelper.dietary.components.button.DeleteButton
 import com.example.healthhelper.dietary.components.button.SaveButton
 import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
+import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
-import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemViewModel
-import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
+import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodItemInfoFrame(
     navController: NavHostController,
-    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
-    selectedFoodItemViewModel: SelectedFoodItemViewModel = viewModel(),
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
+    selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
+    title: String,
+    mealOptionName: String,
 ) {
 
     val TAG = "tag_FoodItemInfoFrame"
 
     val context = LocalContext.current
 
-    val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
-    val selectedFoodItem by selectedFoodItemViewModel.data.collectAsState()
-
     val mealOption by mealOptionViewModel.data.collectAsState()
 
-    val mutableStateString = remember { mutableStateOf(selectedMealOption.name) }
+    val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
+    val selectedMealOptions by mealsOptionViewModel.data.collectAsState()
+
     val options by remember { mutableStateOf(mutableListOf("")) }
+
+    val selectedMealOption = selectedMealOptions.first() { it.text == mealOptionName }
+    var selectedMealsOptionState by remember { mutableStateOf(selectedMealOption) }
+
+    val mutableStateString = remember { mutableStateOf(selectedMealOption.name) }
 
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var saveButtonIsClicked by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        Log.e(TAG, "selectedMealOption:${selectedMealOption}")
         mealOption.forEach {
-            options.add(it.mealsOptionText)
+            options.add(it.name)
         }
     }
     Scaffold(
@@ -83,7 +91,7 @@ fun FoodItemInfoFrame(
             FoodItemTopAppBar(
                 navController = navController,
                 title = {
-                    Text(selectedFoodItem.name)
+                    Text(selectedMealOption.name)
                 }
             )
         },
@@ -109,7 +117,6 @@ fun FoodItemInfoFrame(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         OutlinedTextField(
-                            //value = gramsText,
                             value = selectedFoodItem.grams.value.toInt().toString(),
                             onValueChange = {
                                 if (it.isNotBlank() && it.isDigitsOnly()) {
@@ -146,7 +153,10 @@ fun FoodItemInfoFrame(
                             mutableStateValue = mutableStateString,
                             label = {},
                             modifier = Modifier.width(200.dp),
-                            onValueChangedEvent = { mutableStateString.value = it },
+                            onValueChangedEvent = {
+                                mutableStateString.value = it
+                                selectedMealsOptionState = selectedMealOptions.first() { option -> option.name == mutableStateString.value }
+                            },
                             options = options,
                             outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
                             readOnly = false,
@@ -234,19 +244,26 @@ fun FoodItemInfoFrame(
 
     if (deleteButtonIsClicked) {
         SelectedFoodItemsRepository.remove(selectedFoodItem)
-        deleteButtonIsClicked = false
+
         Toast.makeText(
             context,
             stringResource(R.string.delete_data_successfully),
             Toast.LENGTH_LONG
         ).show()
+        deleteButtonIsClicked = false
         navController.navigateUp()
     } else if (saveButtonIsClicked) {
-        //TODO
+
         SelectedFoodItemsRepository.updateData(selectedFoodItem, selectedFoodItem)
-        saveButtonIsClicked = false
+
         Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
             .show()
+        saveButtonIsClicked = false
+        /*
+        We can directly use `navController.navigateUp` method to jump back to previous page since we need to passed the data.
+        We have to use `navController.navigate` method with arguments to do this.
         navController.navigateUp()
+         */
+        navController.navigate("${DietDiaryScreenEnum.DietDiaryMealFrame.name}/${selectedMealsOptionState.text}")
     }
 }

@@ -7,7 +7,7 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 
 @Composable
 fun TextFieldWithText(

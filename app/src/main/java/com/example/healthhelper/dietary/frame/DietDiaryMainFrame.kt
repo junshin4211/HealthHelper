@@ -30,8 +30,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -39,12 +41,13 @@ import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTopAppBar
 import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
+import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
-import com.example.healthhelper.dietary.dataclasses.vo.SelectedMealOptionVO
-import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
+import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.util.downloaddata.DownloadData
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
+import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
@@ -52,15 +55,22 @@ import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 fun DietDiaryMainFrame(
     navController: NavHostController,
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
+    nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
 ) {
+    val TAG = "tag_DietDiaryMainFrame"
+
     val context = LocalContext.current
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
+    val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
+    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
+
+    var selectedMealsOption by remember { mutableStateOf<MealsOptionVO>(mealsOptions[0]) }
+
+    var selectedMealOptionState by remember { mutableStateOf(selectedMealOption.name) }
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
     var downloadButtonIsClicked by remember { mutableStateOf(false) }
-
-    var selectedMealOptionVO by remember { mutableStateOf(MealsOptionVO(innerIconId = 0, mealsOptionText = "早餐")) }
 
     val verticalScrollState = rememberScrollState()
 
@@ -73,7 +83,7 @@ fun DietDiaryMainFrame(
             )
         },
         floatingActionButton = {
-            Row{
+            Row {
                 DownloadButton(
                     context = context,
                     onClick = { downloadButtonIsClicked = true }
@@ -90,7 +100,7 @@ fun DietDiaryMainFrame(
             ) {
                 Column(
                     modifier = Modifier
-                        .weight(0.95f)
+                        .weight(0.7f)
                         .verticalScroll(verticalScrollState),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
@@ -126,16 +136,17 @@ fun DietDiaryMainFrame(
                         val innerText =
                             @Composable {
                                 Text(
-                                    text = mealsOption.mealsOptionText,
+                                    text = mealsOption.name,
                                     color = Color.White,
+                                    fontSize = 30.sp,
                                 )
                             }
                         MealButton(
                             outerIconButtonModifier = outerIconButtonModifier,
                             outerIconButtonColor = outerIconButtonColor,
                             onClick = {
+                                selectedMealsOption = mealsOption
                                 mealsButtonIsClicked = true
-                                selectedMealOptionVO = mealsOption
                             },
                             innerIconId = innerIconId,
                             spacerModifier = spacerModifier,
@@ -143,13 +154,34 @@ fun DietDiaryMainFrame(
                         )
                     }
                 }
+                Column(
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .verticalScroll(verticalScrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top,
+                ) {
+                    NutritionInfoCombo(
+                        nutritionInfoVO = nutritionInfo,
+                        showTitle = true,
+                        title = {
+                            Text(
+                                text = "${stringResource(R.string.total_title)}:",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                            )
+                        }
+                    )
+                }
             }
         }
     )
-    if(mealsButtonIsClicked){
-        SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = selectedMealOptionVO.mealsOptionText))
+    if (mealsButtonIsClicked) {
+        navController.navigate("${DietDiaryScreenEnum.DietDiaryMealFrame.name}/${selectedMealsOption.text}")
         mealsButtonIsClicked = false
-    }else if(downloadButtonIsClicked){
+    }
+
+    if (downloadButtonIsClicked) {
         DownloadData(
             context = context,
             vo = mealsOptions,

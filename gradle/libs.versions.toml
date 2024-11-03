@@ -32,6 +32,7 @@ material = "1.13.0-alpha07"
 hikaricp = "6.0.0"
 mysqlConnectorJ = "9.1.0"
 slf4jApi = "2.1.0-alpha1"
+kotlinxCoroutinesAndroid = "1.9.0"
 
 #composeThemeAdapter = "1.2.1"
 
@@ -74,6 +75,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 hikaricp = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikaricp" }
 mysql-connector-j = { group = "com.mysql", name = "mysql-connector-j", version.ref = "mysqlConnectorJ" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jApi" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 
 #compose-theme-adapter = { group = "com.google.android.material", name = "compose-theme-adapter", version.ref = "composeThemeAdapter" }
 

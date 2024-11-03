@@ -171,4 +171,17 @@
     <string name="add_data_successfully">新增資料成功</string>
     <string name="grams">克</string>
     <string name="save_data_successfully">儲存資料成功</string>
+    <string name="milli">毫</string>
+    <string name="fiber">纖維質</string>
+    <string name="sugar">糖</string>
+    <string name="sodium">鈉</string>
+    <string name="kilo">大</string>
+    <string name="total_record_title">總記錄</string>
+    <string name="total_title">總計</string>
+    <string name="breakfast_name">breakfast</string>
+    <string name="lunch_name">lunch</string>
+    <string name="dinner_name">dinner</string>
+    <string name="supper_name">supper</string>
+    <string name="save_graph">儲存圖片</string>
+    <string name="save_text_record">文字記錄</string>
 </resources>

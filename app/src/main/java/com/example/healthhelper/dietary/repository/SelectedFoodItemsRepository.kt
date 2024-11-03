@@ -1,9 +1,6 @@
 package com.example.healthhelper.dietary.repository
 
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
-import com.example.healthhelper.dietary.gson.gson
-import com.example.healthhelper.dietary.servlet.url.DietDiaryUrl
-import com.example.healthhelper.web.httpGet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,8 +10,11 @@ object SelectedFoodItemsRepository {
 
     val TAG = "tag_SelectedFoodItemsRepository"
 
-    private val _dataFlow = MutableStateFlow<MutableList<SelectedFoodItemVO>>(fetchDataFromDatabase())
+    private val _dataFlow = MutableStateFlow(fetchData())
     val dataFlow: StateFlow<List<SelectedFoodItemVO>> = _dataFlow.asStateFlow()
+
+    private val _selectedDataFlow = MutableStateFlow(fetchData()[0])
+    val selectedDataFlow: StateFlow<SelectedFoodItemVO> = _selectedDataFlow.asStateFlow()
 
     private fun fetchData():MutableList<SelectedFoodItemVO> {
         val foodItems = mutableListOf(
@@ -26,17 +26,12 @@ object SelectedFoodItemsRepository {
         return foodItems
     }
 
-    private fun fetchDataFromDatabase():MutableList<SelectedFoodItemVO> {
-        val dataIn = httpGet(
-            url = DietDiaryUrl.listAvailableFoodsNameAndGramsUrl,
-            dataOut = "",
-        )
-        val foodItems = gson.fromJson(dataIn,SelectedFoodItemVO.class)
-        return foodItems
-    }
-
     fun setData(newData: MutableList<SelectedFoodItemVO>){
         _dataFlow.update { newData }
+    }
+
+    fun setSelectedData(newData: SelectedFoodItemVO){
+        _selectedDataFlow.update { newData }
     }
 
     fun updateData(selectedFoodItemVO: SelectedFoodItemVO,newSelectedFoodItemVO: SelectedFoodItemVO){

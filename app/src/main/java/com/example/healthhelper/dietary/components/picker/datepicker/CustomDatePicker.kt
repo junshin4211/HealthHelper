@@ -1,6 +1,5 @@
 package com.example.healthhelper.dietary.components.picker.datepicker
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

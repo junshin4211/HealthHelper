@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 
 
 @Composable
