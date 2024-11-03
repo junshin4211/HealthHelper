@@ -21,9 +21,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +44,15 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.person.model.UserData
+import com.example.healthhelper.person.personVM.AchievementViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun PersonScreen(
     navController: NavHostController,
+    achievementVM: AchievementViewModel
 ) {
+    val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
     Scaffold(containerColor = colorResource(R.color.backgroundcolor)) { innerPadding ->
         Column(
@@ -125,6 +131,9 @@ fun PersonScreen(
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
                     onClick = {
+                        scope.launch {
+                            achievementVM.insertAchievement(2)
+                        }
                         navController.navigate(PersonScreenEnum.achivementScreen.name)
                     }
                 ) {
@@ -181,8 +190,8 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Na
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PersonPreview() {
-    PersonScreen(rememberNavController())
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PersonPreview() {
+//    PersonScreen(rememberNavController())
+//}

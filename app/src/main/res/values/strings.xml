@@ -169,5 +169,5 @@
     <string name="error">錯誤</string>
     <string name="noData">尚無資料</string>
     <string name="restaurant_image">餐廳照片</string>
-    <string name="lastWeightRecord">上次最後輸入的資料</string>
+    <string name="lastWeightRecord">最新的資料</string>
 </resources>

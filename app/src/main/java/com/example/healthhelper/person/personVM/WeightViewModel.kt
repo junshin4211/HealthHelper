@@ -23,7 +23,6 @@ class WeightViewModel : ViewModel() {
     private val _dateRangeState = MutableStateFlow(DateRange())
     val dateRangeState: StateFlow<DateRange> = _dateRangeState.asStateFlow()
 
-    val errMsg = ErrorMsg()
 
     init {
         viewModelScope.launch {
@@ -99,7 +98,7 @@ class WeightViewModel : ViewModel() {
         if (response.get("result").asBoolean) {
             refreshWeightData()
         }
-        errMsg.errMsg = response.get("errMsg").toString()
+        ErrorMsg.errMsg = response.get("errMsg").toString()
         return response.get("result").asBoolean
     }
 

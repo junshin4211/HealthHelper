@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +63,7 @@ import com.example.healthhelper.person.widget.CustomTopBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AchievementScreen(
-    achievementVM: AchievementViewModel = viewModel(),
+    achievementVM: AchievementViewModel,
     navController: NavHostController,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -311,8 +312,8 @@ fun AchievementItem(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun AchievementScreenPreview() {
-    AchievementScreen(navController = rememberNavController())
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun AchievementScreenPreview() {
+//    AchievementScreen(navController = rememberNavController())
+//}

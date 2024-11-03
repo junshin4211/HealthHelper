@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.healthhelper.person.personVM.AchievementViewModel
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -26,6 +27,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 fun MainPersonScreen(
     navController: NavHostController = rememberNavController(),
     weightViewModel: WeightViewModel = viewModel(),
+    achievementVM: AchievementViewModel = viewModel()
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -35,7 +37,8 @@ fun MainPersonScreen(
     ) {
         composable(route = PersonScreenEnum.personScreen.name) {
             PersonScreen(
-                navController = navController
+                navController = navController,
+                achievementVM=achievementVM
             )
         }
         composable(route = PersonScreenEnum.cameraPreviewScreen.name) {
@@ -78,7 +81,7 @@ fun MainPersonScreen(
             WeightReviseScreen(navController,  weightViewModel =  weightViewModel, recordId = recordId)
         }
         composable(route = PersonScreenEnum.achivementScreen.name) {
-            AchievementScreen(navController = navController)
+            AchievementScreen(achievementVM=achievementVM, navController = navController)
         }
 
     }
