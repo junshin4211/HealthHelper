@@ -236,6 +236,7 @@ fun DietDiaryMealFrame(
                             ){
                                 Column(
                                     modifier = Modifier
+                                        .padding(16.dp)
                                         .verticalScroll(verticalScrollState),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Top,
