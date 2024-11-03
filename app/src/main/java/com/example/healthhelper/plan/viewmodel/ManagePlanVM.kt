@@ -45,7 +45,7 @@ class ManagePlanVM : ViewModel() {
 
     private suspend fun fetchPlanData(
         userId: Int,
-        finishstate: Int,
+        finishState: Int,
     ): List<PlanModel> {
         val url = "$serverUrl/Plan/Manage"
         return try {
@@ -54,7 +54,7 @@ class ManagePlanVM : ViewModel() {
                 .create()
             val jsonObject = JsonObject().apply {
                 addProperty("userId", userId)
-                addProperty("finishstate", finishstate)
+                addProperty("finishstate", finishState)
             }
 
             val result = httpPost(url, jsonObject.toString())

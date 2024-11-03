@@ -68,36 +68,6 @@ fun EditPlan(planname:String,
                 .verticalScroll(scrollstate)
                 .padding(top = 10.dp)
         ){
-//            Row(
-//                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier
-//                    .padding(start = 10.dp, bottom = 10.dp)
-//                    .clickable {
-//                        navcontroller.popBackStack()
-//                    }
-//            ) {
-//                Image(
-//                    painter = painterResource(R.drawable.arrow),
-//                    contentDescription = "arrow",
-//                    modifier = Modifier
-//                        .scale(2.2f)
-//                        .graphicsLayer(scaleX = -1f),
-//                    colorFilter = ColorFilter.tint(colorResource(R.color.primarycolor))
-//                )
-//
-//                Text(
-//                    text = "${planname}飲食計畫",
-//                    style = TextStyle(
-//                        fontSize = 26.sp,
-//                        fontFamily = FontFamily.Default,
-//                        fontWeight = FontWeight(600),
-//                        color = colorResource(id = R.color.black),
-//                        textAlign = TextAlign.Center,
-//                        letterSpacing = 0.2.sp
-//                    )
-//                )
-//            }
 
             Column (
                 modifier = Modifier

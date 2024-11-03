@@ -43,6 +43,15 @@ object PlanRepository {
         }
     }
 
+    //add myPlan to list
+    fun insertMyPlan(plan: PlanModel) {
+        _myPlanList.update {
+            val plans = it.toMutableList()
+            plans.add(plan)
+            plans
+        }
+    }
+
     private val _completePlanList = MutableStateFlow(emptyList<PlanModel>())
     val completePlanList: StateFlow<List<PlanModel>> = _completePlanList.asStateFlow()
 
@@ -57,6 +66,15 @@ object PlanRepository {
         _completePlanList.update {
             val plans = it.toMutableList()
             plans.remove(plan)
+            plans
+        }
+    }
+
+    //add CompletePlan to list
+    fun insertCompletePlan(plan: PlanModel) {
+        _completePlanList.update {
+            val plans = it.toMutableList()
+            plans.add(plan)
             plans
         }
     }

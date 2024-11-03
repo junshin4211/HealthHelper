@@ -41,24 +41,12 @@ fun ManagePlan(
     val context = LocalContext.current
     val tag = "tag_ManagePlan"
     var activatepannel by remember { mutableStateOf(planVM.panneelname) }
-    //var showdeleteicon by remember { mutableStateOf(planVM.showdelete) }
     val coroutineScope = rememberCoroutineScope()
 
     val myPlanList by managePlanVM.myPlanListState.collectAsState(initial = emptyList())
     Log.d(tag, "get list $myPlanList")
     val completePlanList by managePlanVM.completePlanListState.collectAsState(initial = emptyList())
     Log.d(tag, "get list $completePlanList")
-//    var myPlanList by remember { mutableStateOf(myPlan) }
-//    var completeList by remember { mutableStateOf(completePlan)}
-
-//    if(myPlan.isEmpty())
-//    {
-//        myPlanList = listOf(PlanModel())
-//    }
-//    if(completePlan.isEmpty())
-//    {
-//        completeList = listOf(PlanModel())
-//    }
 
     Column(
         modifier = Modifier
