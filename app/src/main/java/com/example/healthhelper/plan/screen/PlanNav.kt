@@ -33,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CustomText
+import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
@@ -43,7 +44,8 @@ fun Plan(
     navController: NavHostController = rememberNavController(),
     tabViewModel: TabViewModel = viewModel(),
     planVM: PlanVM = viewModel(),
-    managePlanVM: ManagePlanVM = viewModel()
+    managePlanVM: ManagePlanVM = viewModel(),
+    EditPlanVM: EditPlanVM = viewModel()
 ) {
     val tag = "tag_PlanNav"
     val context = LocalContext.current
@@ -86,37 +88,42 @@ fun Plan(
             }
             composable(route = PlanPage.HighProtein.name) {
                 EditPlan(
-                    PlanPage.HighProtein.getPlanTitle(context),
+                    PlanPage.HighProtein,
                     navcontroller = navController,
-                    tabViewModel
+                    tabViewModel,
+                    EditPlanVM
                 )
             }
             composable(route = PlanPage.LowCarb.name) {
                 EditPlan(
-                    PlanPage.LowCarb.getPlanTitle(context),
+                    PlanPage.LowCarb,
                     navcontroller = navController,
-                    tabViewModel
+                    tabViewModel,
+                    EditPlanVM
                 )
             }
             composable(route = PlanPage.Ketone.name) {
                 EditPlan(
-                    PlanPage.Ketone.getPlanTitle(context),
+                    PlanPage.Ketone,
                     navcontroller = navController,
-                    tabViewModel
+                    tabViewModel,
+                    EditPlanVM
                 )
             }
             composable(route = PlanPage.Mediterra.name) {
                 EditPlan(
-                    PlanPage.Mediterra.getPlanTitle(context),
+                    PlanPage.Mediterra,
                     navcontroller = navController,
-                    tabViewModel
+                    tabViewModel,
+                    EditPlanVM
                 )
             }
             composable(route = PlanPage.Custom.name) {
                 CustomEditPlan(
                     PlanPage.Custom.getPlanTitle(context),
                     navcontroller = navController,
-                    tabViewModel
+                    tabViewModel,
+                    EditPlanVM
                 )
             }
             composable(route = PlanPage.ManagePlan.name) {

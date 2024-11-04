@@ -21,30 +21,39 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.DateRange
+import com.example.healthhelper.plan.PlanRepository
+import com.example.healthhelper.plan.usecase.PlanUCImpl
+import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import java.time.Instant
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun CreateDatePicker(
     dateSelected: String?,
-    dateStart: Boolean = true
+    dateStart: Boolean = true,
+    EditPlanVM: EditPlanVM
 ) {
-    var date by remember { mutableStateOf(LocalDate.now()) }
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val repository = PlanRepository
+    var date by remember { mutableStateOf(LocalDateTime.now()) }
+//    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var showDatePicker by remember { mutableStateOf(false) }
-    var getdate by remember { mutableStateOf(date.format(formatter)) }
+//    var getdate by remember { mutableStateOf(date.format(formatter)) }
+    val dateFormatter = PlanUCImpl()::dateTimeFormat;
+    val stringDateFormatter = PlanUCImpl()::stringToTimeStamp;
+    var getdate by remember { mutableStateOf(dateFormatter(date)) }
 
     if (!dateStart) {
-        date = LocalDate.now().plusWeeks(1L)
+        date = LocalDateTime.now().plusWeeks(1L)
+        EditPlanVM.updateEndDateTime(stringDateFormatter(date))
     }
 
     dateformatter(dateSelected ?: DateRange.AWeek.name,
         dateStart,
         onDateselect = {
             date = it
-            getdate = date.format(formatter)
+//            getdate = date.format(formatter)
+            getdate = dateFormatter(date)
         }
     )
 
@@ -92,10 +101,16 @@ fun CreateDatePicker(
             onConfirm = { utcTimeMillis ->
                 utcTimeMillis?.let {
                     date = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
-                        .toLocalDate()
+                        .toLocalDateTime()
                 }
                 showDatePicker = false
-                getdate = date.format(formatter)
+//                getdate = date.format(formatter)
+                getdate = dateFormatter(date)
+                if (dateStart) {
+                    EditPlanVM.updateStartDateTime(stringDateFormatter(date))
+                } else {
+                    EditPlanVM.updateEndDateTime(stringDateFormatter(date))
+                }
             },
             onDismiss = {
                 showDatePicker = false
@@ -107,9 +122,9 @@ fun CreateDatePicker(
 fun dateformatter(
     dateSelected: String,
     dateStart: Boolean,
-    onDateselect: (LocalDate) -> Unit
+    onDateselect: (LocalDateTime) -> Unit
 ) {
-    val today = LocalDate.now()
+    val today = LocalDateTime.now()
     if (dateStart) {
         onDateselect(today)
     } else {

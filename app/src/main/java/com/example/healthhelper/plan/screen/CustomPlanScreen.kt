@@ -46,14 +46,17 @@ import com.example.healthhelper.plan.ui.CustomButton
 import com.example.healthhelper.plan.ui.CustomText
 import com.example.healthhelper.plan.ui.CustomTextField
 import com.example.healthhelper.plan.ui.createSliders
+import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 @Composable
-fun CustomEditPlan(planname:String,
-             navcontroller: NavHostController = rememberNavController(),
-             tabViewModel: TabViewModel = viewModel()
-){
+fun CustomEditPlan(
+    planname: String,
+    navcontroller: NavHostController = rememberNavController(),
+    tabViewModel: TabViewModel = viewModel(),
+    EditPlanVM: EditPlanVM,
+) {
     val scrollstate = rememberScrollState()
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
@@ -71,7 +74,7 @@ fun CustomEditPlan(planname:String,
             .background(color = colorResource(R.color.backgroundcolor))
             .verticalScroll(scrollstate)
             .padding(top = 10.dp)
-    ){
+    ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically,
@@ -101,12 +104,12 @@ fun CustomEditPlan(planname:String,
             )
         }
 
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 13.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
-        ){
+        ) {
             Text(
                 text = stringResource(R.string.setplantime),
                 style = TextStyle(
@@ -122,7 +125,7 @@ fun CustomEditPlan(planname:String,
             CreateDropDownMenu(
                 options = DateRange.entries,
                 selectedOption = null,
-                onOptionSelected = {  selectedDate = it.toString()},
+                onOptionSelected = { selectedDate = it.toString() },
                 getDisplayText = { context.getString(it.title) }
             )
 
@@ -138,7 +141,7 @@ fun CustomEditPlan(planname:String,
                 )
             )
 
-            CreateDatePicker(dateSelected = selectedDate)
+            CreateDatePicker(dateSelected = selectedDate, EditPlanVM = EditPlanVM)
 
             Text(
                 text = stringResource(R.string.enddate),
@@ -152,37 +155,42 @@ fun CustomEditPlan(planname:String,
                 )
             )
 
-            CreateDatePicker(dateSelected = selectedDate, dateStart = false)
+            CreateDatePicker(dateSelected = selectedDate, dateStart = false, EditPlanVM = EditPlanVM)
         }
 
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 30.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
-            Column (
+        ) {
+            Column(
                 modifier = Modifier.padding(start = 30.dp, end = 80.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.Start
-            ){
-                for(i in 0..2){
-                    when(i){
+            ) {
+                for (i in 0..2) {
+                    when (i) {
                         0 -> CustomText().TextWithDiffColor(
                             R.color.red01,
-                            "${stringResource(R.string.carb)} $carbgram 克",15.sp)
+                            "${stringResource(R.string.carb)} $carbgram 克", 15.sp
+                        )
+
                         1 -> CustomText().TextWithDiffColor(
                             R.color.sky_blue,
-                            "${stringResource(R.string.protein)} $proteingram 克",15.sp)
+                            "${stringResource(R.string.protein)} $proteingram 克", 15.sp
+                        )
+
                         2 -> CustomText().TextWithDiffColor(
                             R.color.light_green,
-                            "${stringResource(R.string.body_fat)} $fatgram 克",15.sp)
+                            "${stringResource(R.string.body_fat)} $fatgram 克", 15.sp
+                        )
                     }
                 }
             }
 
-            Column (
-            ){
+            Column(
+            ) {
                 Image(
                     painter = painterResource(R.drawable.myplanimg),
                     contentDescription = "",
@@ -191,43 +199,49 @@ fun CustomEditPlan(planname:String,
             }
         }
 
-        Column (
+        Column(
             modifier = Modifier.padding(top = 10.dp, start = 13.dp, end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
-        ){
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 CustomText().TextWithDiffColor(
                     R.color.primarycolor,
-                    "${stringResource(R.string.setting)}${stringResource(R.string.dailygoal)}",26.sp)
+                    "${stringResource(R.string.setting)}${stringResource(R.string.dailygoal)}",
+                    26.sp
+                )
             }
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically
 
-            ){
-                CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.calories),22.sp)
+            ) {
+                CustomText().TextWithDiffColor(
+                    R.color.black,
+                    stringResource(R.string.calories),
+                    22.sp
+                )
                 CustomTextField().TextFieldWithBorder(
                     value = calorie,
-                    onValueChange = {newvalue -> calorie = newvalue },
-                    convertFromString = {it.toFloatOrNull()},
+                    onValueChange = { newvalue -> calorie = newvalue },
+                    convertFromString = { it.toFloatOrNull() },
                     label = stringResource(R.string.examcalorie),
                     width = 130.dp
                 )
-                CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals),16.sp)
+                CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals), 16.sp)
             }
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 CustomText().TextWithDiffColor(
                     text = stringResource(R.string.carb),
                     setsize = 22.sp
@@ -235,8 +249,8 @@ fun CustomEditPlan(planname:String,
 
                 CustomTextField().TextFieldWithBorder(
                     value = carbpercent,
-                    onValueChange = {newvalue -> carbpercent = newvalue},
-                    convertFromString = {it.toIntOrNull()},
+                    onValueChange = { newvalue -> carbpercent = newvalue },
+                    convertFromString = { it.toIntOrNull() },
                     label = stringResource(R.string.exampercent),
                     width = 100.dp
                 )
@@ -246,12 +260,12 @@ fun CustomEditPlan(planname:String,
 
             carbpercent = createSliders(0f, 100f, R.color.primarycolor, R.color.very_light_gray)
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 CustomText().TextWithDiffColor(
                     text = stringResource(R.string.protein),
                     setsize = 22.sp
@@ -259,8 +273,8 @@ fun CustomEditPlan(planname:String,
 
                 CustomTextField().TextFieldWithBorder(
                     value = proteinpercent,
-                    onValueChange = {newvalue -> proteinpercent = newvalue},
-                    convertFromString = {it.toIntOrNull()},
+                    onValueChange = { newvalue -> proteinpercent = newvalue },
+                    convertFromString = { it.toIntOrNull() },
                     label = stringResource(R.string.exampercent),
                     width = 100.dp
                 )
@@ -270,12 +284,12 @@ fun CustomEditPlan(planname:String,
 
             proteinpercent = createSliders(0f, 100f, R.color.primarycolor, R.color.very_light_gray)
 
-            Row (
+            Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, alignment = Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 CustomText().TextWithDiffColor(
                     text = stringResource(R.string.body_fat),
                     setsize = 22.sp
@@ -283,8 +297,8 @@ fun CustomEditPlan(planname:String,
 
                 CustomTextField().TextFieldWithBorder(
                     value = fatpercent,
-                    onValueChange = {newvalue -> fatpercent = newvalue},
-                    convertFromString = {it.toIntOrNull()},
+                    onValueChange = { newvalue -> fatpercent = newvalue },
+                    convertFromString = { it.toIntOrNull() },
                     label = stringResource(R.string.exampercent),
                     width = 100.dp
                 )
@@ -297,17 +311,20 @@ fun CustomEditPlan(planname:String,
         }
 
         //SaveButton
-        Row (
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp, bottom = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(0.dp, alignment = Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(
+                0.dp,
+                alignment = Alignment.CenterHorizontally
+            ),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             CustomButton().CreateButton(
                 text = stringResource(R.string.save),
                 color = R.color.primarycolor,
-                onClick = {  }
+                onClick = { }
             )
         }
 
@@ -320,6 +337,6 @@ fun CustomEditPlan(planname:String,
 @Composable
 fun CustomEditPlanPreview() {
     HealthHelperTheme {
-        CustomEditPlan("")
+        CustomEditPlan("",EditPlanVM = viewModel())
     }
 }

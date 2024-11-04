@@ -1,12 +1,21 @@
 package com.example.healthhelper.plan
 
 import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.plan.model.PlanWithGoalModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 
 object PlanRepository {
+    //Setting Plan
+    private val _setPlanState = MutableStateFlow(PlanWithGoalModel())
+    val setPlanState: StateFlow<PlanWithGoalModel> = _setPlanState.asStateFlow()
+    fun setPlan(plan: PlanWithGoalModel) {
+        _setPlanState.value = plan
+    }
+
     //Get Single Plan
     private val _myPlan = MutableStateFlow(PlanModel())
     val myPlan: StateFlow<PlanModel> = _myPlan.asStateFlow()
@@ -44,13 +53,6 @@ object PlanRepository {
     }
 
     //add myPlan to list
-    fun insertMyPlan(plan: PlanModel) {
-        _myPlanList.update {
-            val plans = it.toMutableList()
-            plans.add(plan)
-            plans
-        }
-    }
 
     private val _completePlanList = MutableStateFlow(emptyList<PlanModel>())
     val completePlanList: StateFlow<List<PlanModel>> = _completePlanList.asStateFlow()
@@ -71,12 +73,5 @@ object PlanRepository {
     }
 
     //add CompletePlan to list
-    fun insertCompletePlan(plan: PlanModel) {
-        _completePlanList.update {
-            val plans = it.toMutableList()
-            plans.add(plan)
-            plans
-        }
-    }
 
 }

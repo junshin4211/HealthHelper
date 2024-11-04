@@ -26,7 +26,7 @@ class CustomList {
         leadingIcon: @Composable () -> Unit,
         trialingIcon: @Composable (PlanModel) -> Unit,
     ) {
-        val formatter = PlanUCImpl()::DateTimeformat;
+        val formatter = PlanUCImpl()::dateTimeFormat;
         LazyColumn(
             modifier = Modifier
         ) {

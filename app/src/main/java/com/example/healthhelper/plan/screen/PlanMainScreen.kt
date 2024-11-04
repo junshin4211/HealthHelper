@@ -55,7 +55,7 @@ fun PlanMain(context: Context = LocalContext.current,
 ) {
     val tag = "tag_PlanMain"
     tabViewModel.setTabVisibility(true)
-    val formatter = PlanUCImpl()::DateTimeformat;
+    val formatter = PlanUCImpl()::dateTimeFormat;
 
     val myPlan by planViewModel.myPlanState.collectAsState()
     val completePlan by planViewModel.completePlanState.collectAsState()

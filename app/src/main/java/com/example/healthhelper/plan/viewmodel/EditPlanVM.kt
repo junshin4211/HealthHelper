@@ -9,11 +9,62 @@ import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import kotlinx.coroutines.flow.StateFlow
 import java.sql.Timestamp
 
 class EditPlanVM:ViewModel() {
     private val tag = "tag_EditVM"
     private val repository = PlanRepository
+
+    val setPlanState: StateFlow<PlanWithGoalModel> = repository.setPlanState
+
+    fun updateCategoryId(categoryId: Int) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.categoryId = categoryId })
+    }
+
+    fun updateUserId(userId: Int) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.userId = userId })
+    }
+
+    fun updateStartDateTime(startDateTime: Timestamp?) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.startDateTime = startDateTime })
+    }
+
+    fun updateEndDateTime(endDateTime: Timestamp?) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.endDateTime = endDateTime })
+    }
+
+    fun updateFinishState(finishState: Int) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.finishState = finishState })
+    }
+
+    fun updateFatGoal(fatGoal: Float) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.fatgoal = fatGoal })
+    }
+
+    fun updateCarbGoal(carbGoal: Float) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.carbongoal = carbGoal })
+    }
+
+    fun updateProteinGoal(proteinGoal: Float) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.proteingoal = proteinGoal })
+    }
+
+    fun updateCaloriesGoal(caloriesGoal: Float) {
+        val currentPlan = setPlanState.value
+        repository.setPlan(currentPlan.apply { this.Caloriesgoal = caloriesGoal })
+    }
+
+
+
 
     private suspend fun insertPlanRequest(
         planGoal: PlanWithGoalModel,
