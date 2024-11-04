@@ -7,6 +7,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
@@ -14,6 +15,7 @@ import com.example.healthhelper.R
 @Composable
 fun SearchIcon(
     navController: NavHostController,
+    outerIconButtonModifer: Modifier = Modifier,
     onClick: ()->Unit,
     iconButtonColors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
 ) {

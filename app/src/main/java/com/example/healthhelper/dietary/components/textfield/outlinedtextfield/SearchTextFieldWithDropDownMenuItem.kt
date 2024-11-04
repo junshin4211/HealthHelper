@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.components.textfield.outlinedtextfield
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -7,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
@@ -32,7 +34,7 @@ fun SearchTextFieldWithDropDownMenuItem(
         navController = navController,
         mutableStateValue = queryText,
         options = availableOptions,
-        modifier = Modifier,
+        exposedDropdownMenuBoxModifier = Modifier.padding(16.dp,0.dp),
         label = {},
         onValueChangedEvent = { input ->
             queryText.value = input

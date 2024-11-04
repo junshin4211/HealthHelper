@@ -3,6 +3,8 @@ package com.example.healthhelper.dietary.frame
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,8 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -83,7 +88,7 @@ fun DietDiaryMealFrame(
 
     val selectedMealOption = selectedMealOptions.first { it.text == title }
     LaunchedEffect(Unit) {
-        Log.e(TAG,"In tag_DietDiaryMealFrame,selectedMealOption:${selectedMealOption}")
+        Log.e(TAG, "In tag_DietDiaryMealFrame,selectedMealOption:${selectedMealOption}")
     }
     val selectedFoodItems = remember { mutableStateOf(foodItems) }
 
@@ -92,7 +97,8 @@ fun DietDiaryMealFrame(
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var addIconButtonIsClicked by remember { mutableStateOf(false) }
     var downloadButtonIsClicked by remember { mutableStateOf(false) }
-
+    var saveGraphTextButtonIsClicked by remember { mutableStateOf(false) }
+    var saveTextRecordTextButtonIsClicked by remember { mutableStateOf(false) }
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
@@ -139,7 +145,8 @@ fun DietDiaryMealFrame(
                         .any { it.isCheckedWhenSelection.value })
                 if (hasFound) {
                     Column(
-                        modifier = Modifier.weight(0.95f)
+                        modifier = Modifier
+                            .weight(0.95f)
                             .fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
@@ -176,7 +183,9 @@ fun DietDiaryMealFrame(
                                                         .fillMaxSize()
                                                         .weight(weight = 1f),
                                                 ) {
-                                                    Row() {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                    ) {
                                                         Checkbox(
                                                             checked = foodItem.isCheckingWhenSelection.value,
                                                             onCheckedChange = {
@@ -233,19 +242,52 @@ fun DietDiaryMealFrame(
                             Column(
                                 modifier = Modifier
                                     .weight(0.3f)
-                            ){
+                            ) {
                                 Column(
                                     modifier = Modifier
                                         .padding(16.dp)
                                         .verticalScroll(verticalScrollState),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Top,
-                                ){
+                                ) {
                                     SaveGraphAndTextRecordButton(
-                                        outerButtonModifier = Modifier.size(300.dp,50.dp),
-                                        saveGraph = {},
-                                        saveTextRecord = {},
+                                        outerButtonModifier = Modifier.size(250.dp, 40.dp),
+                                        saveGraph = {
+                                            saveGraphTextButtonIsClicked = true
+                                            saveTextRecordTextButtonIsClicked = false
+                                        },
+                                        saveTextRecord = {
+                                            saveTextRecordTextButtonIsClicked = true
+                                            saveGraphTextButtonIsClicked = false
+                                        },
                                     )
+                                    if (saveGraphTextButtonIsClicked || saveTextRecordTextButtonIsClicked) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(600.dp, 200.dp)
+                                                .padding(16.dp)
+                                        ) {
+                                            Image(
+                                                painterResource(R.drawable.postpic),
+                                                contentDescription = "",
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.FillBounds ,
+                                            )
+                                        }
+                                        Box(
+                                            modifier = Modifier
+                                                .size(600.dp, 100.dp)
+                                                .padding(16.dp)
+                                                .border(
+                                                    1.dp,
+                                                    Color.Black,
+                                                    ),
+                                        ) {
+                                            Text(
+                                                text = "Hello World!!!"
+                                            )
+                                        }
+                                    }
                                     Spacer(modifier = Modifier.height(10.dp))
                                     NutritionInfoCombo(
                                         nutritionInfoVO = nutritionInfo,
@@ -272,6 +314,7 @@ fun DietDiaryMealFrame(
             }
         }
     })
+
     if (deleteButtonIsClicked) {
         val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isCheckingWhenSelection.value }) }
         SelectedFoodItemsRepository.setAllCheckedWhenQueryState(false)

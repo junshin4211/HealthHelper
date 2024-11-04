@@ -101,6 +101,15 @@ object DefaultColorViewModel {
             disabledContentColor = Color.Gray,
         )
 
+    val iconButtonColors2: IconButtonColors
+        @Composable
+        get() = IconButtonColors(
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            disabledContainerColor = Color.Gray,
+            disabledContentColor = Color.Gray,
+        )
+
     val buttonColors: ButtonColors
         @Composable
         get() = ButtonDefaults.buttonColors(

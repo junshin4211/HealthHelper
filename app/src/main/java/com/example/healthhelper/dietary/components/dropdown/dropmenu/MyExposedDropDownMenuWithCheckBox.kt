@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
@@ -41,7 +42,7 @@ fun MyExposedDropDownMenuWithCheckBox(
     navController: NavHostController,
     mutableStateValue: MutableState<String>,
     options: List<SelectedFoodItemVO>,
-    modifier: Modifier = Modifier,
+    exposedDropdownMenuBoxModifier: Modifier = Modifier,
     label: @Composable () -> Unit,
     onValueChangedEvent: (String) -> Unit,
     outlinedTextFieldColor: TextFieldColors = OutlinedTextFieldDefaults.colors(),
@@ -60,7 +61,7 @@ fun MyExposedDropDownMenuWithCheckBox(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
-        modifier = modifier,
+        modifier = exposedDropdownMenuBoxModifier,
     ) {
         OutlinedTextField(
             readOnly = readOnly,
@@ -71,6 +72,7 @@ fun MyExposedDropDownMenuWithCheckBox(
                 SearchIcon(
                     navController = navController,
                     onClick = {expanded=!expanded},
+                    iconButtonColors = DefaultColorViewModel.iconButtonColors2,
                 )
             },
             textStyle = LocalTextStyle.current.copy(
