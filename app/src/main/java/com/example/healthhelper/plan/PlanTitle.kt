@@ -37,6 +37,20 @@ object NutritionGoals {
     }
 }
 
+object CateGoryId{
+    private val cateMap = mapOf(
+        PlanPage.HighProtein to 1,
+        PlanPage.LowCarb to 2,
+        PlanPage.Ketone to 3,
+        PlanPage.Mediterra to 4,
+        PlanPage.Custom to 5,
+    )
+
+    fun getCateId(plan: PlanPage):Int?{
+        return cateMap[plan]
+    }
+}
+
 enum class DateRange(@StringRes val title: Int){
     AWeek(title = R.string.aweek),
     HalfMonth(title = R.string.halfmonth),

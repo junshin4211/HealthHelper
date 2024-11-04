@@ -1,6 +1,7 @@
 package com.example.healthhelper.plan.usecase
 
 import android.util.Log
+import com.example.healthhelper.plan.CateGoryId
 import com.example.healthhelper.plan.NutritionGoals
 import com.example.healthhelper.plan.PlanPage
 import java.sql.Timestamp
@@ -8,6 +9,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -35,7 +37,7 @@ class PlanUCImpl : PlanUC {
                 else -> return "9999-99-99"
             }
 
-            // 將日期格式化為 "yyyy-MM-dd"
+
             output.format(date)
         } catch (e: Exception) {
             Log.d("tag_DateTimeformat", "DateTimeformat: $e")
@@ -45,23 +47,35 @@ class PlanUCImpl : PlanUC {
 
     override fun stringToTimeStamp(datetime: LocalDateTime): Timestamp? {
         return try {
-            Timestamp.valueOf(datetime.toString())
-
+            // 定義時間格式
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            // 將 LocalDateTime 格式化為 Timestamp 所需的字串
+            val formattedDateTime = datetime.format(formatter)
+            // 轉換為 Timestamp
+            val timestamp = Timestamp.valueOf(formattedDateTime)
+            Log.d("tag_stringToTimeStamp", "stringToTimeStamp: $timestamp")
+            timestamp
         } catch (e: Exception) {
             e.printStackTrace()
+            Log.d("tag_stringToTimeStamp", "stringToTimeStamp: $e")
             null
         }
     }
 
     // 定義函數，將目標值通過 onSet 回調傳遞出去
-    override fun setGoals(planName: PlanPage, onSet: (fat: Float, carb: Float, protein: Float) -> Unit) {
+    override fun planInitial(planName: PlanPage,
+                             onSetGoal: (fat: Float, carb: Float, protein: Float) -> Unit,
+                             onSetCateId: (cateId: Int) -> Unit) {
         val goals = NutritionGoals.getGoals(planName)
         if (goals != null) {
             val (fatGoal, carbGoal, proteinGoal) = goals
-            onSet(fatGoal, carbGoal, proteinGoal)
+            onSetGoal(fatGoal, carbGoal, proteinGoal)
+        }
+
+        val cateId = CateGoryId.getCateId(planName)
+        if (cateId != null) {
+            onSetCateId(cateId)
         }
     }
-
-
 
 }

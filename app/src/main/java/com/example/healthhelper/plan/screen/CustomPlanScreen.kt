@@ -226,13 +226,13 @@ fun CustomEditPlan(
                     stringResource(R.string.calories),
                     22.sp
                 )
-                CustomTextField().TextFieldWithBorder(
-                    value = calorie,
-                    onValueChange = { newvalue -> calorie = newvalue },
-                    convertFromString = { it.toFloatOrNull() },
-                    label = stringResource(R.string.examcalorie),
-                    width = 130.dp
-                )
+//                CustomTextField().TextFieldWithBorder(
+//                    value = calorie,
+//                    onValueChange = { newvalue -> calorie = newvalue },
+//                    convertFromString = { it.toFloatOrNull() },
+//                    label = stringResource(R.string.examcalorie),
+//                    width = 130.dp
+//                )
                 CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals), 16.sp)
             }
 
@@ -247,13 +247,13 @@ fun CustomEditPlan(
                     setsize = 22.sp
                 )
 
-                CustomTextField().TextFieldWithBorder(
-                    value = carbpercent,
-                    onValueChange = { newvalue -> carbpercent = newvalue },
-                    convertFromString = { it.toIntOrNull() },
-                    label = stringResource(R.string.exampercent),
-                    width = 100.dp
-                )
+//                CustomTextField().TextFieldWithBorder(
+//                    value = carbpercent,
+//                    onValueChange = { newvalue -> carbpercent = newvalue },
+//                    convertFromString = { it.toIntOrNull() },
+//                    label = stringResource(R.string.exampercent),
+//                    width = 100.dp
+//                )
 
                 CustomText().TextWithDiffColor(text = "%(${carbgram}克)", setsize = 20.sp)
             }
@@ -271,13 +271,13 @@ fun CustomEditPlan(
                     setsize = 22.sp
                 )
 
-                CustomTextField().TextFieldWithBorder(
-                    value = proteinpercent,
-                    onValueChange = { newvalue -> proteinpercent = newvalue },
-                    convertFromString = { it.toIntOrNull() },
-                    label = stringResource(R.string.exampercent),
-                    width = 100.dp
-                )
+//                CustomTextField().TextFieldWithBorder(
+//                    value = proteinpercent,
+//                    onValueChange = { newvalue -> proteinpercent = newvalue },
+//                    convertFromString = { it.toIntOrNull() },
+//                    label = stringResource(R.string.exampercent),
+//                    width = 100.dp
+//                )
 
                 CustomText().TextWithDiffColor(text = "%(${proteingram}克)", setsize = 20.sp)
             }
@@ -295,13 +295,13 @@ fun CustomEditPlan(
                     setsize = 22.sp
                 )
 
-                CustomTextField().TextFieldWithBorder(
-                    value = fatpercent,
-                    onValueChange = { newvalue -> fatpercent = newvalue },
-                    convertFromString = { it.toIntOrNull() },
-                    label = stringResource(R.string.exampercent),
-                    width = 100.dp
-                )
+//                CustomTextField().TextFieldWithBorder(
+//                    value = fatpercent,
+//                    onValueChange = { newvalue -> fatpercent = newvalue },
+//                    convertFromString = { it.toIntOrNull() },
+//                    label = stringResource(R.string.exampercent),
+//                    width = 100.dp
+//                )
 
                 CustomText().TextWithDiffColor(text = "%(${fatgram}克)", setsize = 20.sp)
             }

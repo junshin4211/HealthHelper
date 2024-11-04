@@ -1,19 +1,25 @@
 package com.example.healthhelper.plan.screen
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,31 +35,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.DateRange
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CreateDatePicker
 import com.example.healthhelper.plan.ui.CreateDropDownMenu
 import com.example.healthhelper.plan.ui.CustomButton
+import com.example.healthhelper.plan.ui.CustomSnackBar
 import com.example.healthhelper.plan.ui.CustomText
 import com.example.healthhelper.plan.ui.CustomTextField
 import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditPlan(
     planname: PlanPage,
-    navcontroller: NavHostController = rememberNavController(),
     tabViewModel: TabViewModel = viewModel(),
     EditPlanVM: EditPlanVM,
 ) {
+    val tag = "tag_EditPlan"
     val scrollstate = rememberScrollState()
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val calorieErr = stringResource(R.string.calorieerror)
+    val dateErr = stringResource(R.string.dateerror)
+    val insertSuccess = stringResource(R.string.insertplansuccess)
+    val insertFailed = stringResource(R.string.insertplanfail)
+
     var selectedDate by remember { mutableStateOf("") }
     //display nutrient gram value
     var carbgram by remember { mutableFloatStateOf(0.0f) }
@@ -69,11 +83,23 @@ fun EditPlan(
     var calorie by remember { mutableFloatStateOf(0f) }
 
     //set nutrient percent value by planname
-    PlanUCImpl().setGoals(planname){fat,carb,protein ->
-        fatpercent = fat
-        carbpercent = carb
-        proteinpercent = protein
-    }
+    PlanUCImpl().planInitial(
+        planName = planname,
+        onSetGoal = { fat, carb, protein ->
+            //show percent on UI
+            fatpercent = fat
+            carbpercent = carb
+            proteinpercent = protein
+            //save the goal to state
+            EditPlanVM.updateFatGoal(fat)
+            EditPlanVM.updateCarbGoal(carb)
+            EditPlanVM.updateProteinGoal(protein)
+        },
+        onSetCateId = { cateId ->
+            EditPlanVM.updateCategoryId(cateId)
+        }
+    )
+
     // UI
     Column(
         modifier = Modifier
@@ -160,13 +186,13 @@ fun EditPlan(
                         )
 
                         1 -> CustomText().TextWithDiffColor(
-                            R.color.sky_blue,
+                            R.color.dark_blue,
                             "${stringResource(R.string.protein)} $proteingram 克", 15.sp
                         )
 
                         2 -> CustomText().TextWithDiffColor(
-                            R.color.light_green,
-                            "${stringResource(R.string.body_fat)} $fatgram 克", 15.sp
+                            R.color.dark_green,
+                            "${stringResource(R.string.fat)} $fatgram 克", 15.sp
                         )
                     }
                 }
@@ -212,7 +238,6 @@ fun EditPlan(
                 CustomTextField().TextFieldWithBorder(
                     value = calorie,
                     onValueChange = { newvalue -> calorie = newvalue },
-                    convertFromString = { it.toFloatOrNull() },
                     label = stringResource(R.string.examcalorie),
                     width = 130.dp
                 )
@@ -246,7 +271,7 @@ fun EditPlan(
             )
 
             CreateDesciption(
-                type = stringResource(R.string.body_fat),
+                type = stringResource(R.string.fat),
                 gram = fatgram,
                 percent = fatpercent,
                 stringResource(R.string.fatdescripttitle),
@@ -273,10 +298,52 @@ fun EditPlan(
             CustomButton().CreateButton(
                 text = stringResource(R.string.save),
                 color = R.color.primarycolor,
-                onClick = { }
+                onClick = OnClick@{
+                    //save plan
+                    if (calorie <= 1200f) {
+                        scope.launch {
+                            CustomSnackBar().CreateSnackBar(
+                                message = calorieErr,
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
+                        return@OnClick
+                    }
+
+                    val startdate = EditPlanVM.planSetState.value.startDateTime
+                    val enddate = EditPlanVM.planSetState.value.endDateTime
+                    if (startdate == enddate || startdate == null || enddate == null) {
+                        scope.launch {
+                            CustomSnackBar().CreateSnackBar(
+                                message = dateErr,
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
+                        return@OnClick
+                    }
+
+                    EditPlanVM.updateUserId(2)
+                    EditPlanVM.updateFinishState(0)
+                    EditPlanVM.updateCaloriesGoal(calorie)
+                    scope.launch {
+                        if (EditPlanVM.insertPlan())
+                        {
+                            CustomSnackBar().CreateSnackBar(
+                                message = insertSuccess,
+                                snackbarHostState = snackbarHostState
+                            )
+                        }else{
+                            CustomSnackBar().CreateSnackBar(
+                                message = insertFailed,
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
+
+                    }
+                }
             )
         }
-
+        SnackbarHost(snackbarHostState)
     }
 
 }

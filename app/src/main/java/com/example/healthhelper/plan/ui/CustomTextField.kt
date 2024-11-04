@@ -18,20 +18,19 @@ import com.example.healthhelper.R
 
 class CustomTextField {
     @Composable
-    fun <T> TextFieldWithBorder(
-        value: T,
-        onValueChange: (T) -> Unit,
-        convertFromString: (String) -> T?,
+    fun TextFieldWithBorder(
+        value: Float,
+        onValueChange: (Float) -> Unit,
         label: String,
         width: Dp = 200.dp,
         keyboardType: KeyboardType = KeyboardType.Number
     ) {
         TextField(
-            value = value.toString(),
+            value = value.toInt().toString(), // 顯示為 Int 格式的 String
             onValueChange = { newValue ->
-                val convertedValue = convertFromString(newValue)
+                val convertedValue = newValue.toFloatOrNull()
                 if (convertedValue != null) {
-                    onValueChange(convertedValue)
+                    onValueChange(convertedValue) // 將 Float 值傳回外部
                 }
             },
             singleLine = true,
@@ -52,6 +51,7 @@ class CustomTextField {
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType)
         )
     }
+
 
 
 }

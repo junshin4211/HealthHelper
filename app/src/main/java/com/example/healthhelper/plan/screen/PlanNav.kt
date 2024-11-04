@@ -89,7 +89,6 @@ fun Plan(
             composable(route = PlanPage.HighProtein.name) {
                 EditPlan(
                     PlanPage.HighProtein,
-                    navcontroller = navController,
                     tabViewModel,
                     EditPlanVM
                 )
@@ -97,7 +96,6 @@ fun Plan(
             composable(route = PlanPage.LowCarb.name) {
                 EditPlan(
                     PlanPage.LowCarb,
-                    navcontroller = navController,
                     tabViewModel,
                     EditPlanVM
                 )
@@ -105,7 +103,6 @@ fun Plan(
             composable(route = PlanPage.Ketone.name) {
                 EditPlan(
                     PlanPage.Ketone,
-                    navcontroller = navController,
                     tabViewModel,
                     EditPlanVM
                 )
@@ -113,7 +110,6 @@ fun Plan(
             composable(route = PlanPage.Mediterra.name) {
                 EditPlan(
                     PlanPage.Mediterra,
-                    navcontroller = navController,
                     tabViewModel,
                     EditPlanVM
                 )

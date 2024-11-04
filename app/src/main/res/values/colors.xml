@@ -51,4 +51,5 @@
 
     //red color
     <color name="red_100">#F8312A</color>
+    <color name="dark_green">#007106</color>
 </resources>
