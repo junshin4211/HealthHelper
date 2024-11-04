@@ -37,7 +37,7 @@ object GraphDrawer {
                 drawArc(
                     color = entry.color,
                     startAngle = startAngles[index].toFloat(),
-                    sweepAngle = (entry.percentage / numberOfEntries * 360 ).toFloat(),
+                    sweepAngle = (entry.percentage / numberOfEntries * 360).toFloat(),
                     useCenter = true,
                     topLeft = Offset.Zero,
                     size = this.size

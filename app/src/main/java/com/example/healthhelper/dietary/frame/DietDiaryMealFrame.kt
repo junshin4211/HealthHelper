@@ -166,6 +166,7 @@ fun DietDiaryMealFrame(
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             modifier = Modifier
                                                 .requiredWidth(width = 360.dp)
+                                                .padding(horizontal = 16.dp)
                                         ) {
                                             Row(
                                                 horizontalArrangement = Arrangement.spacedBy(
@@ -175,7 +176,6 @@ fun DietDiaryMealFrame(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .requiredHeight(height = 40.dp)
-                                                    .padding(horizontal = 16.dp)
                                             ) {
                                                 Column(
                                                     verticalArrangement = Arrangement.Center,

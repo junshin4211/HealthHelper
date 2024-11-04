@@ -50,18 +50,18 @@ android {
 }
 
 dependencies {
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("androidx.compose.material3:material3:1.0.0-alpha10")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
-    implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("mysql:mysql-connector-java:8.0.33")
-    implementation("androidx.compose.ui:ui:1.5.1")
-    implementation("androidx.compose.material3:material3:1.1.0")
-    implementation("androidx.compose.material:material:1.5.1")
-    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.androidx.lifecycle.viewmodel.compose.v262)
+    implementation(libs.gson.v2101)
+    implementation(libs.androidx.material3.v100alpha10)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.compose.v253)
+    implementation(libs.mysql.connector.java)
+    implementation(libs.ui)
+    implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -85,20 +85,21 @@ dependencies {
 
     implementation(libs.coil.compose)
 
-//    camera
+    //camera
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.extensions)
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
 
-//    implementation(libs.compose.theme.adapter)
+    //implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
     implementation(libs.hikaricp)
     implementation(libs.mysql.connector.j)
     implementation(libs.slf4j.api)
     implementation(libs.kotlinx.coroutines.android)
+    // implementation(libs.compose.screenshot)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -108,12 +109,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-//Google Map
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
-    implementation("com.google.maps.android:maps-ktx:5.1.1")
-    implementation("com.google.maps.android:maps-utils-ktx:5.1.1")
-    val mapsComposeVersion = "6.1.2"
-    implementation("com.google.maps.android:maps-compose:$mapsComposeVersion")
-    implementation("com.google.maps.android:maps-compose-utils:$mapsComposeVersion")
-    implementation("com.google.maps.android:maps-compose-widgets:$mapsComposeVersion")
+    //Google Map
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.ktx)
+    implementation(libs.maps.utils.ktx)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+    implementation(libs.maps.compose.widgets)
 }
