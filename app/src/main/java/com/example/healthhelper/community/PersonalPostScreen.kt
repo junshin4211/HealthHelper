@@ -1,11 +1,9 @@
 package com.example.healthhelper.community
 
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,14 +18,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -189,15 +183,14 @@ fun PersonalPostScreen(navController: NavHostController) {
 
         // Comment list items
         items(comments) { comment ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth() // 確保留言項目填滿寬度
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(color = colorResource(id = R.color.primarycolor))
-            ) {
+
                 ListItem(
                     modifier = Modifier
                         .fillMaxWidth(),
+                    colors = ListItemDefaults.colors(
+                        containerColor = colorResource(R.color.backgroundcolor),
+
+                    ),
                     overlineContent = {
                         Text(
                             text = comment.userName,
@@ -235,7 +228,7 @@ fun PersonalPostScreen(navController: NavHostController) {
                     },
                     trailingContent = { Text("B${comment.index}") }
                 )
-            }
+
             HorizontalDivider(color = colorResource(id = R.color.white_100))
         }
         // 留言輸入框
