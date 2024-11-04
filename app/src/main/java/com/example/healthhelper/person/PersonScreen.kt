@@ -1,5 +1,6 @@
 package com.example.healthhelper.person
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,13 +47,17 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.person.model.UserData
 import com.example.healthhelper.person.personVM.AchievementViewModel
+import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import kotlinx.coroutines.launch
 
 @Composable
 fun PersonScreen(
     navController: NavHostController,
-    achievementVM: AchievementViewModel
+    achievementVM: AchievementViewModel,
+    userPhotoUploadVM: UserPhotoUploadVM
 ) {
+    val userPhotoUrl by userPhotoUploadVM.userPhotoUrlState.collectAsState()
+    Log.e("fectchPhoto", userPhotoUrl.toString())
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
     Scaffold(containerColor = colorResource(R.color.backgroundcolor)) { innerPadding ->
@@ -70,8 +76,7 @@ fun PersonScreen(
                 Box(
                     modifier = Modifier.size(250.dp)
                 ) {
-
-                    UserData.photoUri?.let { uri ->
+                    userPhotoUrl.photoUrl?.let { uri ->
                         Image(
                             painter = rememberAsyncImagePainter(uri),
                             contentDescription = stringResource(R.string.choosePicture),

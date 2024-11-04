@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+﻿package com.example.healthhelper.person
 
 import android.Manifest
 import android.net.Uri
@@ -16,6 +16,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.person.personVM.AchievementViewModel
+import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
+import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -27,7 +29,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 fun MainPersonScreen(
     navController: NavHostController = rememberNavController(),
     weightViewModel: WeightViewModel = viewModel(),
-    achievementVM: AchievementViewModel = viewModel()
+    achievementVM: AchievementViewModel = viewModel(),
+    cloudPhotoUploadVM: CloudPhotoUploadVM = viewModel(),
+    userPhotoUploadVM: UserPhotoUploadVM = viewModel(),
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -38,7 +42,8 @@ fun MainPersonScreen(
         composable(route = PersonScreenEnum.personScreen.name) {
             PersonScreen(
                 navController = navController,
-                achievementVM=achievementVM
+                achievementVM = achievementVM,
+                userPhotoUploadVM = userPhotoUploadVM
             )
         }
         composable(route = PersonScreenEnum.cameraPreviewScreen.name) {
@@ -68,20 +73,28 @@ fun MainPersonScreen(
             )
         }
         composable(route = PersonScreenEnum.pickPhotoScreen.name) {
-            PickPhotoScreen(navController)
+            PickPhotoScreen(
+                navController,
+                cloudPhotoUploadVM = cloudPhotoUploadVM,
+                userPhotoUploadVM = userPhotoUploadVM
+            )
         }
         composable(route = PersonScreenEnum.weightScreen.name) {
             WeightScreen(navController, weightViewModel = weightViewModel)
         }
         composable(route = PersonScreenEnum.weightSettingScreen.name) {
-            WeightSettingScreen(navController, weightViewModel =  weightViewModel)
+            WeightSettingScreen(navController, weightViewModel = weightViewModel)
         }
         composable(route = "${PersonScreenEnum.weightReviseScreen.name}/{recordId}") { backStackEntry ->
             val recordId = backStackEntry.arguments?.getString("recordId")
-            WeightReviseScreen(navController,  weightViewModel =  weightViewModel, recordId = recordId)
+            WeightReviseScreen(
+                navController,
+                weightViewModel = weightViewModel,
+                recordId = recordId
+            )
         }
         composable(route = PersonScreenEnum.achivementScreen.name) {
-            AchievementScreen(achievementVM=achievementVM, navController = navController)
+            AchievementScreen(achievementVM = achievementVM, navController = navController)
         }
 
     }

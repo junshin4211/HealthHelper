@@ -36,6 +36,7 @@ cameraExtensions = "1.4.0-rc03"
 
 
 material = "1.13.0-alpha07"
+cloudinaryAndroid = "3.0.2"
 
 #composeThemeAdapter = "1.2.1"
 
@@ -76,6 +77,7 @@ androidx-camera-extensions = { group = "androidx.camera", name = "camera-extensi
 
 
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+cloudinary-android = { group = "com.cloudinary", name = "cloudinary-android", version.ref = "cloudinaryAndroid" }
 
 #compose-theme-adapter = { group = "com.google.android.material", name = "compose-theme-adapter", version.ref = "composeThemeAdapter" }
 

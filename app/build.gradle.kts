@@ -94,6 +94,8 @@ dependencies {
 //    implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
+    implementation(libs.cloudinary.android)
+    implementation( "com.google.guava:guava:31.0.1-android")
 
 
     testImplementation(libs.junit)

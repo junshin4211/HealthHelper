@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.graphics.Path
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,10 +56,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.cloudinary.Cloudinary
+import com.cloudinary.ProgressCallback
+import com.cloudinary.utils.ObjectUtils
 import com.example.healthhelper.R
-import com.example.healthhelper.person.model.UserData
+import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
+import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.SaveButton
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -67,6 +81,8 @@ import java.io.IOException
 @Composable
 fun PickPhotoScreen(
     navController: NavHostController,
+    cloudPhotoUploadVM: CloudPhotoUploadVM,
+    userPhotoUploadVM: UserPhotoUploadVM,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -80,6 +96,7 @@ fun PickPhotoScreen(
             offset = Offset.Zero
         }
     )
+    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         pickImageLauncher.launch(
             PickVisualMediaRequest(
@@ -155,65 +172,67 @@ fun PickPhotoScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             val context = LocalContext.current
+            val cloudinary = cloudPhotoUploadVM.cloudinary
             SaveButton(
                 onClick = {
-                    val croppedBitmap = selectedImageUri?.let { uri ->
+                    val croppedUri = selectedImageUri?.let { uri ->
                         generateCroppedBitmap(context, uri, scale, offset, 350)
                     }
-                    UserData.photoUri = croppedBitmap
+                    croppedUri?.let { uri ->
+                        scope.launch {
+                            userPhotoUploadVM.uploadImageToCloudinary(cloudinary, uri)
+                            navController.navigateUp()
+                        }
+                    }
                     navController.navigateUp()
                 }
             )
         }
     }
 }
-@RequiresApi(Build.VERSION_CODES.P)
-//fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offset, size: Int): Bitmap? {
-//    val sourceBitmap = try {
-//        ImageDecoder.decodeBitmap(
-//            ImageDecoder.createSource(context.contentResolver, uri)
-//        ) { decoder, _, _ ->
-//            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-//            decoder.isMutableRequired = true
+
+//private suspend fun uploadImageToCloudinary(
+//    cloudinary: Cloudinary,
+//    fileUri: Uri,
+//    userPhotoUploadVM: UserPhotoUploadVM,
+//) {
+//    val file = File(fileUri.path ?: return)
+//    withContext(Dispatchers.IO){
+//        try {
+//            val response =  cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
+//            val url = response["url"] as String
+//            userPhotoUploadVM.uploadedUrl.update { url }
+//            Log.d("Upload", "Image uploaded to: $url")
+//        } catch (e: Exception) {
+//            Log.e("cloudinary:Faild", " ${e.message}")
+//            e.printStackTrace()
 //        }
-//    } catch (e: IOException) {
-//        e.printStackTrace()
-//        return null
 //    }
-//
-//    Log.d("CropDebug", "Source bitmap size: ${sourceBitmap.width}x${sourceBitmap.height}")
-//    Log.d("CropDebug", "Scale: $scale, Offset: $offset")
-//
-//    val outputBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-//    val canvas = android.graphics.Canvas(outputBitmap)
-//
-//    val centerX = size / 2f
-//    val centerY = size / 2f
-//
-//    val scaleX = size.toFloat() / sourceBitmap.width
-//    val scaleY = size.toFloat() / sourceBitmap.height
-//    val baseScale = maxOf(scaleX, scaleY)
-//
-//    val matrix = Matrix().apply {
-//        postScale(baseScale, baseScale)
-//        postTranslate(
-//            (size - sourceBitmap.width * baseScale) / 2f,
-//            (size - sourceBitmap.height * baseScale) / 2f
-//        )
-//        postScale(scale, scale, centerX, centerY)
-//        postTranslate(offset.x, offset.y)
-//    }
-//
-//    Log.d("CropDebug", "Base scale: $baseScale")
-//    Log.d("CropDebug", "Final matrix: $matrix")
-//
-//    canvas.drawBitmap(sourceBitmap, matrix, null)
-//    sourceBitmap.recycle()
-//
-//    return outputBitmap
 //}
 
-fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offset, size: Int): Uri? {
+
+//private fun uploadImageToCloudinary(cloudinary: Cloudinary, fileUri: Uri) {
+//    val file = File(fileUri.path ?: return)
+//    Thread {
+//        try {
+//            val response = cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
+//            val url = response["url"] as String
+//            UserData.photoUrl = url
+//            Log.d("Upload", "Image uploaded to: $url")
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }.start()
+//}
+
+@RequiresApi(Build.VERSION_CODES.P)
+fun generateCroppedBitmap(
+    context: Context,
+    uri: Uri,
+    scale: Float,
+    offset: Offset,
+    size: Int,
+): Uri? {
     val sourceBitmap = try {
         ImageDecoder.decodeBitmap(
             ImageDecoder.createSource(context.contentResolver, uri)
@@ -226,8 +245,6 @@ fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offs
         return null
     }
 
-//    Log.d("CropDebug", "Source bitmap size: ${sourceBitmap.width}x${sourceBitmap.height}")
-//    Log.d("CropDebug", "Scale: $scale, Offset: $offset")
     val outputBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = android.graphics.Canvas(outputBitmap)
     val centerX = size / 2f
@@ -249,9 +266,7 @@ fun generateCroppedBitmap(context: Context, uri: Uri, scale: Float, offset: Offs
         postScale(scale, scale, centerX, centerY)
         postTranslate(offset.x, offset.y)
     }
-//
-//    Log.d("CropDebug", "Base scale: $baseScale")
-//    Log.d("CropDebug", "Final matrix: $matrix")
+
     canvas.drawBitmap(sourceBitmap, matrix, null)
     sourceBitmap.recycle()
 
@@ -273,9 +288,6 @@ private fun saveBitmapToFile(context: Context, bitmap: Bitmap): Uri? {
         }
     }
 }
-
-
-
 
 
 //@Preview(showBackground = true)
