@@ -57,7 +57,6 @@ dependencies {
     implementation(libs.androidx.material3.v100alpha10)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.compose.v253)
-    implementation(libs.mysql.connector.java)
     implementation(libs.ui)
     implementation(libs.androidx.compose.material3.material3)
     implementation(libs.androidx.material)
@@ -95,9 +94,6 @@ dependencies {
     //implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
-    implementation(libs.hikaricp)
-    implementation(libs.mysql.connector.j)
-    implementation(libs.slf4j.api)
     implementation(libs.kotlinx.coroutines.android)
     // implementation(libs.compose.screenshot)
 

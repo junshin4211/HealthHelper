@@ -1,5 +1,7 @@
 package com.example.healthhelper.dietary.repository
 
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +34,16 @@ object SelectedFoodItemsRepository {
 
     fun setSelectedData(newData: SelectedFoodItemVO){
         _selectedDataFlow.update { newData }
+    }
+
+    // set meal of selected item.
+    fun setSelectedData(newData: String){
+        _selectedDataFlow.value.meal = mutableStateOf(newData)
+    }
+
+    // set grams of selected item.
+    fun setSelectedData(newData: Double){
+        _selectedDataFlow.value.grams = mutableDoubleStateOf(newData)
     }
 
     fun updateData(selectedFoodItemVO: SelectedFoodItemVO,newSelectedFoodItemVO: SelectedFoodItemVO){

@@ -1,7 +1,8 @@
 package com.example.healthhelper.dietary.servlet.url
 
+import com.example.healthhelper.web.serverUrl
+
 object DietDiaryUrl {
-    // val emulator
-    val listAvailableFoodsNameAndGramsUrl : String
-        get() = "http://10.0.2.2:8080/HealthyHelperServer/dietDiary/foodNameAndGramsDao/listAvailableFoodsNameAndGrams"
+    val listAvailableFoodNameUrl : String
+        get() = "${serverUrl}/dietDiary/food/listAvailableFoodsName"
 }
