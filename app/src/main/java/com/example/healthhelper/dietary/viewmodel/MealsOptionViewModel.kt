@@ -8,7 +8,11 @@ import kotlinx.coroutines.flow.StateFlow
 
 class MealsOptionViewModel: ViewModel(){
     private val repository = MealsOptionRepository
-    val data: StateFlow<MutableList<MealsOptionVO>>
+    val data: StateFlow<List<MealsOptionVO>>
         @Composable
         get() = repository.dataFlow
+
+    val selectedData: StateFlow<MealsOptionVO>
+        @Composable
+        get() = repository.selectedDataFlow
 }

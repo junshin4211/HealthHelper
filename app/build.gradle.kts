@@ -84,7 +84,7 @@ dependencies {
     implementation(libs.charty)
     implementation(libs.coil.compose)
 
-//    camera
+    //camera
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.extensions)
     implementation(libs.androidx.camera.core)
