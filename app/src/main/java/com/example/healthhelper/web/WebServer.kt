@@ -9,13 +9,13 @@ import java.net.URL
 const val serverProtocol = "http"
 
 // for running at android emulator
-//const val serverIPv4 = "10.0.2.2"
+const val serverIPv4 = "10.0.2.2"
 
 // for running at server (localhost)
 //const val serverIPv4 = "localhost"
 
 // for running at android device (client and server must connect same WIFI and it must be set to IPv4 of the WIFI)
-const val serverIPv4 = "192.168.13.109"
+//const val serverIPv4 = "192.168.13.109"
 
 // default port of Tomcat server
 const val serverPort = "8080"

@@ -1,8 +1,11 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,9 +61,13 @@ import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.combo.SaveGraphAndTextRecordButton
 import com.example.healthhelper.dietary.components.iconbutton.AddIcon
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
+import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
+import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.util.downloaddata.DownloadData
+import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
@@ -73,7 +80,7 @@ fun DietDiaryMealFrame(
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
-    title: String,
+    enterStatusViewModel: EnterStatusViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
@@ -82,13 +89,18 @@ fun DietDiaryMealFrame(
 
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
-    val selectedMealOptions by mealsOptionViewModel.data.collectAsState()
 
-    val selectedMealOption = selectedMealOptions.first { it.text == title }
+    val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
+    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
+
+
+    Log.e(TAG, "-".repeat(50))
+
+    Log.e(TAG, "foodItems:${foodItems}")
+
+    var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
     val selectedFoodItems = remember { mutableStateOf(foodItems) }
-
-    var hasFound by remember { mutableStateOf(false) }
 
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var addIconButtonIsClicked by remember { mutableStateOf(false) }
@@ -96,10 +108,31 @@ fun DietDiaryMealFrame(
     var saveGraphTextButtonIsClicked by remember { mutableStateOf(false) }
     var saveTextRecordTextButtonIsClicked by remember { mutableStateOf(false) }
 
+    var iconButtonIsClickable by remember { mutableStateOf(false) }
+
+    val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
+
+    if (enterStatusVO.isFirstEnter.value) {
+        availableFoodItems = foodItems.filter {
+            it.meal.value in listOf(
+                stringResource(selectedMealOption.nameResId),
+                stringResource(MealCategoryEnum.EMPTY_STRING.title)
+            )
+        }
+    } else {
+        availableFoodItems = foodItems.filter {
+            it.meal.value in listOf(
+                stringResource(selectedMealOption.nameResId),
+            )
+        }
+    }
+
+    Log.e(TAG, "At startup,selectedMealOption:${selectedMealOption}")
+    Log.e(TAG, "At startup,availableFoodItems:${availableFoodItems}")
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
             navController = navController,
-            title = { Text(selectedMealOption.name) },
+            title = { Text(stringResource(selectedMealOption.nameResId)) },
         )
     }, floatingActionButton = {
         Row() {
@@ -122,6 +155,7 @@ fun DietDiaryMealFrame(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .background(color = colorResource(R.color.backgroundcolor)),
         ) {
             Column(
                 modifier = Modifier
@@ -136,190 +170,187 @@ fun DietDiaryMealFrame(
                     label = { Text(stringResource(R.string.search_label)) },
                 )
 
-                hasFound =
-                    (selectedFoodItems.value.isNotEmpty() && selectedFoodItems.value.filter { it.isCheckedWhenSelection.value }
-                        .any { it.isCheckedWhenSelection.value })
-                if (hasFound) {
+                Column(
+                    modifier = Modifier
+                        .weight(0.95f)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     Column(
                         modifier = Modifier
-                            .weight(0.95f)
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                            .weight(0.7f),
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(0.7f),
-                        ) {
-                            selectedFoodItems.value.filter { it.isCheckedWhenSelection.value }
-                                .forEach { foodItem ->
-                                    Box(
+                        availableFoodItems.filter { it.isCheckedWhenSelection.value }
+                            .forEach { foodItem ->
+                                Box(
+                                    modifier = Modifier
+                                        .requiredWidth(width = 360.dp)
+                                        .requiredHeight(height = 41.dp),
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier
                                             .requiredWidth(width = 360.dp)
-                                            .requiredHeight(height = 41.dp),
+                                            .padding(horizontal = 16.dp)
                                     ) {
-                                        Column(
-                                            verticalArrangement = Arrangement.Center,
-                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(
+                                                16.dp, Alignment.CenterHorizontally
+                                            ),
+                                            verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier
-                                                .requiredWidth(width = 360.dp)
-                                                .padding(horizontal = 16.dp)
+                                                .fillMaxWidth()
+                                                .requiredHeight(height = 40.dp)
                                         ) {
-                                            Row(
-                                                horizontalArrangement = Arrangement.spacedBy(
-                                                    16.dp, Alignment.CenterHorizontally
-                                                ),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .requiredHeight(height = 40.dp)
-                                            ) {
-                                                Column(
-                                                    verticalArrangement = Arrangement.Center,
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .weight(weight = 1f),
-                                                ) {
-                                                    Row(
-                                                        verticalAlignment = Alignment.CenterVertically,
-                                                    ) {
-                                                        Checkbox(
-                                                            checked = foodItem.isCheckingWhenSelection.value,
-                                                            onCheckedChange = {
-                                                                SelectedFoodItemsRepository.setCheckingWhenSelectionState(
-                                                                    foodItem,
-                                                                    it
-                                                                )
-                                                            })
-
-                                                        Text(
-                                                            text = foodItem.name,
-                                                            color = colorResource(R.color.primarycolor),
-                                                            lineHeight = 1.27.em,
-                                                            style = MaterialTheme.typography.titleLarge,
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .wrapContentHeight(align = Alignment.CenterVertically)
-                                                        )
-                                                    }
-                                                }
-                                                Row(
-                                                    horizontalArrangement = Arrangement.spacedBy(
-                                                        10.dp, Alignment.Start
-                                                    )
-                                                ) {
-                                                    IconButton(onClick = {
-                                                        navController.navigate(
-                                                            "${DietDiaryScreenEnum.FoodItemInfoFrame.name}/${foodItem.name}/${selectedMealOption.text}"
-                                                        )
-                                                    }) {
-                                                        Icon(
-                                                            imageVector = Icons.Default.KeyboardArrowRight,
-                                                            contentDescription = "arrow_right",
-                                                            tint = colorResource(R.color.primarycolor)
-                                                        )
-                                                    }
-                                                }
-                                            }
                                             Column(
                                                 verticalArrangement = Arrangement.Center,
-                                                modifier = Modifier.fillMaxWidth()
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .weight(weight = 1f),
                                             ) {
-                                                HorizontalDivider(
-                                                    color = colorResource(R.color.primarycolor),
-                                                    modifier = Modifier.fillMaxWidth()
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                ) {
+                                                    MyCheckBox(
+                                                        context = context,
+                                                        foodItem = foodItem,
+                                                        mealsOptionVO = selectedMealOption,
+                                                    )
+
+                                                    Text(
+                                                        text = foodItem.name.value,
+                                                        color = colorResource(R.color.primarycolor),
+                                                        lineHeight = 1.27.em,
+                                                        style = MaterialTheme.typography.titleLarge,
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .wrapContentHeight(
+                                                                align =
+                                                                Alignment.CenterVertically
+                                                            )
+                                                    )
+                                                }
+                                            }
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(
+                                                    10.dp, Alignment.Start
                                                 )
+                                            ) {
+                                                IconButton(onClick = {
+                                                    SelectedFoodItemsRepository.setSelectedData(
+                                                        foodItem
+                                                    )
+                                                    iconButtonIsClickable = true
+                                                }) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.KeyboardArrowRight,
+                                                        contentDescription = "arrow_right",
+                                                        tint = colorResource(R.color.primarycolor)
+                                                    )
+                                                }
                                             }
                                         }
-                                        Box(
-                                            modifier = Modifier.fillMaxSize()
-                                        )
-                                    }
-                                }
-                            Column(
-                                modifier = Modifier
-                                    .weight(0.3f)
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .verticalScroll(verticalScrollState),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Top,
-                                ) {
-                                    SaveGraphAndTextRecordButton(
-                                        outerButtonModifier = Modifier.size(250.dp, 40.dp),
-                                        saveGraph = {
-                                            saveGraphTextButtonIsClicked = true
-                                            saveTextRecordTextButtonIsClicked = false
-                                        },
-                                        saveTextRecord = {
-                                            saveTextRecordTextButtonIsClicked = true
-                                            saveGraphTextButtonIsClicked = false
-                                        },
-                                    )
-                                    if (saveGraphTextButtonIsClicked || saveTextRecordTextButtonIsClicked) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(600.dp, 200.dp)
-                                                .padding(16.dp)
+                                        Column(
+                                            verticalArrangement = Arrangement.Center,
+                                            modifier = Modifier.fillMaxWidth()
                                         ) {
-                                            Image(
-                                                painterResource(R.drawable.postpic),
-                                                contentDescription = "",
-                                                modifier = Modifier.fillMaxSize(),
-                                                contentScale = ContentScale.FillBounds ,
-                                            )
-                                        }
-                                        Box(
-                                            modifier = Modifier
-                                                .size(600.dp, 100.dp)
-                                                .padding(16.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color.Black,
-                                                    ),
-                                        ) {
-                                            Text(
-                                                text = "Hello World!!!"
+                                            HorizontalDivider(
+                                                color = colorResource(R.color.primarycolor),
+                                                modifier = Modifier.fillMaxWidth()
                                             )
                                         }
                                     }
-                                    Spacer(modifier = Modifier.height(10.dp))
-                                    NutritionInfoCombo(
-                                        nutritionInfoVO = nutritionInfo,
-                                        showTitle = false,
-                                        title = {
-                                            Text(
-                                                text = "${stringResource(R.string.total_title)}:",
-                                                fontWeight = FontWeight.Bold,
-                                            )
-                                        }
+                                    Box(
+                                        modifier = Modifier.fillMaxSize()
                                     )
                                 }
                             }
+                        Column(
+                            modifier = Modifier
+                                .weight(0.3f)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .verticalScroll(verticalScrollState),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Top,
+                            ) {
+                                SaveGraphAndTextRecordButton(
+                                    outerButtonModifier = Modifier.size(250.dp, 40.dp),
+                                    saveGraph = {
+                                        saveGraphTextButtonIsClicked = true
+                                        saveTextRecordTextButtonIsClicked = false
+                                    },
+                                    saveTextRecord = {
+                                        saveTextRecordTextButtonIsClicked = true
+                                        saveGraphTextButtonIsClicked = false
+                                    },
+                                )
+                                if (saveGraphTextButtonIsClicked || saveTextRecordTextButtonIsClicked) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(600.dp, 200.dp)
+                                            .padding(16.dp)
+                                    ) {
+                                        Image(
+                                            painterResource(R.drawable.postpic),
+                                            contentDescription = "",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.FillBounds,
+                                        )
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .size(600.dp, 100.dp)
+                                            .padding(16.dp)
+                                            .border(
+                                                1.dp,
+                                                Color.Black,
+                                            ),
+                                    ) {
+                                        Text(
+                                            text = "Hello World!!!"
+                                        )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+                                NutritionInfoCombo(
+                                    nutritionInfoVO = nutritionInfo,
+                                    showTitle = false,
+                                    title = {
+                                        Text(
+                                            text = "${stringResource(R.string.total_title)}:",
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                    }
+                                )
+                            }
                         }
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = stringResource(R.string.result_not_found))
                     }
                 }
             }
         }
     })
 
+    if (iconButtonIsClickable) {
+        SelectedFoodItemsRepository.setSelectedDataMealValue(stringResource(selectedMealOption.nameResId))
+        SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItem, true)
+        Log.e(TAG, "At IconButton onClick event triggers,selectedFoodItem:${selectedFoodItem}")
+        navController.navigate(
+            DietDiaryScreenEnum.FoodItemInfoFrame.name
+        )
+        iconButtonIsClickable = false
+    }
+
+    // NOT test YET
     if (deleteButtonIsClicked) {
         val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isCheckingWhenSelection.value }) }
         SelectedFoodItemsRepository.setAllCheckedWhenQueryState(false)
         if (selectedFoodItemVOs.isNotEmpty()) {
             selectedFoodItemVOs.forEach { selectedFoodItemVo ->
-                SelectedFoodItemsRepository.setCheckedWhenSelectionState(
-                    selectedFoodItemVo,
-                    false
-                )
+                SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItemVo, false)
             }
             Toast.makeText(
                 context,
@@ -358,4 +389,20 @@ fun DietDiaryMealFrame(
         )
         downloadButtonIsClicked = false
     }
+}
+
+@Composable
+fun MyCheckBox(
+    context: Context,
+    foodItem: SelectedFoodItemVO,
+    mealsOptionVO: MealsOptionVO,
+) {
+    var isChecked by remember { mutableStateOf(false) }
+    Checkbox(
+        checked = isChecked,
+        onCheckedChange = {
+            isChecked = !isChecked
+            SelectedFoodItemsRepository.setCheckingWhenSelectionState(foodItem, it)
+            SelectedFoodItemsRepository.setMealValue(foodItem,context.getString(mealsOptionVO.nameResId))
+        })
 }

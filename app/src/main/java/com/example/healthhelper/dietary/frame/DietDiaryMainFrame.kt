@@ -1,6 +1,8 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,8 +45,8 @@ import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
-import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.repository.MealsOptionRepository
 import com.example.healthhelper.dietary.util.downloaddata.DownloadData
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
@@ -62,17 +64,15 @@ fun DietDiaryMainFrame(
     val context = LocalContext.current
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
+    val selectedMealsOption by mealsOptionViewModel.selectedData.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
-    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
 
-    var selectedMealsOption by remember { mutableStateOf<MealsOptionVO>(mealsOptions[0]) }
-
-    var selectedMealOptionState by remember { mutableStateOf(selectedMealOption.name) }
+    var currentMealOption by remember { mutableStateOf(mealsOptions[0]) }
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
     var downloadButtonIsClicked by remember { mutableStateOf(false) }
 
-    val verticalScrollState = rememberScrollState()
+    val verticalScrollState2 = rememberScrollState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -94,14 +94,15 @@ fun DietDiaryMainFrame(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .background(color = colorResource(R.color.backgroundcolor)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
             ) {
                 Column(
                     modifier = Modifier
                         .weight(0.7f)
-                        .verticalScroll(verticalScrollState),
+                        .verticalScroll(verticalScrollState2),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
                 ) {
@@ -132,11 +133,11 @@ fun DietDiaryMainFrame(
                             disabledContentColor = colorResource(R.color.gray_300),
                             disabledContainerColor = colorResource(R.color.gray_300),
                         )
-                        val innerIconId = mealsOption.innerIconId
+                        val innerIconId = mealsOption.iconResId
                         val innerText =
                             @Composable {
                                 Text(
-                                    text = mealsOption.name,
+                                    text = stringResource(mealsOption.nameResId),
                                     color = Color.White,
                                     fontSize = 30.sp,
                                 )
@@ -145,7 +146,7 @@ fun DietDiaryMainFrame(
                             outerIconButtonModifier = outerIconButtonModifier,
                             outerIconButtonColor = outerIconButtonColor,
                             onClick = {
-                                selectedMealsOption = mealsOption
+                                currentMealOption = mealsOption
                                 mealsButtonIsClicked = true
                             },
                             innerIconId = innerIconId,
@@ -156,8 +157,7 @@ fun DietDiaryMainFrame(
                 }
                 Column(
                     modifier = Modifier
-                        .weight(0.3f)
-                        .verticalScroll(verticalScrollState),
+                        .weight(0.3f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
                 ) {
@@ -176,8 +176,11 @@ fun DietDiaryMainFrame(
             }
         }
     )
+
     if (mealsButtonIsClicked) {
-        navController.navigate("${DietDiaryScreenEnum.DietDiaryMealFrame.name}/${selectedMealsOption.text}")
+        MealsOptionRepository.setSelectedData(currentMealOption)
+        Log.e(TAG,"At mealsButtonIsClicked is true in TAG:${TAG}, selectedMealsOption:${selectedMealsOption}")
+        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
         mealsButtonIsClicked = false
     }
 

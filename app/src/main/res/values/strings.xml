@@ -184,4 +184,5 @@
     <string name="supper_name">supper</string>
     <string name="save_graph">儲存圖片</string>
     <string name="save_text_record">文字記錄</string>
+    <string name="empty_string">""</string>
 </resources>
