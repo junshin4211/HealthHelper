@@ -8,4 +8,7 @@ object DietDiaryUrl {
 
     val queryByDateUrl : String
         get() = "${serverUrl}/dietDiary/query/byDate"
+
+    val insertDietDiary : String
+        get() = "${serverUrl}/dietDiary/insert/insertDietDiary"
 }
