@@ -13,7 +13,6 @@ class CustomSnackBar {
         withDismissAction: Boolean = true,
         actionLabel: String? = null,
         duration: SnackbarDuration = SnackbarDuration.Short,
-        //scope: CoroutineScope,
         snackbarHostState: SnackbarHostState
     ){
         snackbarHostState.showSnackbar(

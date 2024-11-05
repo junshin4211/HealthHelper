@@ -162,4 +162,8 @@
     <string name="dateerror">日期選擇錯誤</string>
     <string name="insertplansuccess">新增計畫成功</string>
     <string name="insertplanfail">新增計畫失敗</string>
+    <string name="deleteplansuccess">刪除成功!!</string>
+    <string name="deleteplanfailed">刪除失敗!!</string>
+    <string name="deleteplantitle">確定刪除計畫?</string>
+    <string name="percenterror">營養目標設定有誤</string>
 </resources>

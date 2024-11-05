@@ -18,9 +18,10 @@ import java.sql.Timestamp
 class EditPlanVM:ViewModel() {
     private val tag = "tag_EditVM"
     private val repository = PlanRepository
-
+    //get the insert plan value from here
     val planSetState: StateFlow<PlanWithGoalModel> = repository.setPlanState
 
+    //update plan value by function
     fun updateCategoryId(categoryId: Int) {
         val currentPlan = planSetState.value
         repository.setPlan(currentPlan.apply { this.categoryId = categoryId })
@@ -66,7 +67,7 @@ class EditPlanVM:ViewModel() {
         repository.setPlan(currentPlan.apply { this.Caloriesgoal = caloriesGoal })
     }
 
-
+    //insert plan call here
     suspend fun insertPlan(): Boolean {
         val currentPlan = planSetState.value
         return withContext(Dispatchers.IO) {
@@ -80,18 +81,9 @@ class EditPlanVM:ViewModel() {
         }
     }
 
-
+    //insert plan request
     private suspend fun insertPlanRequest(
         planGoal: PlanWithGoalModel,
-//        categoryId: Int,
-//        userId: Int,
-//        startDateTime: Timestamp,
-//        endDateTime: Timestamp,
-//        finishState: Int,
-//        fatgoal: Float,
-//        carbongoal: Float,
-//        proteingoal: Float,
-//        Caloriesgoal: Float
     ):Boolean {
         try {
             val url = "$serverUrl/Plan/AddPlan"

@@ -23,12 +23,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.DateRange
-import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 @Composable
 fun CreateDatePicker(
@@ -41,10 +41,12 @@ fun CreateDatePicker(
     val dateFormatter = PlanUCImpl()::dateTimeFormat;
     val stringDateFormatter = PlanUCImpl()::stringToTimeStamp;
     var getdate by remember { mutableStateOf("") }
-
+//    val todayByZone = ZonedDateTime.now(ZoneId.of("Asia/Taipei"))
+    val todayByZone = LocalDateTime.now(ZoneId.of("Asia/Taipei"))
     LaunchedEffect(dateSelected, dateStart) {
+        Log.d(tag, "LaunchedEffect ${ZonedDateTime.now(ZoneId.of("Asia/Taipei"))}")
         // 初始化日期格式並更新到 ViewModel
-        dateformatter(dateSelected ?: DateRange.AWeek.name, dateStart) { selectedDate ->
+        rangeFormatter(dateSelected ?: DateRange.AWeek.name, dateStart,todayByZone) { selectedDate ->
             getdate = dateFormatter(selectedDate)
             val timestamp = stringDateFormatter(selectedDate)
 
@@ -101,8 +103,9 @@ fun CreateDatePicker(
         CreateDatePickerDialog(
             onConfirm = { utcTimeMillis ->
                 utcTimeMillis?.let {
-                    val date = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
+                    val date = Instant.ofEpochMilli(it).atZone(ZoneId.of("Asia/Taipei"))
                         .toLocalDateTime()
+//                    val date = Instant.ofEpochMilli(it).atZone(ZoneId.of("Asia/Taipei"))
                     getdate = dateFormatter(date)
 
                     if (dateStart) {
@@ -122,12 +125,12 @@ fun CreateDatePicker(
     }
 }
 
-fun dateformatter(
+fun rangeFormatter(
     dateSelected: String,
     dateStart: Boolean,
+    today: LocalDateTime,
     onDateselect: (LocalDateTime) -> Unit
 ) {
-    val today = LocalDateTime.now()
     if (dateStart) {
         onDateselect(today)
     } else {

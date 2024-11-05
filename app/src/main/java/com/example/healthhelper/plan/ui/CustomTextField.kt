@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.healthhelper.R
+import java.util.Locale
 
 class CustomTextField {
     @Composable
@@ -52,6 +53,41 @@ class CustomTextField {
         )
     }
 
-
-
+    @Composable
+    fun TextFieldWithBorder(
+        value: Float,
+        onValueChange: (Float) -> Unit,
+        label: String,
+        width: Dp = 200.dp,
+        keyboardType: KeyboardType = KeyboardType.Number,
+        modifier: Modifier
+    ) {
+        TextField(
+            value = String.format(Locale.US, "%.1f", value), // 顯示為 Int 格式的 String
+            onValueChange = { newValue ->
+                val convertedValue = newValue.toFloatOrNull()
+                if (convertedValue != null && convertedValue in 0f..100f) {
+                    onValueChange(convertedValue) // 將 Float 值傳回外部
+                }else if(newValue.isEmpty()){
+                    onValueChange(0f)
+                }
+            },
+            singleLine = true,
+            label = { Text(text = label) },
+            modifier = Modifier
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.primarycolor),
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .width(width),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent
+            ),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType)
+        )
+    }
 }

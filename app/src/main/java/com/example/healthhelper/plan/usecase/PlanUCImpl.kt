@@ -4,11 +4,14 @@ import android.util.Log
 import com.example.healthhelper.plan.CateGoryId
 import com.example.healthhelper.plan.NutritionGoals
 import com.example.healthhelper.plan.PlanPage
+import com.example.healthhelper.plan.viewmodel.ManagePlanVM
+import com.example.healthhelper.plan.viewmodel.PlanVM
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -16,16 +19,21 @@ import java.util.Locale
 class PlanUCImpl : PlanUC {
     override fun dateTimeFormat(datetime: Any?): String {
         val output = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        output.timeZone = java.util.TimeZone.getTimeZone("Asia/Taipei") // 設定輸出時區為台北時區
 
         return try {
             val date = when (datetime) {
                 is Date -> datetime
-                is LocalDate -> Date.from(datetime.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                is LocalDateTime -> Date.from(datetime.atZone(ZoneId.systemDefault()).toInstant())
+                is LocalDate -> Date.from(datetime.atStartOfDay(ZoneId.of("Asia/Taipei")).toInstant())
+                is LocalDateTime -> Date.from(datetime.atZone(ZoneId.of("Asia/Taipei")).toInstant())
+                is ZonedDateTime -> Date.from(datetime.withZoneSameInstant(ZoneId.of("Asia/Taipei")).toInstant()) // 轉換為台北時區
                 is String -> {
                     // 嘗試解析字串為 LocalDateTime 或 LocalDate
                     val inputDateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
+                    inputDateTimeFormat.timeZone = java.util.TimeZone.getTimeZone("Asia/Taipei") // 設定解析時區為台北時區
+
                     val inputDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    inputDateFormat.timeZone = java.util.TimeZone.getTimeZone("Asia/Taipei") // 設定解析時區為台北時區
 
                     try {
                         inputDateTimeFormat.parse(datetime)
@@ -37,7 +45,7 @@ class PlanUCImpl : PlanUC {
                 else -> return "9999-99-99"
             }
 
-
+            // 格式化輸出為 "yyyy-MM-dd"
             output.format(date)
         } catch (e: Exception) {
             Log.d("tag_DateTimeformat", "DateTimeformat: $e")
@@ -75,6 +83,41 @@ class PlanUCImpl : PlanUC {
         val cateId = CateGoryId.getCateId(planName)
         if (cateId != null) {
             onSetCateId(cateId)
+        }
+    }
+
+    override fun customPlanInitial(planName: PlanPage, onSetCateId: (cateId: Int) -> Unit) {
+        val cateId = CateGoryId.getCateId(planName)
+        if (cateId != null) {
+            onSetCateId(cateId)
+        }
+    }
+
+    override fun fetchSingle(planVM: PlanVM) {
+        planVM.getPlan()
+        planVM.getCompletePlan()
+    }
+
+    override fun fetchList(managePlanVM: ManagePlanVM) {
+        managePlanVM.getPlanList()
+        managePlanVM.getCompletePlanList()
+    }
+
+    override fun percentToGram(nutrition: String ,calorie: Float,percent: Float ,onSetGram: (grams:Float) -> Unit) {
+        if(calorie >= 1200f)
+        {
+            when(nutrition)
+            {
+                "carb","protein" ->{
+                    val Cals = calorie * percent
+                    onSetGram(Cals/4)
+                }
+                "fat" ->{
+                    val Cals = calorie * percent
+                    onSetGram(Cals/9)
+                }
+
+            }
         }
     }
 

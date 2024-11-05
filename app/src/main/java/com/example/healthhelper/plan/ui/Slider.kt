@@ -12,27 +12,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import com.example.healthhelper.R
+import java.util.Locale
 
 @Composable
 fun createSliders(
+    value: Float,
     minvalue: Float,
     maxvalue: Float,
     activatecolor:Int,
     inactivatecolor:Int,
-): Int {
-    var value by remember { mutableFloatStateOf(minvalue) }
+    onValueChange: (Float) -> Unit
+){
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        //modifier = Modifier.fillMaxWidth()
+        verticalAlignment = Alignment.CenterVertically
     ) {
         CustomText().TextWithDiffColor(text = "${minvalue.toInt()}")
 
         Slider(
             value = value,
-            onValueChange = { value = it },
+            onValueChange = {newvalue ->
+                onValueChange(newvalue)
+                            },
             valueRange = minvalue..maxvalue,
-            modifier = Modifier
-                .weight(1.0f),
+            modifier = Modifier,
+                //.weight(1.0f),
             colors = SliderDefaults.colors(
                 thumbColor = colorResource(R.color.black),
                 activeTrackColor = colorResource(activatecolor),
@@ -43,5 +46,4 @@ fun createSliders(
         CustomText().TextWithDiffColor(text = "${maxvalue.toInt()}")
 
     }
-    return value.toInt()
 }

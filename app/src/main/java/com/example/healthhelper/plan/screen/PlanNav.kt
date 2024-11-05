@@ -8,6 +8,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -51,6 +54,8 @@ fun Plan(
     val context = LocalContext.current
     val backStackEntry by navController.currentBackStackEntryAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     var showdeleteicon by remember { mutableStateOf(planVM.showdelete) }
     val currentScreen = PlanPage.valueOf(
         backStackEntry?.destination?.route ?: PlanPage.DietPlan.name
@@ -70,7 +75,8 @@ fun Plan(
                 },
                 planViewModel = planVM
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -88,45 +94,72 @@ fun Plan(
             }
             composable(route = PlanPage.HighProtein.name) {
                 EditPlan(
-                    PlanPage.HighProtein,
-                    tabViewModel,
-                    EditPlanVM
+                    planname = PlanPage.HighProtein,
+                    tabViewModel = tabViewModel,
+                    EditPlanVM = EditPlanVM,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    navcontroller = navController,
+                    planVM = planVM,
+                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.LowCarb.name) {
                 EditPlan(
-                    PlanPage.LowCarb,
-                    tabViewModel,
-                    EditPlanVM
+                    planname = PlanPage.LowCarb,
+                    tabViewModel = tabViewModel,
+                    EditPlanVM = EditPlanVM,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    navcontroller = navController,
+                    planVM = planVM,
+                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.Ketone.name) {
                 EditPlan(
-                    PlanPage.Ketone,
-                    tabViewModel,
-                    EditPlanVM
+                    planname = PlanPage.Ketone,
+                    tabViewModel = tabViewModel,
+                    EditPlanVM = EditPlanVM,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    navcontroller = navController,
+                    planVM = planVM,
+                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.Mediterra.name) {
                 EditPlan(
-                    PlanPage.Mediterra,
-                    tabViewModel,
-                    EditPlanVM
+                    planname = PlanPage.Mediterra,
+                    tabViewModel = tabViewModel,
+                    EditPlanVM = EditPlanVM,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
+                    navcontroller = navController,
+                    planVM = planVM,
+                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.Custom.name) {
                 CustomEditPlan(
-                    PlanPage.Custom.getPlanTitle(context),
+                    planname = PlanPage.Custom,
+                    tabViewModel = tabViewModel,
+                    EditPlanVM = EditPlanVM,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState,
                     navcontroller = navController,
-                    tabViewModel,
-                    EditPlanVM
+                    planVM = planVM,
+                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.ManagePlan.name) {
                 ManagePlan(
                     planVM = planVM,
                     managePlanVM = managePlanVM,
-                    showdeleteicon
+                    showdeleteicon,
+                    tabViewModel,
+                    scope = scope,
+                    snackbarHostState = snackbarHostState
                 )
             }
             composable(route = PlanPage.CheckPlan.name)
