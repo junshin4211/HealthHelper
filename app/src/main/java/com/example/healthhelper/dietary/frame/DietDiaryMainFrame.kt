@@ -45,7 +45,6 @@ import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
-import com.example.healthhelper.dietary.util.downloaddata.DownloadData
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
@@ -68,7 +67,6 @@ fun DietDiaryMainFrame(
     var currentMealOption by remember { mutableStateOf(mealsOptions[0]) }
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
-    var downloadButtonIsClicked by remember { mutableStateOf(false) }
 
     val verticalScrollState2 = rememberScrollState()
 
@@ -172,14 +170,6 @@ fun DietDiaryMainFrame(
         Log.e(TAG,"At mealsButtonIsClicked is true in TAG:${TAG}, selectedMealsOption:${selectedMealsOption}")
         navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
         mealsButtonIsClicked = false
-    }
-
-    if (downloadButtonIsClicked) {
-        DownloadData(
-            context = context,
-            vo = mealsOptions,
-        )
-        downloadButtonIsClicked = false
     }
 }
 
