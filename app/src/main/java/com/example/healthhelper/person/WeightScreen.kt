@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -39,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -95,7 +98,7 @@ fun WeightScreen(
                         navController.navigate(PersonScreenEnum.weightSettingScreen.name)
                     }) {
                         Icon(
-                            imageVector = Icons.Default.Settings,
+                            imageVector = Icons.Default.Add,
                             contentDescription = stringResource(R.string.weightSetting),
                             modifier = Modifier.size(40.dp),
                             tint = colorResource(R.color.primarycolor)
@@ -148,15 +151,6 @@ fun WeightScreen(
 
             LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                 item {
-                    CustomTabRow(
-                        selectedTab = selectedTab,
-                        onTabSelected = { newTab -> selectedTab = newTab },
-                        textColor = Color.Black,
-                        selectedTextColor = Color.White,
-                        labels = labels
-                    )
-
-
                     if (weightData.size < 2) {
                         Text(
                             stringResource(R.string.noBodyData),
@@ -187,21 +181,15 @@ fun WeightScreen(
                         }
                         Text(stringResource(R.string.month))
                     }
+                    CustomTabRow(
+                        selectedTab = selectedTab,
+                        onTabSelected = { newTab -> selectedTab = newTab },
+                        textColor = Color.Black,
+                        selectedTextColor = Color.White,
+                        labels = labels
+                    )
                 }
                 item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            stringResource(R.string.historyRecord),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            textDecoration = TextDecoration.Underline
-                        )
-                    }
                     ListItem(
                         { HeaderRow() },
                         colors = ListItemDefaults.colors(containerColor = colorResource(R.color.backgroundcolor)),
@@ -230,7 +218,12 @@ fun HeaderRow() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            stringResource(R.string.historyRecord),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
         Text(
             text = stringResource(R.string.weight),
             fontWeight = FontWeight.Bold,
@@ -249,6 +242,7 @@ fun HeaderRow() {
             modifier = Modifier.weight(0.5f),
             fontSize = 18.sp
         )
+//        Spacer(modifier = Modifier.weight(0.2f))
     }
 }
 
@@ -257,14 +251,21 @@ fun WeightDataRow(data: WeightData, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .padding(horizontal = 10.dp, vertical = 16.dp)
             .clickable { navController.navigate("${PersonScreenEnum.weightReviseScreen.name}/${data.recordId}") },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = data.recordDate, modifier = Modifier.weight(1f), fontSize = 18.sp)
-        Text(text = data.weight.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp)
-        Text(text = data.bmi.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp)
-        Text(text = data.bodyFat.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp)
+        Text(text = data.weight.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = data.bmi.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = data.bodyFat.toString(), modifier = Modifier.weight(0.5f), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+//        Icon(
+//            modifier = Modifier.weight(0.2f),
+//            painter = painterResource(R.drawable.baseline_mode_edit_24),
+////            imageVector = Icons.Default.PlayArrow,
+//            contentDescription = "edit"
+//
+//        )
     }
 }
 

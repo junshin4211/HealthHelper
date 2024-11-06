@@ -7,7 +7,6 @@ import android.graphics.Matrix
 import android.graphics.Path
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,22 +55,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.cloudinary.Cloudinary
-import com.cloudinary.ProgressCallback
-import com.cloudinary.utils.ObjectUtils
 import com.example.healthhelper.R
 import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.SaveButton
-import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -191,40 +180,6 @@ fun PickPhotoScreen(
     }
 }
 
-//private suspend fun uploadImageToCloudinary(
-//    cloudinary: Cloudinary,
-//    fileUri: Uri,
-//    userPhotoUploadVM: UserPhotoUploadVM,
-//) {
-//    val file = File(fileUri.path ?: return)
-//    withContext(Dispatchers.IO){
-//        try {
-//            val response =  cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
-//            val url = response["url"] as String
-//            userPhotoUploadVM.uploadedUrl.update { url }
-//            Log.d("Upload", "Image uploaded to: $url")
-//        } catch (e: Exception) {
-//            Log.e("cloudinary:Faild", " ${e.message}")
-//            e.printStackTrace()
-//        }
-//    }
-//}
-
-
-//private fun uploadImageToCloudinary(cloudinary: Cloudinary, fileUri: Uri) {
-//    val file = File(fileUri.path ?: return)
-//    Thread {
-//        try {
-//            val response = cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
-//            val url = response["url"] as String
-//            UserData.photoUrl = url
-//            Log.d("Upload", "Image uploaded to: $url")
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }.start()
-//}
-
 @RequiresApi(Build.VERSION_CODES.P)
 fun generateCroppedBitmap(
     context: Context,
@@ -282,6 +237,7 @@ private fun saveBitmapToFile(context: Context, bitmap: Bitmap): Uri? {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.flush()
             Uri.fromFile(file)
+
         } catch (e: IOException) {
             e.printStackTrace()
             null

@@ -66,13 +66,9 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
                 .weight(1f)
         ) {
             when (tabIndex) {
-                0 -> MainPersonScreen()
-
+                0 -> MainPersonScreen(tabViewModel = tabViewModel)
                 1 -> CmtController()
-
-
                 2 -> { DietDiaryMainScreen() }
-
                 3 -> Plan()
                 4 -> RequestAccessLocationPermission(onGrant = {
                         MainMapSearchScreen()

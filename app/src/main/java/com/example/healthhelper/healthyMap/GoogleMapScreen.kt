@@ -1,6 +1,5 @@
 package com.example.healthhelper.healthyMap
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -27,7 +26,10 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,15 +57,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
 import com.example.healthhelper.healthyMap.model.MapState
 import com.example.healthhelper.healthyMap.model.RestaurantInfo
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -77,7 +76,7 @@ import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoogleMapScreen(
     favorListViewModel: FavorListViewModel,
@@ -119,10 +118,6 @@ fun GoogleMapScreen(
             val cameraPositionState = rememberCameraPositionState {
                 position = CameraPosition.fromLatLngZoom(restaurantLatLng, 15f)
             }
-
-            val locationPermission = rememberPermissionState(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
             DirectButton(
                 context = context,
                 modifier = Modifier
@@ -134,7 +129,6 @@ fun GoogleMapScreen(
                 userLng = userLng,
                 restaurant = restaurant
             )
-
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
@@ -166,6 +160,13 @@ fun GoogleMapScreen(
                     }
                 )
             }
+        }
+        if (mapState.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(50.dp)
+            )
         }
         mapState.error?.let { error ->
             AlertDialog(
@@ -202,7 +203,6 @@ fun GoogleMapScreen(
                         favorResturants = favorResturants
                     )
                 }
-
             }
         }
     }
@@ -218,9 +218,6 @@ fun RestaurantDetailsBottomSheet(
 ) {
     var isFavor by remember { mutableStateOf(favorResturants.any { it.rID == restaurant.rID })}
     val scope = rememberCoroutineScope()
-    val favoriteColor = animateColorAsState(
-        targetValue = if (isFavor) colorResource(R.color.primarycolor) else colorResource(R.color.footer),
-        animationSpec = tween(durationMillis = 300) )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -285,10 +282,10 @@ fun RestaurantDetailsBottomSheet(
                     }
                 }) {
                     Icon(
-                        Icons.Filled.Favorite,
+                        imageVector = if (isFavor) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = stringResource(R.string.addFavor),
                         modifier = Modifier.size(50.dp),
-                        tint = favoriteColor.value
+                        tint = colorResource(R.color.primarycolor)
                     )
                 }
             }

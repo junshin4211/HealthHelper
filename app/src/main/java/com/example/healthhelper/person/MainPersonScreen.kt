@@ -19,6 +19,7 @@ import com.example.healthhelper.person.personVM.AchievementViewModel
 import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.personVM.WeightViewModel
+import com.example.healthhelper.screen.TabViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -32,6 +33,8 @@ fun MainPersonScreen(
     achievementVM: AchievementViewModel = viewModel(),
     cloudPhotoUploadVM: CloudPhotoUploadVM = viewModel(),
     userPhotoUploadVM: UserPhotoUploadVM = viewModel(),
+    tabViewModel: TabViewModel
+
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -56,20 +59,25 @@ fun MainPersonScreen(
                     onCancelClick = {
                         imageUri = null
                         navController.popBackStack(PersonScreenEnum.personScreen.name, false)
-                    }
+                    },
+                    tabViewModel = tabViewModel
                 )
             })
         }
         composable(route = PersonScreenEnum.photoPreviewScreen.name) {
             PhotoPreviewScreen(
+                navController =navController,
                 imageUri = imageUri,
-                onAcceptClick = {
-                    navController.popBackStack(
-                        PersonScreenEnum.personScreen.name,
-                        false
-                    )
-                },
-                onRejectClick = { navController.popBackStack() }
+//                onAcceptClick = {
+//                    navController.popBackStack(
+//                        PersonScreenEnum.personScreen.name,
+//                        false
+//                    )
+//                },
+                onRejectClick = { navController.popBackStack() },
+                userPhotoUploadVM = userPhotoUploadVM,
+                cloudPhotoUploadVM = cloudPhotoUploadVM,
+                tabViewModel = tabViewModel
             )
         }
         composable(route = PersonScreenEnum.pickPhotoScreen.name) {

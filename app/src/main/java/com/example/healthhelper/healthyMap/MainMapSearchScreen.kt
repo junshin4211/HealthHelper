@@ -71,7 +71,7 @@ fun MainMapSearchScreen(
     navController: NavHostController = rememberNavController(),
 ) {
     val destination = navController.currentBackStackEntryAsState().value?.destination
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val viewModel: RestaurantViewModel = viewModel()
     val restaurants by viewModel.restaurantsByDistrict.collectAsState()
 
@@ -111,7 +111,6 @@ fun MainMapSearchScreen(
                 MapSearchAppBar(
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
-                    scrollBehavior = scrollBehavior,
                     navController = navController,
                     userCity = if (userCity == "") stringResource(R.string.LocationNone) else userCity
                 )
@@ -167,7 +166,7 @@ fun MapSearchAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior,
+//    scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
     userCity: String,
 ) {
@@ -222,7 +221,6 @@ fun MapSearchAppBar(
                 )
             }
         },
-        scrollBehavior = scrollBehavior,
     )
 }
 

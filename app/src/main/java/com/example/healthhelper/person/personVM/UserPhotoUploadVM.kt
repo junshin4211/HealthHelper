@@ -1,5 +1,8 @@
 package com.example.healthhelper.person.personVM
 
+import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -18,13 +21,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 
-class UserPhotoUploadVM: ViewModel() {
+class UserPhotoUploadVM : ViewModel() {
     private val _userPhotoUrlState = MutableStateFlow(UserPhoto())
     val userPhotoUrlState: StateFlow<UserPhoto> = _userPhotoUrlState.asStateFlow()
 
-    val uploadedUrl :MutableStateFlow<String?> = MutableStateFlow(null)
+    private val uploadedUrl: MutableStateFlow<String?> = MutableStateFlow(null)
 
     init {
         viewModelScope.launch {
@@ -33,17 +37,19 @@ class UserPhotoUploadVM: ViewModel() {
 
         viewModelScope.launch {
             uploadedUrl.collect {
-                if (it?.isNotEmpty()==true) {
+                if (it?.isNotEmpty() == true) {
                     insertUserPhotoUrl(2, it)
                 }
             }
         }
     }
-    fun refreshUserPhoto(){
+
+    private fun refreshUserPhoto() {
         viewModelScope.launch {
             _userPhotoUrlState.value = fetchUserPhoto(2)
         }
     }
+
     suspend fun fetchUserPhoto(userId: Int): UserPhoto {
         val url = "$serverUrl/selectUserPhoto"
         val gson = Gson()
@@ -52,13 +58,14 @@ class UserPhotoUploadVM: ViewModel() {
 
         return try {
             val result = httpPost(url, jsonObject.toString())
-            Log.e("Refresh","result: $result")
+            Log.e("Refresh", "result: $result")
             gson.fromJson(result, UserPhoto::class.java) ?: UserPhoto()
         } catch (e: Exception) {
             Log.e("Fetch Error", "Error fetching user photo from $url: ${e.message}", e)
             UserPhoto()
         }
     }
+
     suspend fun insertUserPhotoUrl(userId: Int, photoUrl: String): Boolean {
         val url = "$serverUrl/insertUserPhoto"
         val gson = Gson()
@@ -81,18 +88,41 @@ class UserPhotoUploadVM: ViewModel() {
     suspend fun uploadImageToCloudinary(
         cloudinary: Cloudinary,
         fileUri: Uri,
-    ) {
-        val file = File(fileUri.path ?: return)
-        withContext(Dispatchers.IO) {
+    ): Boolean {
+        val file = File(fileUri.path ?: return false)
+        return withContext(Dispatchers.IO) {
             try {
                 val response = cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
+                val url = response["url"] as String
+                uploadedUrl.value = url
+                url.isNotEmpty()
+            } catch (e: Exception) {
+                Log.e("cloudinary:Failed", " ${e.message}")
+                false
+            }
+        }
+    }
+
+    suspend fun uploadImageUriToCloudinary(
+        cloudinary: Cloudinary,
+        contentUri: Uri,
+        contentResolver: ContentResolver,
+    ) {
+        withContext(Dispatchers.IO) {
+            try {
+                val inputStream = contentResolver.openInputStream(contentUri)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream)
+                val byteArray = byteArrayOutputStream.toByteArray()
+                val response = cloudinary.uploader().upload(byteArray, ObjectUtils.emptyMap())
                 val url = response["url"] as String
                 uploadedUrl.value = url
                 Log.d("Upload", "Image uploaded to: $url")
             } catch (e: Exception) {
                 Log.e("cloudinary:Failed", " ${e.message}")
-                e.printStackTrace()
             }
         }
     }
+
 }

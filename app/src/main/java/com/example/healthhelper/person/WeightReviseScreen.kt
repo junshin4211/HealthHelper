@@ -219,7 +219,7 @@ fun WeightReviseScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primarycolor)),
                 ) {
                     Text(
-                        stringResource(R.string.revise),
+                        stringResource(R.string.save),
                         color = Color.White,
                         fontSize = 24.sp
                     )

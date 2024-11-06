@@ -194,5 +194,6 @@
     <string name="error">錯誤</string>
     <string name="noData">尚無資料</string>
     <string name="restaurant_image">餐廳照片</string>
-    <string name="lastWeightRecord">最新的資料</string>
+    <string name="lastWeightRecord">最新一筆紀錄</string>
+    <string name="noAchievement">尚未解鎖成就</string>
 </resources>

@@ -14,7 +14,9 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -29,17 +31,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
-import com.example.healthhelper.person.model.UserData
 import com.example.healthhelper.screen.TabViewModel
 
 @Composable
-fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Unit, tabViewModel: TabViewModel = viewModel()) {
+fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Unit, tabViewModel: TabViewModel ) {
     val tag = "tag_CameraPreviewScreen"
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -62,6 +64,7 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
 
         Row(modifier = Modifier.align(Alignment.BottomCenter)) {
             Button(modifier = Modifier
+                .height(70.dp)
                 .weight(1f)
                 .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
@@ -89,7 +92,6 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                                 val savedUri = outputFileResults.savedUri
                                 if (savedUri != null) {
                                     imageUri = outputFileResults.savedUri
-                                    UserData.photoUri = imageUri
                                     Log.d(tag, "imageUri: $imageUri")
                                     onPictureTaken(imageUri)
                                 }
@@ -102,16 +104,20 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                     )
                 }
             ) {
-                Text(stringResource(id = R.string.takePicture), color = colorResource(R.color.backgroundcolor))
+                Text(stringResource(id = R.string.takePicture), color = colorResource(R.color.backgroundcolor), fontSize = 28.sp)
             }
             Button(
                 modifier = Modifier
+                    .height(70.dp)
                     .weight(1f)
                     .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-                onClick = onCancelClick
+                onClick = {
+                    onCancelClick
+                    tabViewModel.setTabVisibility(true)
+                }
             ) {
-                Text(text = stringResource(id = R.string.cancel), color = colorResource(R.color.backgroundcolor))
+                Text(text = stringResource(id = R.string.cancel), color = colorResource(R.color.backgroundcolor), fontSize = 28.sp)
             }
         }
     }
@@ -135,8 +141,6 @@ private fun startCamera(
                 // 取得Preview.SurfaceProvider，並用以顯示預覽資料
                 it.surfaceProvider = previewView.surfaceProvider
             }
-
-        // 選擇前鏡頭
         val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
         try {

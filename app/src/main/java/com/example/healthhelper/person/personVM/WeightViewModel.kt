@@ -36,7 +36,7 @@ class WeightViewModel : ViewModel() {
 
 
     fun calculateBMI(height: Double, weight: Double): Double {
-        return String.format("%.2f", weight / (height / 100).pow(2)).toDouble()
+        return String.format("%.1f", weight / (height / 100).pow(2)).toDouble()
     }
 
     suspend fun updateBodyDataJson(recordId: Int, height: Double, weight: Double, bodyFat: Double, recordDate: String, bmi: Double): Boolean {

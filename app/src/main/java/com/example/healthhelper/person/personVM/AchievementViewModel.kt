@@ -36,9 +36,10 @@ class AchievementViewModel : ViewModel() {
     suspend fun fetchAchievementList(): List<Achievement> {
         val url = "${serverUrl}/achievement/getlist"
         val gson = Gson()
-
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("userId", 3) // TODO:需要修改 userId
         return try {
-            val result = httpPost(url, "")
+            val result = httpPost(url, jsonObject.toString())
             val collectionType = object : TypeToken<List<Achievement>>() {}.type
             gson.fromJson(result, collectionType) ?: emptyList()
         } catch (e: Exception) {
@@ -51,7 +52,7 @@ class AchievementViewModel : ViewModel() {
         val url = "${serverUrl}/insertAchievement"
         val gson = Gson()
         val jsonObject = JsonObject()
-        jsonObject.addProperty("userId", 2) // TODO: 需要修改 userId
+        jsonObject.addProperty("userId", 3) // TODO: 需要修改 userId
 
         val result = httpPost(url, jsonObject.toString())
         val response = gson.fromJson(result, JsonObject::class.java)

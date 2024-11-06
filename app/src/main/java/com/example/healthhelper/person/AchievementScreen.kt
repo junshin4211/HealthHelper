@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -174,6 +175,89 @@ fun AchievementContent(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun AchievementList(
+    title: String,
+    description: String,
+    achievements: List<Achievement>,
+    onItemClick: (Achievement) -> Unit,
+) {
+    Column {
+        Text(
+            title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            description,
+            fontSize = 12.sp,
+            color = Color.DarkGray
+        )
+        if (achievements.isEmpty()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = stringResource(R.string.noAchievement),
+                    tint = Color.Gray
+                )
+                Text(
+                    text = stringResource(R.string.noAchievement),
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            }
+
+        } else {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                achievements.forEach { achievement ->
+                    AchievementItem(
+                        modifier = Modifier.fillMaxWidth(1f / 3f),
+                        achievement = achievement,
+                        onClick = { onItemClick(achievement) },
+                    )
+                }
+            }
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+    }
+
+
+}
+
+@Composable
+fun AchievementItem(
+    achievement: Achievement,
+    onClick: (Achievement) -> Unit,
+    modifier: Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .clickable { onClick(achievement) }
+    ) {
+        achievement.photo?.let { base64String ->
+            val imageBytes = Base64.decode(base64String, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+            )
+        } ?: Image(
+            painter = painterResource(id = R.drawable.baseline_photo_24),
+            contentDescription = null,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+        Text(text = achievement.aname)
+    }
+}
 
 @Composable
 fun AchievementDetailDialog(
@@ -244,73 +328,6 @@ fun AchievementDetailDialog(
         }
     }
 }
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun AchievementList(
-    title: String,
-    description: String,
-    achievements: List<Achievement>,
-    onItemClick: (Achievement) -> Unit,
-) {
-    Column {
-        Text(
-            title,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            description,
-            fontSize = 12.sp,
-            color = Color.DarkGray
-        )
-
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            achievements.forEach { achievement ->
-                AchievementItem(
-                    modifier = Modifier.fillMaxWidth(1f/3f),
-                    achievement = achievement,
-                    onClick = { onItemClick(achievement) },
-                )
-            }
-        }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-    }
-
-
-}
-
-@Composable
-fun AchievementItem(
-    achievement: Achievement,
-    onClick: (Achievement) -> Unit,
-    modifier: Modifier,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-            .clickable { onClick(achievement) }
-    ) {
-        achievement.photo?.let { base64String ->
-            val imageBytes = Base64.decode(base64String, Base64.DEFAULT)
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-            Image(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-            )
-        } ?: Image(
-            painter = painterResource(id = R.drawable.baseline_photo_24),
-            contentDescription = null,
-            modifier = Modifier.padding(top = 16.dp)
-        )
-        Text(text = achievement.aname)
-    }
-}
-
 
 //@Preview(showBackground = true)
 //@Composable

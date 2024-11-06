@@ -124,6 +124,7 @@ fun WeightSettingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    Text(stringResource(R.string.lastWeightRecord), color = colorResource(R.color.primarycolor))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -199,9 +200,10 @@ fun WeightSettingScreen(
                             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                         )
                     }
+
                 }
             }
-            Text(stringResource(R.string.lastWeightRecord), color = colorResource(R.color.primarycolor))
+
             Spacer(modifier = Modifier.padding(bottom = 8.dp))
             SaveButton(
                 onClick = {

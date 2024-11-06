@@ -1,6 +1,5 @@
 package com.example.healthhelper.person
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,19 +33,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
-import com.example.healthhelper.person.model.UserData
 import com.example.healthhelper.person.personVM.AchievementViewModel
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import kotlinx.coroutines.launch
@@ -57,9 +54,11 @@ fun PersonScreen(
     userPhotoUploadVM: UserPhotoUploadVM
 ) {
     val userPhotoUrl by userPhotoUploadVM.userPhotoUrlState.collectAsState()
-    Log.e("fectchPhoto", userPhotoUrl.toString())
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
+//    var isLoading by remember { mutableStateOf(true) }
+
+
     Scaffold(containerColor = colorResource(R.color.backgroundcolor)) { innerPadding ->
         Column(
             modifier = Modifier
@@ -76,6 +75,13 @@ fun PersonScreen(
                 Box(
                     modifier = Modifier.size(250.dp)
                 ) {
+//                    if (isLoading) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier
+//                                .align(Alignment.Center)
+//                                .size(50.dp)
+//                        )
+//                    }
                     userPhotoUrl.photoUrl?.let { uri ->
                         Image(
                             painter = rememberAsyncImagePainter(uri),

@@ -47,13 +47,13 @@ fun CustomTabRow(
             border = BorderStroke(1.dp, colorResource(R.color.primarycolor))
         ) {
 
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .graphicsLayer(alpha = if (selectedTab == 0) 1f else 0f)
-            )
+//            Icon(
+//                imageVector = Icons.Default.Check,
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .padding(end = 4.dp)
+//                    .graphicsLayer(alpha = if (selectedTab == 0) 1f else 0f)
+//            )
 
             Text(
                 labels[0],
@@ -72,12 +72,12 @@ fun CustomTabRow(
             border = BorderStroke(1.dp, colorResource(R.color.primarycolor))
         ) {
 
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
-                        .graphicsLayer(alpha = if (selectedTab == 1) 1f else 0f)
-                )
+//                Icon(
+//                    imageVector = Icons.Default.Check,
+//                    contentDescription = null,
+//                    modifier = Modifier.padding(end = 4.dp)
+//                        .graphicsLayer(alpha = if (selectedTab == 1) 1f else 0f)
+//                )
 
             Text(
                 labels[1],
@@ -96,12 +96,12 @@ fun CustomTabRow(
             border = BorderStroke(1.dp, colorResource(R.color.primarycolor))
         ) {
 
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
-                        .graphicsLayer(alpha = if (selectedTab == 2) 1f else 0f)
-                )
+//                Icon(
+//                    imageVector = Icons.Default.Check,
+//                    contentDescription = null,
+//                    modifier = Modifier.padding(end = 4.dp)
+//                        .graphicsLayer(alpha = if (selectedTab == 2) 1f else 0f)
+//                )
 
             Text(
                 labels[2],
