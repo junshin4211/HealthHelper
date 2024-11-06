@@ -53,6 +53,7 @@ import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun EditPlan(
@@ -90,9 +91,10 @@ fun EditPlan(
 
     //display calorie value
     var calorie by remember { mutableFloatStateOf(0f) }
+    val planUCImpl = remember { PlanUCImpl() }
 
     //set nutrient percent value by planname
-    PlanUCImpl().planInitial(
+    planUCImpl.planInitial(
         planName = planname,
         onSetGoal = { fat, carb, protein ->
             //show percent on UI
@@ -108,6 +110,11 @@ fun EditPlan(
             EditPlanVM.updateCategoryId(cateId)
         }
     )
+
+    planUCImpl.percentToGram("carb", calorie, carbpercent) { carbgram = it }
+    planUCImpl.percentToGram("protein", calorie, proteinpercent) { proteingram = it }
+    planUCImpl.percentToGram("fat", calorie, fatpercent) { fatgram = it }
+
 
     // UI
     Column(
@@ -191,17 +198,17 @@ fun EditPlan(
                     when (i) {
                         0 -> CustomText().TextWithDiffColor(
                             R.color.red01,
-                            "${stringResource(R.string.carb)} $carbgram 克", 15.sp
+                            "${stringResource(R.string.carb)}${String.format(Locale.US, "%.1f", carbgram)}克", 15.sp
                         )
 
                         1 -> CustomText().TextWithDiffColor(
                             R.color.dark_blue,
-                            "${stringResource(R.string.protein)} $proteingram 克", 15.sp
+                            "${stringResource(R.string.protein)}${String.format(Locale.US, "%.1f", proteingram)}克", 15.sp
                         )
 
                         2 -> CustomText().TextWithDiffColor(
                             R.color.dark_green,
-                            "${stringResource(R.string.fat)} $fatgram 克", 15.sp
+                            "${stringResource(R.string.fat)}${String.format(Locale.US, "%.1f", fatgram)}克", 15.sp
                         )
                     }
                 }
@@ -390,7 +397,7 @@ fun CreateDesciption(
 
         ) {
             CustomText().TextWithDiffColor(text = type, setsize = 25.sp)
-            CustomText().TextWithDiffColor(text = "$percent%(${gram}克)", setsize = 20.sp)
+            CustomText().TextWithDiffColor(text = "$percent%(${String.format(Locale.US, "%.1f", gram)}克)", setsize = 20.sp)
         }
         Row(
             modifier = Modifier

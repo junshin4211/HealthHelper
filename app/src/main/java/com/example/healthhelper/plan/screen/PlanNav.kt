@@ -88,8 +88,8 @@ fun Plan(
             composable(route = PlanPage.DietPlan.name) {
                 PlanMain(
                     navcontroller = navController,
-                    tabViewModel = tabViewModel,
-                    planViewModel = planVM
+                    tabVM = tabViewModel,
+                    planVM = planVM
                 )
             }
             composable(route = PlanPage.HighProtein.name) {

@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -60,6 +61,7 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
+import java.util.Locale
 
 @Composable
 fun CustomEditPlan(
@@ -99,14 +101,31 @@ fun CustomEditPlan(
 
     //display calorie value
     var calorie by remember { mutableFloatStateOf(0f) }
+    val planUCImpl = remember { PlanUCImpl() }
 
     //set customplan cateId
-    PlanUCImpl().customPlanInitial(
+    planUCImpl.customPlanInitial(
         planName = planname,
         onSetCateId = { cateId ->
             EditPlanVM.updateCategoryId(cateId)
         }
     )
+
+    // 計算克數
+    fun updateGrams() {
+        planUCImpl.percentToGram("carb", calorie, carbpercent) { carbgram = it }
+        planUCImpl.percentToGram("protein", calorie, proteinpercent) { proteingram = it }
+        planUCImpl.percentToGram("fat", calorie, fatpercent) { fatgram = it }
+    }
+
+    // 每次更改百分比時保持總和為 100 並更新克數
+    fun adjustAndRefreshValues(changedPercent: Float, onValueChange: (Float) -> Unit) {
+        onValueChange(changedPercent)
+        val remaining = 100f - carbpercent - proteinpercent
+        fatpercent = remaining.coerceIn(0f, 100f)
+        updateGrams()
+    }
+
 
     //UI
     Column(
@@ -190,17 +209,35 @@ fun CustomEditPlan(
                     when (i) {
                         0 -> CustomText().TextWithDiffColor(
                             R.color.red01,
-                            "${stringResource(R.string.carb)} $carbgram 克", 15.sp
+                            "${stringResource(R.string.carb)}${
+                                String.format(
+                                    Locale.US,
+                                    "%.1f",
+                                    carbgram
+                                )
+                            }克", 15.sp
                         )
 
                         1 -> CustomText().TextWithDiffColor(
-                            R.color.sky_blue,
-                            "${stringResource(R.string.protein)} $proteingram 克", 15.sp
+                            R.color.dark_blue,
+                            "${stringResource(R.string.protein)}${
+                                String.format(
+                                    Locale.US,
+                                    "%.1f",
+                                    proteingram
+                                )
+                            }克", 15.sp
                         )
 
                         2 -> CustomText().TextWithDiffColor(
-                            R.color.light_green,
-                            "${stringResource(R.string.fat)} $fatgram 克", 15.sp
+                            R.color.dark_green,
+                            "${stringResource(R.string.fat)}${
+                                String.format(
+                                    Locale.US,
+                                    "%.1f",
+                                    fatgram
+                                )
+                            }克", 15.sp
                         )
                     }
                 }
@@ -245,7 +282,10 @@ fun CustomEditPlan(
                 )
                 CustomTextField().TextFieldWithBorder(
                     value = calorie,
-                    onValueChange = { newvalue -> calorie = newvalue },
+                    onValueChange = { newvalue ->
+                        calorie = newvalue
+                        updateGrams()
+                    },
                     label = stringResource(R.string.examcalorie),
                     width = 130.dp
                 )
@@ -268,37 +308,48 @@ fun CustomEditPlan(
                     onValueChange = { newValue ->
                         carbpercent = newValue
                         val remaining = 100f - carbpercent
-                        // 將剩餘值按比例分配給 proteinPercent 和 fatPercent
-                        proteinpercent = remaining * 0.5f
-                        fatpercent = remaining * 0.5f
+                        // 將剩餘值按比例分配給 proteinpercent 和 fatpercent
+                        proteinpercent = (remaining * 0.5f).coerceIn(0f, remaining)
+                        fatpercent = (remaining * 0.5f).coerceIn(0f, remaining)
                         val total = carbpercent + proteinpercent + fatpercent
                         val adjustment = 100f - total
                         carbpercent += adjustment
-                        PlanUCImpl().percentToGram("carb",calorie,carbpercent){carbgram = it}
+                        adjustAndRefreshValues(newValue) { carbpercent = it }
                     },
                     label = stringResource(R.string.exampercent),
                     width = 100.dp,
                     modifier = Modifier
                 )
 
-                CustomText().TextWithDiffColor(text = "%(${carbgram}克)", setsize = 20.sp)
+                CustomText().TextWithDiffColor(
+                    text = "%(${
+                        String.format(
+                            Locale.US,
+                            "%.1f",
+                            carbgram
+                        )
+                    }克)", setsize = 20.sp
+                )
             }
 
             createSliders(
                 carbpercent,
-                0f,
-                100f,
+                0.0f,
+                100.0f,
                 R.color.primarycolor,
                 R.color.light_gray
-            ) {newValue ->
+            ) { newValue ->
+                updateSliders(
+                    "carb",
+                    newValue,
+                    carbpercent,
+                    proteinpercent,
+                    fatpercent,
+                    { carbpercent = it },
+                    { proteinpercent = it },
+                    { fatpercent = it })
                 carbpercent = newValue
-                val remaining = 100f - carbpercent
-                // 將剩餘值按比例分配給 proteinPercent 和 fatPercent
-                proteinpercent = remaining * 0.5f
-                fatpercent = remaining * 0.5f
-                val total = carbpercent + proteinpercent + fatpercent
-                val adjustment = 100f - total
-                carbpercent += adjustment
+                adjustAndRefreshValues(newValue) { carbpercent = it }
             }
 
             Row(
@@ -317,28 +368,44 @@ fun CustomEditPlan(
                     onValueChange = { newValue ->
                         proteinpercent = newValue
                         val remaining = 100f - carbpercent - proteinpercent
-                        // 更新 fatPercent，使總和保持 100
-                        fatpercent = remaining.coerceIn(0f, 100f)
+                        // 更新 fatpercent，使總和保持 100
+                        fatpercent = remaining.coerceIn(0f, 100f - carbpercent - proteinpercent)
+
+                        adjustAndRefreshValues(newValue) { proteinpercent = it }
                     },
                     label = stringResource(R.string.exampercent),
                     width = 100.dp,
                     modifier = Modifier
                 )
 
-                CustomText().TextWithDiffColor(text = "%(${proteingram}克)", setsize = 20.sp)
+                CustomText().TextWithDiffColor(
+                    text = "%(${
+                        String.format(
+                            Locale.US,
+                            "%.1f",
+                            proteingram
+                        )
+                    }克)", setsize = 20.sp
+                )
             }
 
             createSliders(
                 proteinpercent,
-                0f,
-                100f,
+                0.0f,
+                100.0f - carbpercent,
                 R.color.primarycolor,
                 R.color.light_gray
-            ) {newValue ->
-                proteinpercent = newValue
-                val remaining = 100f - carbpercent - proteinpercent
-                // 更新 fatPercent，使總和保持 100
-                fatpercent = remaining.coerceIn(0f, 100f)
+            ) { newValue ->
+                updateSliders(
+                    "protein",
+                    newValue,
+                    carbpercent,
+                    proteinpercent,
+                    fatpercent,
+                    { carbpercent = it },
+                    { proteinpercent = it },
+                    { fatpercent = it })
+                adjustAndRefreshValues(newValue) { proteinpercent = it }
             }
 
             Row(
@@ -356,23 +423,42 @@ fun CustomEditPlan(
                     value = fatpercent,
                     onValueChange = { newValue ->
                         fatpercent = newValue
+                        updateGrams()
                     },
                     label = stringResource(R.string.exampercent),
                     width = 100.dp,
                     modifier = Modifier
                 )
 
-                CustomText().TextWithDiffColor(text = "%(${fatgram}克)", setsize = 20.sp)
+                CustomText().TextWithDiffColor(
+                    text = "%(${
+                        String.format(
+                            Locale.US,
+                            "%.1f",
+                            fatgram
+                        )
+                    }克)", setsize = 20.sp
+                )
             }
 
             createSliders(
                 fatpercent,
-                0f,
-                100f,
+                0.0f,
+                100.0f - carbpercent,
                 R.color.primarycolor,
                 R.color.light_gray
-            ) {newValue ->
+            ) { newValue ->
+                updateSliders(
+                    "fat",
+                    newValue,
+                    carbpercent,
+                    proteinpercent,
+                    fatpercent,
+                    { carbpercent = it },
+                    { proteinpercent = it },
+                    { fatpercent = it })
                 fatpercent = newValue
+                updateGrams()
             }
 
         }
@@ -442,8 +528,8 @@ fun CustomEditPlan(
                                 snackbarHostState = snackbarHostState
                             )
                             Log.d(tag, "insertSuccess")
-                            fetchSingle(planVM)
-                            fetchList(ManagePlanVM)
+//                            fetchSingle(planVM)
+//                            fetchList(ManagePlanVM)
                             navcontroller.navigate(PlanPage.DietPlan.name)
                         } else {
                             CustomSnackBar().CreateSnackBar(
@@ -460,6 +546,41 @@ fun CustomEditPlan(
 
     }
 
+}
+
+fun updateSliders(changedSlider: String,
+                  newValue: Float,
+                  carbpercent: Float,
+                  proteinpercent: Float,
+                  fatpercent: Float,
+                  oncarbpercentChange: (Float) -> Unit,
+                  onproteinpercentChange: (Float) -> Unit,
+                  onfatpercentChange: (Float) -> Unit
+) {
+    when (changedSlider) {
+        "carb" -> {
+            oncarbpercentChange(newValue)
+            val remaining = 100f - carbpercent
+            if (proteinpercent + fatpercent == 0f) {
+                onproteinpercentChange(remaining)
+                onfatpercentChange(0f)
+            } else {
+                // 將剩餘百分比按比例分配給 proteinpercent 和 fatpercent
+                onproteinpercentChange((remaining * (proteinpercent / (proteinpercent + fatpercent))).coerceIn(0f, remaining))
+                onfatpercentChange((remaining - proteinpercent).coerceIn(0f, remaining))
+            }
+        }
+
+        "protein" -> {
+            onproteinpercentChange(newValue.coerceIn(0f, 100f - carbpercent))
+            onfatpercentChange((100f - carbpercent - proteinpercent).coerceIn(0f, 100f - carbpercent))
+        }
+
+        "fat" -> {
+            onfatpercentChange(newValue.coerceIn(0f, 100f - carbpercent))
+            onproteinpercentChange((100f - carbpercent - fatpercent).coerceIn(0f, 100f - carbpercent))
+        }
+    }
 }
 
 @Preview(locale = "zh-rTW")

@@ -52,15 +52,16 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 @Composable
 fun PlanMain(context: Context = LocalContext.current,
              navcontroller: NavHostController = rememberNavController(),
-             tabViewModel: TabViewModel = viewModel(),
-             planViewModel: PlanVM,
+             tabVM: TabViewModel = viewModel(),
+             planVM: PlanVM,
 ) {
     val tag = "tag_PlanMain"
-    tabViewModel.setTabVisibility(true)
+    tabVM.setTabVisibility(true)
     val formatter = PlanUCImpl()::dateTimeFormat;
 
-    val myPlan by planViewModel.myPlanState.collectAsState()
-    val completePlan by planViewModel.completePlanState.collectAsState()
+    PlanUCImpl().fetchSingle(planVM)
+    val myPlan by planVM.myPlanState.collectAsState()
+    val completePlan by planVM.completePlanState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -169,7 +170,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         TextButton(
             onClick = {
-                planViewModel.panneelname = PlanPage.MyPlan.name
+                planVM.panneelname = PlanPage.MyPlan.name
                 navcontroller.navigate(PlanPage.ManagePlan.name)
             },
             modifier = Modifier
@@ -276,7 +277,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         TextButton(
             onClick = {
-                planViewModel.panneelname = PlanPage.CompletedPlan.name
+                planVM.panneelname = PlanPage.CompletedPlan.name
                 navcontroller.navigate(PlanPage.ManagePlan.name)
             },
             modifier = Modifier

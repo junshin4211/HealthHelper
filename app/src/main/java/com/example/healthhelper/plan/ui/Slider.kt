@@ -26,7 +26,7 @@ fun createSliders(
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CustomText().TextWithDiffColor(text = "${minvalue.toInt()}")
+        CustomText().TextWithDiffColor(text = String.format(Locale.US, "%.1f", minvalue))
 
         Slider(
             value = value,
@@ -34,8 +34,8 @@ fun createSliders(
                 onValueChange(newvalue)
                             },
             valueRange = minvalue..maxvalue,
-            modifier = Modifier,
-                //.weight(1.0f),
+            modifier = Modifier
+                .weight(1.0f),
             colors = SliderDefaults.colors(
                 thumbColor = colorResource(R.color.black),
                 activeTrackColor = colorResource(activatecolor),
@@ -43,7 +43,7 @@ fun createSliders(
             )
         )
 
-        CustomText().TextWithDiffColor(text = "${maxvalue.toInt()}")
+        CustomText().TextWithDiffColor(text = String.format(Locale.US, "%.1f", maxvalue))
 
     }
 }

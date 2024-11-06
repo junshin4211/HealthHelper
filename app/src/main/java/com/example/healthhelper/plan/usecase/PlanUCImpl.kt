@@ -109,11 +109,11 @@ class PlanUCImpl : PlanUC {
             when(nutrition)
             {
                 "carb","protein" ->{
-                    val Cals = calorie * percent
+                    val Cals = calorie * (percent/100)
                     onSetGram(Cals/4)
                 }
                 "fat" ->{
-                    val Cals = calorie * percent
+                    val Cals = calorie * (percent/100)
                     onSetGram(Cals/9)
                 }
 

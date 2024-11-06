@@ -54,10 +54,11 @@ fun ManagePlan(
     var activatepannel by remember { mutableStateOf(planVM.panneelname) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedPlan by remember { mutableStateOf(PlanModel()) }
-    val fetchSingle = PlanUCImpl()::fetchSingle
+    //val fetchSingle = PlanUCImpl()::fetchSingle
     val deletePlanSuccess = stringResource(R.string.deleteplansuccess)
     val deletePlanFailed = stringResource(R.string.deleteplanfailed)
 
+    PlanUCImpl().fetchList(managePlanVM)
     //get plan list
     val myPlanList by managePlanVM.myPlanListState.collectAsState(initial = emptyList())
     Log.d(tag, "get list $myPlanList")
@@ -188,7 +189,7 @@ fun ManagePlan(
                                 snackbarHostState = snackbarHostState
                             )
                             Log.d(tag, deletePlanSuccess)
-                            fetchSingle(planVM)
+                            //fetchSingle(planVM)
                         } else {
                             CustomSnackBar().CreateSnackBar(
                                 message = deletePlanFailed,
