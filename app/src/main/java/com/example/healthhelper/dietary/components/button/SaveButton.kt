@@ -8,14 +8,14 @@ import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
 
 @Composable
-fun DeleteButton(
+fun SaveButton(
     onClick: ()->Unit,
-    buttonColors: ButtonColors,
+    buttonColors:ButtonColors,
 ){
     Button(
         onClick = onClick,
         colors = buttonColors,
     ) {
-        Text(stringResource(R.string.delete))
+        Text(stringResource(R.string.save))
     }
 }

@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 object SelectedFoodItemRepository {
-    private val _dataFlow = MutableStateFlow<SelectedFoodItemVO>(SelectedFoodItemVO(name = "",grams = 0.0))
+    private val _dataFlow = MutableStateFlow<SelectedFoodItemVO>(fetchData())
     val dataFlow: StateFlow<SelectedFoodItemVO> = _dataFlow.asStateFlow()
 
+    private fun fetchData():SelectedFoodItemVO{
+        return SelectedFoodItemVO("Apple")
+    }
     fun setData(newData: SelectedFoodItemVO){
-        //_dataFlow.value = newData
         _dataFlow.update { newData }
     }
 }
