@@ -23,7 +23,7 @@ fun SaveButton(
         modifier = Modifier
             .width(100.dp),
         shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primarycolor)),
+        colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor))
     ) {
         Text(
             stringResource(R.string.save),

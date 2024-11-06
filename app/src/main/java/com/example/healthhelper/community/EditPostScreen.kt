@@ -1,5 +1,6 @@
 package com.example.healthhelper.community
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,11 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,75 +29,56 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
+import com.example.healthhelper.community.components.CmtNavbarComponent
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+
+
 @Composable
-fun EditPostScreen() {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
+fun EditPostScreen(navController: NavHostController) {
+    var title by remember { mutableStateOf("我的菜單分享") }
+    var content by remember { mutableStateOf("今日菜單內容有.............................") }
+    var showAlert by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 40.dp)
+            .background(colorResource(id = R.color.backgroundcolor))
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.arrow_back_ios_new),
-                contentDescription = "arrowBack",
-                tint = colorResource(id = R.color.primarycolor)
-            )
-            Text(
-                text = "飲食社群",
-                fontSize = 24.sp,
-                color = colorResource(id = R.color.primarycolor),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight(600),
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.tabler_receipt),
-                contentDescription = "arrowBack",
-                tint = colorResource(id = R.color.primarycolor)
-            )
-        }
-        HorizontalDivider(
-            thickness = 2.dp,
-            modifier = Modifier
-                .fillMaxWidth(),
-            color = colorResource(id = R.color.primarycolor)
-        )
+        CmtNavbarComponent(navController = navController)
         Column(
             // 內容物水平置中
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp) // 所有padding皆為16
-            // .padding(top = 64.dp)
-            // .padding(horizontal = 16.dp, vertical = 32.dp)
-            // .padding(start = 16.dp, top = 64.dp, end = 8.dp, bottom = 32.dp)
+                .padding(16.dp)
         ) {
 
             // Profile row
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.profile),
@@ -122,36 +104,49 @@ fun EditPostScreen() {
                     modifier = Modifier
                         .padding(16.dp)
                         .clickable {
-                            // 點擊關閉處理邏輯
+                            showAlert = true
                         },
                     colorResource(R.color.red_100)
                 )
+                if (showAlert) {
+                    CustomDialog(
+                        // 點擊對話視窗外部或 back 按鈕時呼叫
+                        onDismissRequest = {
+                            showAlert = false
+                        },
+                        // 設定確定時欲執行內容
+                        onConfirm = {
+                            //之後需寫刪除貼文這筆資料後並導到我的貼文頁
+                            navController.navigate(CmtScreenEnum.MyPostsScreen.name)
+                        },
+                        // 設定取消時欲執行內容
+                        onDismiss = {
+                            showAlert = false
+                        })
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Title TextField
             //Title字數限制尚未完成
-            OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
-                placeholder = {
-                    Text(
-                        text = stringResource(R.string.post_title),
-                        color = colorResource(id = R.color.gray_300)
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray_300),
-                        shape = RoundedCornerShape(size = 4.dp)
-                    )
-                    .background(
-                        color = colorResource(id = R.color.gray_200),
-                        shape = RoundedCornerShape(size = 4.dp)
-                    )
+            OutlinedTextField(value = title, onValueChange = { title = it }, placeholder = {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight(600),
+                    color = colorResource(id = R.color.black_200)
+                )
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = colorResource(id = R.color.gray_300),
+                    shape = RoundedCornerShape(size = 4.dp)
+                )
+                .background(
+                    color = colorResource(id = R.color.gray_200),
+                    shape = RoundedCornerShape(size = 4.dp)
+                )
 
             )
 
@@ -163,7 +158,7 @@ fun EditPostScreen() {
                 onValueChange = { content = it },
                 placeholder = {
                     Text(
-                        text = stringResource(R.string.post_content),
+                        text = content,
                         color = colorResource(id = R.color.gray_300)
                     )
                 },
@@ -186,8 +181,7 @@ fun EditPostScreen() {
 
             // Add Image and Submit Button Row
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
                     onClick = { /* 點擊加入圖片的邏輯 */ },
@@ -216,7 +210,7 @@ fun EditPostScreen() {
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Button(
-                    onClick = { /* 點擊送出的邏輯 */ },
+                    onClick = { navController.navigate(CmtScreenEnum.MyPostsScreen.name) },
                     modifier = Modifier
                         .width(161.dp)
                         .height(52.dp)
@@ -227,7 +221,7 @@ fun EditPostScreen() {
                         .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
                     colors = ButtonDefaults.buttonColors(colorResource(id = R.color.primarycolor))
                 ) {
-                    Text(text = "送出")
+                    Text(text = "儲存")
                 }
             }
 
@@ -238,10 +232,87 @@ fun EditPostScreen() {
     }
 }
 
+
+@Composable
+fun CustomDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(dismissOnClickOutside = true) // 控制點擊外部時是否消失
+    ) {
+        // Dialog 內容
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                // Title
+                Text(
+                    text = stringResource(id = R.string.make_sure_delete_post),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    fontWeight = FontWeight(700),
+                    color = colorResource(R.color.black_200)
+                )
+
+                // Confirm Button
+                Button(
+                    onClick = { onConfirm() },
+                    modifier = Modifier
+                        .width(280.dp)
+                        .height(52.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(colorResource(id = R.color.red_100)),
+                    colors = ButtonDefaults.buttonColors(colorResource(id = R.color.red_100))
+                ) {
+                    Text(
+                        stringResource(id = R.string.confirm),
+                        fontWeight = FontWeight(600)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Dismiss Button
+                Button(
+                    onClick = { onDismiss() },
+                    modifier = Modifier
+                        .width(280.dp)
+                        .height(52.dp)
+                        .background(colorResource(id = R.color.white))
+                        .border(
+                            BorderStroke(1.dp, color = colorResource(R.color.gray_400)),
+                            shape = RoundedCornerShape(size = 8.dp)
+                        ),
+                    colors = ButtonDefaults.buttonColors(colorResource(id = R.color.white)),
+                    shape = RoundedCornerShape(size = 8.dp)
+                ) {
+                    Text(
+                        stringResource(id = R.string.cancel),
+                        fontWeight = FontWeight(600),
+                        color = colorResource(R.color.gray_400)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun EditPostScreenPreview() {
     HealthHelperTheme {
-        EditPostScreen()
+        EditPostScreen(rememberNavController())
     }
 }

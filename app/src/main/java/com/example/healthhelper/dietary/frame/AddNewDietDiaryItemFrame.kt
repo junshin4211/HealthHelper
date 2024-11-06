@@ -13,9 +13,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,10 +36,10 @@ import com.example.healthhelper.dietary.components.dialog.alertdialog.MyAlertDia
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.DateTextField
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.FoodTextField
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.NameTextField
+import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TimeTextField
 import com.example.healthhelper.dietary.dataclasses.vo.DiaryVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.DiaryRepository
-import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TimeTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +79,9 @@ fun AddNewDietDiaryItemFrame(
 
         },
         floatingActionButton = {
-            FloatingActionButton(
+            SmallFloatingActionButton(
+                contentColor = Color.Black,
+                containerColor = colorResource(R.color.primarycolor) ,
                 onClick = {
                     if (
                         name.value.isNotBlank() &&
@@ -94,10 +98,10 @@ fun AddNewDietDiaryItemFrame(
                         DiaryRepository.addData(diary)
 
                         navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
-                        return@FloatingActionButton
+                        return@SmallFloatingActionButton
                     }
                     shouldPopUpAlertDialog = true
-                    return@FloatingActionButton
+                    return@SmallFloatingActionButton
                 }
             ) {
                 Icon(
@@ -129,6 +133,7 @@ fun AddNewDietDiaryItemFrame(
                         .fillMaxWidth()
                 )
                 FoodTextField(
+                    navController = navController,
                     modifier = Modifier
                         .width(textFieldWidth.dp)
                         .fillMaxWidth(),

@@ -51,6 +51,20 @@ android {
 
 dependencies {
 
+    implementation ("androidx.navigation:navigation-compose:2.7.5")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.compose.material3:material3:1.0.0-alpha10")
+    implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
+   // implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("mysql:mysql-connector-java:8.0.33")
+    implementation("androidx.compose.ui:ui:1.5.1")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.material:material:1.5.1")
+    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -70,7 +84,6 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.accompanist.permissions)
     implementation(libs.charty)
-
     implementation(libs.coil.compose)
 
 //    camera
@@ -83,6 +96,7 @@ dependencies {
 //    implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

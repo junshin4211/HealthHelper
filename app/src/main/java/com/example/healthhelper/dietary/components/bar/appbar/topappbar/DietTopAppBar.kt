@@ -24,7 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.navigationicon.HamburgerNavigationIcon
+import com.example.healthhelper.dietary.components.iconbutton.navigationicon.NavigateUpNavigationIcon
 import com.example.healthhelper.dietary.gson.toJson
 import com.example.healthhelper.dietary.util.sharedata.ShareData
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -47,15 +49,14 @@ fun DietAppTopBar(
     val diaries by vm.data.collectAsState()
     CenterAlignedTopAppBar(
         modifier = modifier,
+        colors = DefaultColorViewModel.topAppBarColors,
         title = title,
         navigationIcon = {
-            HamburgerNavigationIcon()
+            NavigateUpNavigationIcon(navController)
         },
 
         actions = {
-            if (
-                hasShareButton
-            ) {
+            if (hasShareButton) {
                 IconButton(
                     onClick = {
                         val jsonString = diaries.toJson()
@@ -72,11 +73,6 @@ fun DietAppTopBar(
                 }
             }
         },
-
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
         scrollBehavior = scrollBehavior,
     )
 }
