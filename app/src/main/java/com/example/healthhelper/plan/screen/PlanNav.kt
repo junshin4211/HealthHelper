@@ -166,7 +166,10 @@ fun Plan(
             {
                 CheckPlan(
                     navcontroller = navController,
-                    tabViewModel
+                    tabViewModel,
+                    planVM,
+                    managePlanVM,
+                    currentScreen
                 )
             }
         }

@@ -10,9 +10,9 @@ import java.time.ZonedDateTime
 interface PlanUC {
     fun dateTimeFormat(datetime:Any?):String
     fun stringToTimeStamp(datetime:LocalDateTime): Timestamp?
-    fun planInitial(planName: PlanPage,
-                    onSetGoal: (fat: Float, carb: Float, protein: Float) -> Unit,
-                    onSetCateId: (cateId: Int) -> Unit)
+    fun InitialDefaultGoal(planName: PlanPage,
+                           onSetGoal: (fat: Float, carb: Float, protein: Float) -> Unit,
+                           onSetCateId: (cateId: Int) -> Unit)
     fun customPlanInitial(planName: PlanPage,
                           onSetCateId: (cateId: Int) -> Unit)
     fun fetchSingle(planVM: PlanVM)

@@ -38,7 +38,6 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManagePlan(
     planVM: PlanVM,
@@ -51,14 +50,17 @@ fun ManagePlan(
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
     val tag = "tag_ManagePlan"
+    val planUCImpl = remember { PlanUCImpl() }
+
     var activatepannel by remember { mutableStateOf(planVM.panneelname) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedPlan by remember { mutableStateOf(PlanModel()) }
-    //val fetchSingle = PlanUCImpl()::fetchSingle
+
     val deletePlanSuccess = stringResource(R.string.deleteplansuccess)
     val deletePlanFailed = stringResource(R.string.deleteplanfailed)
 
-    PlanUCImpl().fetchList(managePlanVM)
+    planUCImpl.fetchList(managePlanVM)
+
     //get plan list
     val myPlanList by managePlanVM.myPlanListState.collectAsState(initial = emptyList())
     Log.d(tag, "get list $myPlanList")
@@ -111,7 +113,7 @@ fun ManagePlan(
                                 CustomIcon().CreateArrow(
                                     isRight = true,
                                     size = 3.0f,
-                                    color = R.color.black
+                                    color = R.color.black_300
                                 )
                             }
                         }
@@ -163,7 +165,7 @@ fun ManagePlan(
                                 CustomIcon().CreateArrow(
                                     isRight = true,
                                     size = 3.0f,
-                                    color = R.color.black
+                                    color = R.color.black_300
                                 )
                             }
                         }
@@ -189,7 +191,6 @@ fun ManagePlan(
                                 snackbarHostState = snackbarHostState
                             )
                             Log.d(tag, deletePlanSuccess)
-                            //fetchSingle(planVM)
                         } else {
                             CustomSnackBar().CreateSnackBar(
                                 message = deletePlanFailed,

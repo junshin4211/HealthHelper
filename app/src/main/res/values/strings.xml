@@ -162,7 +162,6 @@
     <string name="planAcievementContent">完成飲食計畫來獲得這些勳章</string>
     <string name="finishDate">完成日期:</string>
     <string name="close">關閉</string>
-<<<<<<< HEAD
     <string name="calorieerror">卡路里建議每日超過1200</string>
     <string name="dateerror">日期選擇錯誤</string>
     <string name="insertplansuccess">新增計畫成功</string>
@@ -171,7 +170,6 @@
     <string name="deleteplanfailed">刪除失敗!!</string>
     <string name="deleteplantitle">確定刪除計畫?</string>
     <string name="percenterror">營養目標設定有誤</string>
-=======
     <string name="ingredient">成分</string>
     <string name="nutrition">營養</string>
     <string name="cholesterol">膽固醇</string>
@@ -184,5 +182,4 @@
     <string name="add_data_successfully">新增資料成功</string>
     <string name="grams">克</string>
     <string name="save_data_successfully">儲存資料成功</string>
->>>>>>> master
 </resources>

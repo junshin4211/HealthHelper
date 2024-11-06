@@ -162,7 +162,7 @@ fun CustomEditPlan(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = colorResource(id = R.color.black),
+                    color = colorResource(id = R.color.black_300),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -176,7 +176,7 @@ fun CustomEditPlan(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = colorResource(id = R.color.black),
+                    color = colorResource(id = R.color.black_300),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -264,7 +264,7 @@ fun CustomEditPlan(
 
             ) {
                 CustomText().TextWithDiffColor(
-                    R.color.black,
+                    R.color.black_300,
                     stringResource(R.string.calories),
                     22.sp
                 )
@@ -277,7 +277,7 @@ fun CustomEditPlan(
                     label = stringResource(R.string.examcalorie),
                     width = 130.dp
                 )
-                CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals), 16.sp)
+                CustomText().TextWithDiffColor(R.color.black_300, stringResource(R.string.cals), 16.sp)
             }
 
             Row(
@@ -516,8 +516,6 @@ fun CustomEditPlan(
                                 snackbarHostState = snackbarHostState
                             )
                             Log.d(tag, "insertSuccess")
-//                            fetchSingle(planVM)
-//                            fetchList(ManagePlanVM)
                             navcontroller.navigate(PlanPage.DietPlan.name)
                         } else {
                             CustomSnackBar().CreateSnackBar(

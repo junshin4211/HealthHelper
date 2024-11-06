@@ -1,7 +1,6 @@
 package com.example.healthhelper.plan.screen
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -74,8 +72,7 @@ fun EditPlan(
     val scrollstate = rememberScrollState()
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
-    val fetchSingle = PlanUCImpl()::fetchSingle
-    val fetchList = PlanUCImpl()::fetchList
+    val planUCImpl = remember { PlanUCImpl() }
 
     val calorieErr = stringResource(R.string.calorieerror)
     val dateErr = stringResource(R.string.dateerror)
@@ -95,10 +92,9 @@ fun EditPlan(
 
     //display calorie value
     var calorie by remember { mutableFloatStateOf(0f) }
-    val planUCImpl = remember { PlanUCImpl() }
 
     //set nutrient percent value by planname
-    planUCImpl.planInitial(
+    planUCImpl.InitialDefaultGoal(
         planName = planname,
         onSetGoal = { fat, carb, protein ->
             //show percent on UI
@@ -160,7 +156,7 @@ fun EditPlan(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = colorResource(id = R.color.black),
+                    color = colorResource(id = R.color.black_300),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -174,7 +170,7 @@ fun EditPlan(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = colorResource(id = R.color.black),
+                    color = colorResource(id = R.color.black_300),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -262,7 +258,7 @@ fun EditPlan(
 
             ) {
                 CustomText().TextWithDiffColor(
-                    R.color.black,
+                    R.color.black_300,
                     stringResource(R.string.calories),
                     22.sp
                 )
@@ -272,7 +268,7 @@ fun EditPlan(
                     label = stringResource(R.string.examcalorie),
                     width = 130.dp
                 )
-                CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals), 16.sp)
+                CustomText().TextWithDiffColor(R.color.black_300, stringResource(R.string.cals), 16.sp)
             }
 
             CreateDesciption(
@@ -366,8 +362,6 @@ fun EditPlan(
                                 snackbarHostState = snackbarHostState
                             )
                             Log.d(tag,"insertSuccess")
-                            fetchSingle(planVM)
-                            fetchList(ManagePlanVM)
                             navcontroller.navigate(PlanPage.DietPlan.name)
                         }else{
                             CustomSnackBar().CreateSnackBar(

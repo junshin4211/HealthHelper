@@ -71,9 +71,9 @@ class PlanUCImpl : PlanUC {
     }
 
     // 定義函數，將目標值通過 onSet 回調傳遞出去
-    override fun planInitial(planName: PlanPage,
-                             onSetGoal: (fat: Float, carb: Float, protein: Float) -> Unit,
-                             onSetCateId: (cateId: Int) -> Unit) {
+    override fun InitialDefaultGoal(planName: PlanPage,
+                                    onSetGoal: (fat: Float, carb: Float, protein: Float) -> Unit,
+                                    onSetCateId: (cateId: Int) -> Unit) {
         val goals = NutritionGoals.getGoals(planName)
         if (goals != null) {
             val (fatGoal, carbGoal, proteinGoal) = goals
