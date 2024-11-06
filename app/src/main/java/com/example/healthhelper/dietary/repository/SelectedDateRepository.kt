@@ -16,10 +16,10 @@ object SelectedDateRepository {
     }
 
     fun setUserId(userId:UInt){
-        _dataFlow.value.userId.value = userId.toInt()
+        _dataFlow.value.userId = userId.toInt()
     }
 
     fun setDate(selectedDate:Date){
-        _dataFlow.value.selectedDate.value = selectedDate
+        _dataFlow.value.selectedDate = selectedDate
     }
 }
