@@ -37,6 +37,7 @@ import com.himanshoe.charty.common.ChartSurface
 import com.himanshoe.charty.common.config.AxisConfig
 import com.himanshoe.charty.common.maxYValue
 import com.himanshoe.charty.common.minYValue
+import com.himanshoe.charty.common.ui.drawGridLines
 import com.himanshoe.charty.line.config.LineChartDefaults
 import com.himanshoe.charty.line.config.LineConfig
 import com.himanshoe.charty.line.model.LineData
@@ -61,7 +62,8 @@ fun LineChart(
 
     // 設定顏色
     val lineColor = Brush.linearGradient(listOf(Color(0xFFFFCC80), Color(0xFFFFE0B2)))
-    val backgroundColor = Brush.linearGradient(listOf(Color(0xFFFFF3E0), Color(0xFFFFF8E1)))
+//    val backgroundColor = Brush.linearGradient(listOf(Color(0xFFFFF3E0), Color(0xFFFFF8E1)))
+    val backgroundColor = Brush.linearGradient(listOf(Color(0x00000000), Color(0x00000000)))
     val dotColor = Brush.linearGradient(listOf(Color(0xFFFFA726), Color(0xFFFFA726)))
 
     ChartSurface(
@@ -82,21 +84,26 @@ fun LineChart(
                     pointBound = size.width.div(points.count().times(1.2F))
                 }
                 .drawBehind {
-                        val minValue = dataCollection.minYValue()
-                        val maxValue = dataCollection.maxYValue()
-                        drawYAxis(
-                            color = axisConfig.axisColor,
-                            stroke = axisConfig.axisStroke,
-                            minValue = minValue,
-                            maxValue = maxValue,
-                            verticalScale = verticalScale
-                        )
 
-                        drawYAxisLabels(
-                            values = points.map { it.yValue },
-                            spacing = padding.toPx(),
-                            textColor = axisConfig.axisColor
-                        )
+                    val minValue = dataCollection.minYValue()
+                    val maxValue = dataCollection.maxYValue()
+                    drawYAxis(
+                        color = axisConfig.axisColor,
+                        stroke = axisConfig.axisStroke,
+                        minValue = minValue,
+                        maxValue = maxValue,
+                        verticalScale = verticalScale
+                    )
+
+                    drawYAxisLabels(
+                        values = points.map { it.yValue },
+                        spacing = padding.toPx(),
+                        textColor = axisConfig.axisColor
+                    )
+                    if (axisConfig.showGridLines) {
+                        drawGridLines(chartWidth, chartHeight, padding.toPx())
+                    }
+
 
                 }
         ) {

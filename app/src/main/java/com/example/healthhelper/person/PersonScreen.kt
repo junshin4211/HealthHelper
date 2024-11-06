@@ -40,24 +40,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.person.personVM.AchievementViewModel
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
+import com.example.healthhelper.screen.TabViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun PersonScreen(
     navController: NavHostController,
     achievementVM: AchievementViewModel,
-    userPhotoUploadVM: UserPhotoUploadVM
+    userPhotoUploadVM: UserPhotoUploadVM,
+    tabViewModel: TabViewModel
 ) {
     val userPhotoUrl by userPhotoUploadVM.userPhotoUrlState.collectAsState()
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
 //    var isLoading by remember { mutableStateOf(true) }
-
+    tabViewModel.setTabVisibility(true)
 
     Scaffold(containerColor = colorResource(R.color.backgroundcolor)) { innerPadding ->
         Column(

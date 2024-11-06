@@ -196,4 +196,8 @@
     <string name="restaurant_image">餐廳照片</string>
     <string name="lastWeightRecord">最新一筆紀錄</string>
     <string name="noAchievement">尚未解鎖成就</string>
+    <string name="bodyManagement">體重管理</string>
+    <string name="weightKg">體重(kg)</string>
+    <string name="body_fatpercent">體脂(%)</string>
+    <string name="BodyDatatrend">變化趨勢</string>
 </resources>

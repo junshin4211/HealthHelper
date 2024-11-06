@@ -33,8 +33,7 @@ fun MainPersonScreen(
     achievementVM: AchievementViewModel = viewModel(),
     cloudPhotoUploadVM: CloudPhotoUploadVM = viewModel(),
     userPhotoUploadVM: UserPhotoUploadVM = viewModel(),
-    tabViewModel: TabViewModel
-
+    tabViewModel: TabViewModel = viewModel()
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -46,7 +45,8 @@ fun MainPersonScreen(
             PersonScreen(
                 navController = navController,
                 achievementVM = achievementVM,
-                userPhotoUploadVM = userPhotoUploadVM
+                userPhotoUploadVM = userPhotoUploadVM,
+                tabViewModel = tabViewModel
             )
         }
         composable(route = PersonScreenEnum.cameraPreviewScreen.name) {
@@ -56,10 +56,7 @@ fun MainPersonScreen(
                         imageUri = uri
                         navController.navigate(PersonScreenEnum.photoPreviewScreen.name)
                     },
-                    onCancelClick = {
-                        imageUri = null
-                        navController.popBackStack(PersonScreenEnum.personScreen.name, false)
-                    },
+                    navController = navController,
                     tabViewModel = tabViewModel
                 )
             })
@@ -68,16 +65,9 @@ fun MainPersonScreen(
             PhotoPreviewScreen(
                 navController =navController,
                 imageUri = imageUri,
-//                onAcceptClick = {
-//                    navController.popBackStack(
-//                        PersonScreenEnum.personScreen.name,
-//                        false
-//                    )
-//                },
                 onRejectClick = { navController.popBackStack() },
                 userPhotoUploadVM = userPhotoUploadVM,
                 cloudPhotoUploadVM = cloudPhotoUploadVM,
-                tabViewModel = tabViewModel
             )
         }
         composable(route = PersonScreenEnum.pickPhotoScreen.name) {

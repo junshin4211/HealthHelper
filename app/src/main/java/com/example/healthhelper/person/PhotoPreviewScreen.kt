@@ -38,11 +38,9 @@ import kotlinx.coroutines.launch
 fun PhotoPreviewScreen(
     navController:NavHostController,
     imageUri: Uri?,
-//    onAcceptClick: () -> Unit,
     onRejectClick: () -> Unit,
     userPhotoUploadVM: UserPhotoUploadVM,
     cloudPhotoUploadVM: CloudPhotoUploadVM,
-    tabViewModel: TabViewModel
     ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -75,7 +73,7 @@ fun PhotoPreviewScreen(
                                 false
                             )
                         }
-                        tabViewModel.setTabVisibility(true)
+//                        tabViewModel.setTabVisibility(true)
                     }
                 }
             ) {

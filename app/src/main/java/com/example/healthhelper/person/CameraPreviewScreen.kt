@@ -37,11 +37,17 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.screen.TabViewModel
 
 @Composable
-fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Unit, tabViewModel: TabViewModel ) {
+fun CameraPreviewScreen(
+    onPictureTaken: (Uri?) -> Unit,
+    navController: NavHostController,
+    tabViewModel: TabViewModel,
+) {
     val tag = "tag_CameraPreviewScreen"
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -96,6 +102,7 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                                     onPictureTaken(imageUri)
                                 }
                             }
+
                             override fun onError(exception: ImageCaptureException) {
                                 val msg = "Picture capture failed: ${exception.message}"
                                 Log.e(tag, msg, exception)
@@ -104,7 +111,11 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                     )
                 }
             ) {
-                Text(stringResource(id = R.string.takePicture), color = colorResource(R.color.backgroundcolor), fontSize = 28.sp)
+                Text(
+                    stringResource(id = R.string.takePicture),
+                    color = colorResource(R.color.backgroundcolor),
+                    fontSize = 28.sp
+                )
             }
             Button(
                 modifier = Modifier
@@ -113,11 +124,15 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                     .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
                 onClick = {
-                    onCancelClick
-                    tabViewModel.setTabVisibility(true)
+                    imageUri = null
+                    navController.popBackStack(PersonScreenEnum.personScreen.name, false)
                 }
             ) {
-                Text(text = stringResource(id = R.string.cancel), color = colorResource(R.color.backgroundcolor), fontSize = 28.sp)
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    color = colorResource(R.color.backgroundcolor),
+                    fontSize = 28.sp
+                )
             }
         }
     }
@@ -126,7 +141,7 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
 private fun startCamera(
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    previewView: PreviewView
+    previewView: PreviewView,
 ): ImageCapture {
     // 單例模式取得物件，用來連結相機生命週期
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
