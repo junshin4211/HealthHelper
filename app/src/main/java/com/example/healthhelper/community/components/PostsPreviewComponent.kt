@@ -29,6 +29,8 @@ import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.community.CmtScreenEnum
 import com.example.healthhelper.community.Post
+import com.example.healthhelper.signuplogin.SignUpProperty
+import com.example.healthhelper.signuplogin.SignUpUiState
 
 @Composable
 fun PostsPreviewComponent(navController: NavHostController, post: Post) {
@@ -59,14 +61,16 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            painter = painterResource(id = post.userIcon),
+                            //usericon資料未引入
+                            painter = painterResource(id = R.drawable.profile),
                             contentDescription = "Profile Picture",
                             modifier = Modifier.width(25.dp).height(25.dp),
                             tint = colorResource(R.color.primarycolor)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = post.userName,
+                            //username資料未引入
+                            text ="userName",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.black_200)
@@ -92,8 +96,10 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Spacer(modifier = Modifier.height(10.dp))
+                    val imagePainter = runCatching { painterResource(id = post.img) }
+                        .getOrElse { painterResource(id = R.drawable.postpic) }
                     Image(
-                        painter = painterResource(id = post.img),
+                            painter = imagePainter,
                         contentDescription = "貼文圖片",
                         modifier = Modifier
                             .width(189.dp)
@@ -108,32 +114,32 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
-                Row {
-                    Icon(
-                        painter = painterResource(id = R.drawable.like_not_fill),
-                        contentDescription = "Like",
-                        tint = colorResource(R.color.primarycolor)
-                    )
-                    Text(
-                        text = " ${post.likesAmount}",
-                        fontWeight = FontWeight(600),
-                        color = colorResource(R.color.primarycolor),
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
+//                Row {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.like_not_fill),
+//                        contentDescription = "Like",
+//                        tint = colorResource(R.color.primarycolor)
+//                    )
+//                    Text(
+//                        text = " ${post.likesAmount}",
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(R.color.primarycolor),
+//                        modifier = Modifier.padding(start = 4.dp)
+//                    )
+//                }
                 Spacer(modifier = Modifier.width(32.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.comment),
-                        contentDescription = "Comment",
-                        tint = colorResource(R.color.primarycolor)
-                    )
-                    Text(
-                        text = " ${post.commentAmount}",
-                        fontWeight = FontWeight(600),
-                        color = colorResource(R.color.primarycolor),
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.comment),
+//                        contentDescription = "Comment",
+//                        tint = colorResource(R.color.primarycolor)
+//                    )
+//                    Text(
+//                        text = " ${comment.commentAmount}",
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(R.color.primarycolor),
+//                        modifier = Modifier.padding(start = 4.dp)
+//                    )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = post.postTime,
