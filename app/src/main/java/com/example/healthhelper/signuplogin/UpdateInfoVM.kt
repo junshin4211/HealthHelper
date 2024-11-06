@@ -15,23 +15,56 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class UpdateInfoVM : ViewModel() {
+
+
     private val _uiState = MutableStateFlow(UpdateInfoUIState())
     val uiState: StateFlow<UpdateInfoUIState> = _uiState.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private val gson = Gson()
 
-    // 設置用戶資料
+    init {
+        // 在 ViewModel 初始化時就讀取用戶資料
+        UserManager.getUser()?.let { user ->
+            Log.d("TEST_UpdateInfo", """
+                UpdateInfoVM - 初始化時讀取資料:
+                Account: ${user.account}
+                Username: ${user.username}
+                Email: ${user.userEmail}
+                Phone: ${user.phoneno}
+                Gender: ${user.gender}
+                Birthday: ${user.birthday}
+                roleID: ${user.roleID}
+            """.trimIndent())
+
+            setUserData(user)
+        }
+    }
+
     fun setUserData(user: User) {
-        Log.d("UpdateInfoVM", """
-            Setting user data:
-            Account: ${user.account}
-            Username: ${user.username}
-            Email: ${user.userEmail}
-            Phone: ${user.phoneno}
-            Gender: ${user.gender}
-            Birthday: ${user.birthday}
-        """.trimIndent())
+        // 從 UserManager 取得資料來測試
+        val savedUser = UserManager.getUser()
+        Log.d("TEST_UpdateInfo", """
+        UpdateInfoVM - 比較資料:
+        ----從 UserManager 取得的資料----
+        Account: ${savedUser?.account}
+        Username: ${savedUser?.username}
+        Email: ${savedUser?.userEmail}
+        Phone: ${savedUser?.phoneno}
+        Gender: ${savedUser?.gender}
+        Birthday: ${savedUser?.birthday}
+        roleID: ${savedUser?.roleID}
+        ----傳入的 user 資料----
+        Account: ${user.account}
+        Username: ${user.username}
+        Email: ${user.userEmail}
+        Phone: ${user.phoneno}
+        Gender: ${user.gender}
+        Birthday: ${user.birthday}
+        roleID: ${user.roleID}
+    """.trimIndent())
+
+
 
         if (user.account.isNotEmpty()) {
             _uiState.update { currentState ->
@@ -63,6 +96,15 @@ class UpdateInfoVM : ViewModel() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+
+        val currentUser = _uiState.value.currentUser
+        if (currentUser == null) {
+            Log.e("UpdateInfoVM", "currentUser is null")
+            onError("未找到使用者帳號")
+            return
+        }
+
+
         Log.d("UpdateInfoVM", "Submitting form with account: ${_uiState.value.formState.account}")
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -77,12 +119,13 @@ class UpdateInfoVM : ViewModel() {
                 }
 
                 val jsonObject = JsonObject().apply {
-                    addProperty("account", _uiState.value.formState.account)
+                    addProperty("account", currentUser.account)
                     addProperty("username", _uiState.value.formState.username)
                     addProperty("userEmail", _uiState.value.formState.email)
                     addProperty("phoneno", _uiState.value.formState.phone)
                     addProperty("gender", genderValue)
                     addProperty("birthday", _uiState.value.formState.birthDate)
+
                 }
 
                 Log.d("UpdateInfoVM", "Prepared JSON Data (with account): ${jsonObject.toString()}")

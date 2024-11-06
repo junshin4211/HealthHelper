@@ -67,9 +67,14 @@ fun UpdateInfoScreen(
 
     // 當登入的用戶資料改變時，更新表單資料
     LaunchedEffect(loginState.loggedInUser) {
-        Log.d("UpdateInfoScreen", "Initial login state: ${loginState.loggedInUser}")
-        Log.d("UpdateInfo", "User data changed: ${loginState.loggedInUser}")
+        Log.d("UpdateInfoScreen", """
+           Login state changed:
+           User: ${loginState.loggedInUser}
+           Account: ${loginState.loggedInUser?.account}
+       """.trimIndent())
+
         loginState.loggedInUser?.let { user ->
+            Log.d("UpdateInfoScreen", "Setting user data to UpdateInfoVM")
             viewModel.setUserData(user)
         }
     }

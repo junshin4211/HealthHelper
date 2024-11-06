@@ -2,14 +2,6 @@ package com.example.healthhelper.signuplogin
 
 
 data class User(
-//    var userId: Int = 0,
-//    var account: String = "",
-//    var username: String = "",
-//    var roleID: Int = 0,
-//    var userEmail: String = "",
-//    var phone: String = "",
-//    var gender: Int? = null,
-//    var birthday: String? = null
 
     var userId: Int = 0,
     var account: String = "",
@@ -19,6 +11,7 @@ data class User(
     var phoneno: String? = null,
     var gender: Int? = null,
     var birthday: String? = null
+
 
 ) {
     override fun equals(other: Any?): Boolean {

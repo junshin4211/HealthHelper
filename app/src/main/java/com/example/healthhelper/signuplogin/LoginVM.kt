@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 
 
 class LoginVM : ViewModel() {
+
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
@@ -70,7 +71,8 @@ class LoginVM : ViewModel() {
 
                 val user = gson.fromJson(result, User::class.java)
 
-                // 只更新 StateFlow，不使用 SharedPreferences
+                UserManager.setUser(user)
+
                 _uiState.update { currentState ->
                     currentState.copy(loggedInUser = user)
                 }
@@ -97,10 +99,7 @@ class LoginVM : ViewModel() {
         }
     }
 
-    // 提供獲取當前登入用戶的方法
-//    fun getCurrentUser(): User? {
-//        return _uiState.value.loggedInUser
-//    }
+
 }
 
 data class LoginUiState(

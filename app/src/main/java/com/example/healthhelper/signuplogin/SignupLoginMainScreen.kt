@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun LoginMain() {
     val navController = rememberNavController()
-    val uiState by remember { mutableStateOf(User()) }
     val loginViewModel: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
+
     NavHost(navController = navController, startDestination = "LoginScreen") {
         composable("LoginScreen") {
             LoginScreen(navController)
@@ -26,9 +26,10 @@ fun LoginMain() {
         }
 
         composable("UpdateInfoScreen") {
-           UpdateInfoScreen(uiState,navController)
+            // 從 UserManager 獲取用戶資料
+            val user = UserManager.getUser() ?: User()
+            UpdateInfoScreen(user, navController)
         }
-
     }
 }
 
