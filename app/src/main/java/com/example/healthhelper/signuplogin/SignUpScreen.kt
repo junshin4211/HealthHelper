@@ -20,11 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -32,6 +30,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import java.time.Instant
 import java.time.ZoneId
+import android.widget.Toast
+import androidx.compose.ui.tooling.preview.Preview
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -44,9 +44,17 @@ fun SignUpScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
 
+    // 檔案選擇器
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            viewModel.handleFileSelection(context, uri)
+        }
+    }
+
     val textFieldColors = TextFieldDefaults.colors(
-        errorContainerColor = Color(0xFFFFCDD2),  // 淺紅色代表錯誤
-        cursorColor = Color(0xFFD75813),
+        errorContainerColor = Color(0xFFFFCDD2),
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
@@ -57,13 +65,15 @@ fun SignUpScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFFFEED))
-            .offset(y = 50.dp)
+            .offset(y = 20.dp)
+            .padding(bottom = 50.dp)
+            .systemBarsPadding()
+            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -145,7 +155,6 @@ fun SignUpScreen(
                 isError = uiState.formState.passwordErrorMessage.isNotEmpty()
             )
 
-            // 密碼錯誤訊息
             if (uiState.formState.passwordErrorMessage.isNotEmpty()) {
                 Text(
                     text = uiState.formState.passwordErrorMessage,
@@ -208,13 +217,23 @@ fun SignUpScreen(
                         expanded = uiState.formState.expanded,
                         onDismissRequest = { viewModel.toggleGenderDropdown() }
                     ) {
-                        DropdownMenuItem(text = { Text("男") }, onClick = { viewModel.updateGender("男") })
-                        DropdownMenuItem(text = { Text("女") }, onClick = { viewModel.updateGender("女") })
-                        DropdownMenuItem(text = { Text("不提供") }, onClick = { viewModel.updateGender("不提供") })
+                        DropdownMenuItem(
+                            text = { Text("男") },
+                            onClick = { viewModel.updateGender("男") }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("女") },
+                            onClick = { viewModel.updateGender("女") }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("不提供") },
+                            onClick = { viewModel.updateGender("不提供") }
+                        )
                     }
                 }
             }
 
+            // 電話
             TextField(
                 value = uiState.formState.phone,
                 onValueChange = { viewModel.updatePhone(it) },
@@ -236,6 +255,7 @@ fun SignUpScreen(
                 )
             }
 
+            // Email
             TextField(
                 value = uiState.formState.email,
                 onValueChange = { viewModel.updateEmail(it) },
@@ -247,10 +267,8 @@ fun SignUpScreen(
                     .background(Color.White),
                 colors = textFieldColors
             )
-            // 生日選擇
-            // In SignUpScreen.kt
 
-// Inside the Composable function of SignUpScreen
+            // 生日
             TextField(
                 value = uiState.formState.birthDate,
                 onValueChange = { /* Do nothing since this field is readonly */ },
@@ -288,8 +306,7 @@ fun SignUpScreen(
                 )
             }
 
-
-
+            // 使用者身分選擇
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -337,22 +354,14 @@ fun SignUpScreen(
                 }
             }
 
-            // 營養師證書
+            // 營養師證書上傳
             if (uiState.formState.isNutritionist) {
-                var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
-                val pickFileLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.GetContent()
-                ) { uri: Uri? ->
-                    selectedFileUri = uri
-                    viewModel.updateCertificate(uri)
-                }
-
                 TextField(
                     value = uiState.formState.certificate,
-                    onValueChange = { viewModel.updateCertificate(null) },
+                    onValueChange = { /* 唯讀 */ },
                     label = { Text("營養師證書") },
                     trailingIcon = {
-                        IconButton(onClick = { pickFileLauncher.launch("*/*") }) {
+                        IconButton(onClick = { pickFileLauncher.launch("image/*") }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.upload),
                                 contentDescription = "上傳證書",
@@ -360,6 +369,7 @@ fun SignUpScreen(
                             )
                         }
                     },
+                    readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
@@ -369,19 +379,19 @@ fun SignUpScreen(
                 )
             }
 
-
-            // 註冊按鈕
             Button(
                 onClick = {
                     viewModel.submitForm(
+                        context = context,
                         onSuccess = {
+                            Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
                             navController.navigate("LoginScreen")
                         },
                         onError = { errorMessage ->
-                            android.widget.Toast.makeText(
+                            Toast.makeText(
                                 context,
                                 errorMessage,
-                                android.widget.Toast.LENGTH_SHORT
+                                Toast.LENGTH_SHORT
                             ).show()
                         }
                     )

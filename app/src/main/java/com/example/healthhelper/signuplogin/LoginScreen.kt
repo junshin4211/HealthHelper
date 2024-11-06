@@ -1,8 +1,9 @@
 package com.example.healthhelper.signuplogin
 
-
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,10 +20,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,8 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
-
 
 @Composable
 fun LoginScreen(
@@ -52,6 +53,14 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
+
+    val textFieldColors = TextFieldDefaults.colors(
+        errorContainerColor = Color(0xFFFFCDD2),  // 淺紅色代表錯誤
+        focusedIndicatorColor = Color.Transparent,
+        unfocusedIndicatorColor = Color.Transparent,
+        unfocusedContainerColor = Color.White,
+        focusedContainerColor = Color.White
+    )
 
     Box(
         modifier = Modifier
@@ -67,6 +76,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(150.dp))
+
             Text(
                 text = "會員登入",
                 fontSize = 28.sp,
@@ -82,9 +92,9 @@ fun LoginScreen(
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp)),
-
-                colors = DefaultColorViewModel.outlinedTextFieldDefaultColors,
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
             )
 
             // 密碼輸入框
@@ -97,29 +107,21 @@ fun LoginScreen(
                 trailingIcon = {
                     IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                         Icon(
-
                             painter = if (uiState.formState.passwordVisible)
                                 painterResource(id = R.drawable.eyeshow)
                             else painterResource(id = R.drawable.eyenoshow),
                             contentDescription = if (uiState.formState.passwordVisible)
                                 "隱藏密碼" else "顯示密碼",
-
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
                         )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp)),
-                /*
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color(0xFFD75813),
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    backgroundColor = Color.White
-                )
-                */
-                colors = DefaultColorViewModel.outlinedTextFieldDefaultColors
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                colors = textFieldColors
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -145,8 +147,10 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         viewModel.submitLogin(
-                            onSuccess = {
-                                navController.navigate("SignUpScreen")
+                            context = context,
+                            onSuccess = { userId ->
+                                // 登入成功後直接導航到更新頁面
+                                navController.navigate("UpdateInfoScreen")
                                 Toast.makeText(context, "登入成功", Toast.LENGTH_SHORT).show()
                             },
                             onError = { error ->
@@ -158,12 +162,11 @@ fun LoginScreen(
                         .width(150.dp)
                         .height(48.dp)
                         .clip(RoundedCornerShape(14.dp)),
-
                     colors = ButtonDefaults.buttonColors(Color(0xFFFAEAD1)),
                     enabled = !isLoading
                 ) {
                     if (isLoading) {
-                        androidx.compose.material3.CircularProgressIndicator(
+                        CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = Color(0xFFD75813)
                         )
@@ -171,7 +174,6 @@ fun LoginScreen(
                         Text(text = "登入", fontSize = 18.sp, color = Color(0xFFD75813))
                     }
                 }
-
             }
         }
     }
@@ -180,5 +182,6 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    LoginScreen()
+    val navController = rememberNavController()
+    LoginScreen(navController = navController)
 }

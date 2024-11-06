@@ -1,92 +1,78 @@
 package com.example.healthhelper.signuplogin
 
+import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.healthhelper.dietary.gson.gson
 import com.google.gson.JsonObject
-import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
-
-private const val SERVER_URL = "http://10.0.2.2:8080/HealthyHelperServer"
 
 class SignUpViewModel : ViewModel() {
-    // UI 狀態
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> = _uiState.asStateFlow()
 
-    // Loading 狀態
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // 驗證錯誤
-    private val _validationErrors = MutableStateFlow<List<SignUpValidator.ValidationError>>(emptyList())
-    val validationErrors: StateFlow<List<SignUpValidator.ValidationError>> = _validationErrors.asStateFlow()
+   // private val serverUrl = "http://10.0.2.2:8080/HealthyHelperServer" // 替換成你的伺服器網址
 
-    private val validator = SignUpValidator()
-    private val gson = Gson()
-
-    // 更新帳號
+    // 表單更新方法
     fun updateAccount(account: String) {
         _uiState.update { currentState ->
             currentState.copy(formState = currentState.formState.copy(account = account))
         }
-        validateForm()
     }
 
-    // 更新密碼
     fun updatePassword(password: String) {
         _uiState.update { currentState ->
-            currentState.formState.copy(password = password).let { newFormState ->
-                currentState.copy(
-                    formState = newFormState.copy(
-                        passwordErrorMessage = if (newFormState.confirmPassword.isNotEmpty()
-                            && newFormState.confirmPassword != password) {
-                            "密碼不相符"
-                        } else {
-                            ""
-                        }
-                    )
-                )
-            }
+            currentState.copy(formState = currentState.formState.copy(password = password))
         }
-        validateForm()
     }
 
-    // 更新確認密碼
     fun updateConfirmPassword(confirmPassword: String) {
         _uiState.update { currentState ->
-            currentState.formState.copy(confirmPassword = confirmPassword).let { newFormState ->
-                currentState.copy(
-                    formState = newFormState.copy(
-                        passwordErrorMessage = if (newFormState.password != confirmPassword) {
-                            "密碼不相符"
-                        } else {
-                            ""
-                        }
-                    )
+            currentState.copy(
+                formState = currentState.formState.copy(
+                    confirmPassword = confirmPassword,
+                    passwordErrorMessage = if (confirmPassword != currentState.formState.password)
+                        "密碼不一致" else ""
                 )
-            }
+            )
         }
-        validateForm()
     }
 
-    // 更新使用者名稱
     fun updateUsername(username: String) {
         _uiState.update { currentState ->
             currentState.copy(formState = currentState.formState.copy(username = username))
         }
-        validateForm()
     }
 
-    // 更新性別
+    fun updateEmail(email: String) {
+        _uiState.update { currentState ->
+            currentState.copy(formState = currentState.formState.copy(email = email))
+        }
+    }
+
+    fun updatePhone(phone: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                formState = currentState.formState.copy(
+                    phone = phone,
+                    phoneErrorMessage = if (!phone.matches(Regex("^09\\d{8}$")) && phone.isNotEmpty())
+                        "手機號碼格式不正確" else ""
+                )
+            )
+        }
+    }
+
     fun updateGender(gender: String) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -96,74 +82,21 @@ class SignUpViewModel : ViewModel() {
                 )
             )
         }
-        validateForm()
     }
 
-    // 更新電話
-    fun updatePhone(phone: String) {
-        if (phone.length <= 10) {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    formState = currentState.formState.copy(
-                        phone = phone,
-                        phoneErrorMessage = if (phone.isNotEmpty() && (!phone.startsWith("09") || phone.length != 10)) {
-                            "電話號碼必須以09開頭且為10碼"
-                        } else {
-                            ""
-                        }
-                    )
-                )
-            }
-            validateForm()
-        }
-    }
-
-    fun updateEmail(email: String) {
-        _uiState.update { currentState ->
-            currentState.copy(formState = currentState.formState.copy(email = email))
-        }
-        validateForm()
-    }
-
-    // 更新生日
     fun updateBirthDate(birthDate: String) {
         _uiState.update { currentState ->
-            currentState.copy(
-                formState = currentState.formState.copy(
-                    birthDate = birthDate,
-                    showDatePicker = false
-                )
-            )
+            currentState.copy(formState = currentState.formState.copy(birthDate = birthDate))
         }
-        validateForm()
     }
 
-    // 更新是否為營養師
     fun updateIsNutritionist(isNutritionist: Boolean) {
         _uiState.update { currentState ->
-            currentState.copy(
-                formState = currentState.formState.copy(
-                    isNutritionist = isNutritionist,
-                    certificate = if (!isNutritionist) "" else currentState.formState.certificate
-                )
-            )
+            currentState.copy(formState = currentState.formState.copy(isNutritionist = isNutritionist))
         }
-        validateForm()
     }
 
-    // 更新證書
-    fun updateCertificate(certificateUri: Uri?) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                formState = currentState.formState.copy(
-                    certificate = certificateUri?.lastPathSegment ?: "未選擇檔案"
-                )
-            )
-        }
-        validateForm()
-    }
-
-    // 切換密碼可見性
+    // UI 狀態切換
     fun togglePasswordVisibility() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -174,7 +107,6 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    // 切換確認密碼可見性
     fun toggleConfirmPasswordVisibility() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -185,7 +117,6 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    // 切換性別下拉選單
     fun toggleGenderDropdown() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -196,7 +127,6 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    // 切換日期選擇器
     fun toggleDatePicker() {
         _uiState.update { currentState ->
             currentState.copy(
@@ -207,126 +137,99 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
-    // 網路請求函數
-    private suspend fun httpPost(url: String, dataOut: String): String {
-        var dataIn = ""
-        withContext(Dispatchers.IO) {
-            (URL(url).openConnection() as? HttpURLConnection)?.run {
-                doInput = true
-                doOutput = true
-                setChunkedStreamingMode(0)
-                useCaches = false
-                requestMethod = "POST"
-                setRequestProperty("content-type", "application/json")
-                setRequestProperty("charset", "utf-8")
-
-                outputStream.bufferedWriter().use { it.write(dataOut) }
-                if (responseCode == 200) {
-                    inputStream.bufferedReader().useLines { lines ->
-                        dataIn = lines.fold("") { text, line -> "$text$line" }
-                    }
-                }
-            }
-        }
-        return dataIn
-    }
-
-    // 表單驗證
-    private fun validateForm() {
-        val errors = validator.validateSignUp(_uiState.value.formState)
-        _validationErrors.value = errors
-        _uiState.update { currentState ->
-            currentState.copy(
-                isSubmitEnabled = errors.isEmpty() &&
-                        _uiState.value.formState.password == _uiState.value.formState.confirmPassword
-            )
-        }
-    }
-
-    // 註冊函數
-    private suspend fun register(): Boolean {
-        val url = "$SERVER_URL/user/register"
-        val jsonObject = JsonObject().apply {
-            addProperty("account", _uiState.value.formState.account)
-            addProperty("password", _uiState.value.formState.password)
-            addProperty("username", _uiState.value.formState.username)
-            addProperty("userEmail", _uiState.value.formState.email)
-            addProperty("phoneno", _uiState.value.formState.phone)
-            addProperty("gender", _uiState.value.formState.gender)
-            addProperty("birthday", _uiState.value.formState.birthDate)
-            addProperty("isNutritionist", _uiState.value.formState.isNutritionist)
-            addProperty("certificate", _uiState.value.formState.certificate)
-        }
-
-        val result = httpPost(url, jsonObject.toString())
-
-        // 新增錯誤處理
-        return try {
-            if (result.isEmpty()) {
-                return false
-            }
-            val response = gson.fromJson(result, JsonObject::class.java)
-            response?.get("success")?.asBoolean ?: false
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
-    }
-
-    fun submitForm(onSuccess: () -> Unit, onError: (String) -> Unit) {
+    // 檔案處理
+    fun handleFileSelection(context: Context, uri: Uri) {
         viewModelScope.launch {
             try {
-                _isLoading.value = true
-                validateForm()
+                val base64String = convertFileToBase64(context, uri)
+                if (base64String != null) {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            formState = currentState.formState.copy(
+                                certificate = "已選擇檔案",
+                                certificateBase64 = base64String
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
-                if (_validationErrors.value.isEmpty() &&
-                    _uiState.value.formState.password == _uiState.value.formState.confirmPassword
-                ) {
-                    val url = "$SERVER_URL/user/register"
+    private fun convertFileToBase64(context: Context, uri: Uri): String? {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val bytes = inputStream.readBytes()
+                Base64.encodeToString(bytes, Base64.DEFAULT)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // 表單提交
+    // 在 SignUpViewModel 中修改 submitForm 方法
+
+    fun submitForm(context: Context, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _isLoading.value = true
+
+                // 資料驗證
+                val validator = SignUpValidator()
+                val accountExists = false // 假設帳號不存在，您可以在將來替換此值
+                val validationErrors = validator.validateSignUp(_uiState.value.formState, accountExists)
+
+                if (validationErrors.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        onError(validationErrors.first().message)
+                    }
+                    return@launch
+                }
+
+                // 準備 JSON 數據
+                val jsonObject = JsonObject().apply {
+                    addProperty("account", _uiState.value.formState.account)
+                    addProperty("password", _uiState.value.formState.password)
+                    addProperty("username", _uiState.value.formState.username)
+                    addProperty("userEmail", _uiState.value.formState.email)
+                    addProperty("phoneno", _uiState.value.formState.phone)
                     val genderValue = when (_uiState.value.formState.gender) {
                         "男" -> 0
                         "女" -> 1
-                        "不提供" -> 2
-                        else -> 3
+                        else -> 2
                     }
-
-                    val jsonObject = JsonObject().apply {
-                        addProperty("account", _uiState.value.formState.account)
-                        addProperty("password", _uiState.value.formState.password)
-                        addProperty("username", _uiState.value.formState.username)
-                        addProperty("userEmail", _uiState.value.formState.email)
-                        addProperty("phoneno", _uiState.value.formState.phone)
-                        addProperty("gender", genderValue)
-                        addProperty("birthday", _uiState.value.formState.birthDate)
-                        addProperty("roleID", if (_uiState.value.formState.isNutritionist) 2 else 1)
-                        // 如果需要證書
-                        if (_uiState.value.formState.isNutritionist) {
-                            addProperty("certificate", _uiState.value.formState.certificate)
-                        }
+                    addProperty("gender", genderValue)
+                    addProperty("birthday", _uiState.value.formState.birthDate)
+                    addProperty("roleID", if (_uiState.value.formState.isNutritionist) 2 else 1)
+                    if (_uiState.value.formState.isNutritionist) {
+                        addProperty("certificate", _uiState.value.formState.certificateBase64)
                     }
-
-                    val result = httpPost(url, jsonObject.toString())
-
-                    if (result.isNotBlank()) {
-                        try {
-                            val response = gson.fromJson(result, JsonObject::class.java)
-                            if (response.get("success")?.asBoolean == true) {
-                                resetForm()
-                                onSuccess()
-                            } else {
-                                onError(response.get("message")?.asString ?: "註冊失敗")
-                            }
-                        } catch (e: Exception) {
-                            onError("伺服器回應格式錯誤: ${e.message}")
-                        }
-                    } else {
-                        onError("伺服器無回應")
-                    }
-                } else {
-                    onError(_validationErrors.value.firstOrNull()?.message ?: "表單驗證失敗")
                 }
+
+                 //使用 httpPost 發送註冊請求
+                val response = httpPost(
+                    url = "$serverUrl/user/register",
+                    dataOut = jsonObject.toString()
+                )
+
+                // 處理伺服器回應
+                withContext(Dispatchers.Main) {
+                    val jsonResponse = gson.fromJson(response, JsonObject::class.java)
+                    if (jsonResponse.get("success")?.asBoolean == true) {
+                        onSuccess()
+                    } else {
+                        onError(jsonResponse.get("message")?.asString ?: "註冊失敗")
+                    }
+                }
+
             } catch (e: Exception) {
-                onError("註冊失敗: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    onError("註冊失敗: ${e.message}")
+                }
             } finally {
                 _isLoading.value = false
             }
@@ -334,15 +237,10 @@ class SignUpViewModel : ViewModel() {
     }
 
 
-    // 重置表單
-    fun resetForm() {
-        _uiState.value = SignUpUiState()
-        _validationErrors.value = emptyList()
-    }
-}
+
 
 // UI 狀態數據類
 data class SignUpUiState(
-    val formState: SignUpProperty = SignUpProperty(),
-    val isSubmitEnabled: Boolean = false
+    val formState: SignUpProperty = SignUpProperty()
 )
+}

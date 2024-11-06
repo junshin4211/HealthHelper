@@ -31,7 +31,7 @@ suspend fun httpPost(
                 setRequestProperty("charset", "utf-8")
 
                 outputStream.bufferedWriter().use { it.write(dataOut) }
-                Log.d("NetworkDebug", "Data written")
+                //Log.d("NetworkDebug", "Data written")
 
                 if (responseCode == 200) {
                     inputStream.bufferedReader().useLines { lines ->
