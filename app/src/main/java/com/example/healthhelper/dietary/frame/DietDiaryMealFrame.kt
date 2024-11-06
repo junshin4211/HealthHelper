@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -94,8 +94,11 @@ fun DietDiaryMealFrame(
 
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-    remember { mutableStateOf(foodItems) }
+    val selectedFoodItems = remember { mutableStateOf(foodItems) }
 
+    var deleteButtonIsClicked by remember { mutableStateOf(false) }
+    var addIconButtonIsClicked by remember { mutableStateOf(false) }
+    var downloadButtonIsClicked by remember { mutableStateOf(false) }
     var saveGraphTextButtonIsClicked by remember { mutableStateOf(false) }
     var saveTextRecordTextButtonIsClicked by remember { mutableStateOf(false) }
 
@@ -103,15 +106,15 @@ fun DietDiaryMealFrame(
 
     val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
 
-    availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
-        foodItems.filter {
+    if (enterStatusVO.isFirstEnter.value) {
+        availableFoodItems = foodItems.filter {
             it.meal.value in listOf(
                 stringResource(selectedMealOption.nameResId),
                 stringResource(MealCategoryEnum.EMPTY_STRING.title)
             )
         }
     } else {
-        foodItems.filter {
+        availableFoodItems = foodItems.filter {
             it.meal.value in listOf(
                 stringResource(selectedMealOption.nameResId),
             )
@@ -219,7 +222,7 @@ fun DietDiaryMealFrame(
                                                     iconButtonIsClickable = true
                                                 }) {
                                                     Icon(
-                                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                                        imageVector = Icons.Default.KeyboardArrowRight,
                                                         contentDescription = "arrow_right",
                                                         tint = colorResource(R.color.primarycolor)
                                                     )

@@ -1,6 +1,5 @@
 package com.example.healthhelper.dietary.components.dropdown.dropmenu
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -54,8 +53,6 @@ fun MyExposedDropDownMenuWithCheckBox(
     val TAG="tag_MyExposedDropDownMenuWithCheckBox"
 
     var expanded by remember { mutableStateOf(false) }
-
-    Log.e(TAG,"In MyExposedDropDownMenuWithCheckBox function, options:${options}")
 
     ExposedDropdownMenuBox(
         expanded = expanded,

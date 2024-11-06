@@ -1,12 +1,15 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import com.google.gson.annotations.SerializedName
 import java.sql.Date
 
 data class SelectedDateVO(
     @SerializedName("userId")
-    var userId:Int = -1,
+    val userId:MutableState<Int> = mutableIntStateOf(-1),
 
     @SerializedName("createdate")
-    var selectedDate:Date = Date(0),
+    val selectedDate:MutableState<Date> = mutableStateOf(Date(0)),
 )
