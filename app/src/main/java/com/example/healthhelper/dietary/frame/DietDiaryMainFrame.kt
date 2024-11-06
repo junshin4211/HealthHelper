@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +40,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTopAppBar
-import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
@@ -81,14 +79,6 @@ fun DietDiaryMainFrame(
                 navController = navController,
                 title = { Text(stringResource(R.string.diet_diary_main_frame_title)) },
             )
-        },
-        floatingActionButton = {
-            Row {
-                DownloadButton(
-                    context = context,
-                    onClick = { downloadButtonIsClicked = true }
-                )
-            }
         },
         content = { innerPadding ->
             Column(

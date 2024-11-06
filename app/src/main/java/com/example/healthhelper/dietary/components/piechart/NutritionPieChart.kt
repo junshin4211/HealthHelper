@@ -27,7 +27,7 @@ fun NutritionPieChart(
         texts = texts,
         entries = pieChartEntries,
         numberOfEntries = pieChartEntries.size,
-        canvasSize = 50.toUInt(),
-        fontSize = 10.toUInt(),
+        canvasSize = 70.toUInt(),
+        fontSize = 15.toUInt(),
     )
 }

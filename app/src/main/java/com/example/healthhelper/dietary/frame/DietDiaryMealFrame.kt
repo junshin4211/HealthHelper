@@ -3,7 +3,6 @@ package com.example.healthhelper.dietary.frame
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -53,20 +52,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
-import com.example.healthhelper.dietary.components.button.DeleteButton
-import com.example.healthhelper.dietary.components.button.DownloadButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.combo.SaveGraphAndTextRecordButton
-import com.example.healthhelper.dietary.components.iconbutton.AddIcon
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
-import com.example.healthhelper.dietary.util.downloaddata.DownloadData
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
@@ -134,22 +128,6 @@ fun DietDiaryMealFrame(
             navController = navController,
             title = { Text(stringResource(selectedMealOption.nameResId)) },
         )
-    }, floatingActionButton = {
-        Row() {
-            DownloadButton(
-                context = context,
-                onClick = { downloadButtonIsClicked = true }
-            )
-            DeleteButton(
-                onClick = { deleteButtonIsClicked = true },
-                buttonColors = DefaultColorViewModel.buttonColors,
-            )
-            AddIcon(
-                navController = navController,
-                onClick = { addIconButtonIsClicked = true },
-                iconButtonColors = DefaultColorViewModel.iconButtonColors
-            )
-        }
     }, content = { innerPadding ->
         Column(
             modifier = Modifier
@@ -311,6 +289,7 @@ fun DietDiaryMealFrame(
                                             ),
                                     ) {
                                         Text(
+                                            modifier = Modifier.padding(16.dp),
                                             text = "Hello World!!!"
                                         )
                                     }
@@ -342,52 +321,6 @@ fun DietDiaryMealFrame(
             DietDiaryScreenEnum.FoodItemInfoFrame.name
         )
         iconButtonIsClickable = false
-    }
-
-    // NOT test YET
-    if (deleteButtonIsClicked) {
-        val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isCheckingWhenSelection.value }) }
-        SelectedFoodItemsRepository.setAllCheckedWhenQueryState(false)
-        if (selectedFoodItemVOs.isNotEmpty()) {
-            selectedFoodItemVOs.forEach { selectedFoodItemVo ->
-                SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItemVo, false)
-            }
-            Toast.makeText(
-                context,
-                stringResource(R.string.delete_data_successfully),
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            Toast.makeText(
-                context,
-                stringResource(R.string.no_item_selected),
-                Toast.LENGTH_LONG
-            ).show()
-        }
-        deleteButtonIsClicked = false
-    } else if (addIconButtonIsClicked) {
-        val selectedFoodItemVOs by remember { mutableStateOf(selectedFoodItems.value.filter { it.isCheckingWhenQuery.value }) }
-        SelectedFoodItemsRepository.setAllCheckedWhenQueryState(false)
-        if (selectedFoodItemVOs.isNotEmpty()) {
-            Toast.makeText(
-                context,
-                stringResource(R.string.add_data_successfully),
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            Toast.makeText(
-                context,
-                stringResource(R.string.no_item_selected),
-                Toast.LENGTH_LONG
-            ).show()
-        }
-        addIconButtonIsClicked = false
-    } else if (downloadButtonIsClicked) {
-        DownloadData(
-            context = context,
-            vo = foodItems
-        )
-        downloadButtonIsClicked = false
     }
 }
 
