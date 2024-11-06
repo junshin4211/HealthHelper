@@ -13,7 +13,8 @@
     <color name="blue04">#E6EEFF</color>
     <color name="red01">#FE1010</color>
     <color name="darkgray">#9F9BAA</color>
-    <color name="light_green">#00FF7B</color>
+    <color name="light_green">#8AFF80</color>
+    <color name="dark_green">#20A628</color>
     <color name="light_gray">#EFF1F5</color>
     //主題一 橘色
     <color name="backgroundcolor">#FFFEED</color>
@@ -51,5 +52,5 @@
 
     //red color
     <color name="red_100">#F8312A</color>
-    <color name="dark_green">#007106</color>
+    <color name="light_red">#F17355</color>
 </resources>

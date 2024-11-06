@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -41,6 +42,7 @@ import com.example.healthhelper.plan.DateRange
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CreateDatePicker
 import com.example.healthhelper.plan.ui.CreateDropDownMenu
+import com.example.healthhelper.plan.ui.CreatePieChart
 import com.example.healthhelper.plan.ui.CustomButton
 import com.example.healthhelper.plan.ui.CustomSnackBar
 import com.example.healthhelper.plan.ui.CustomText
@@ -51,6 +53,8 @@ import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
+import com.himanshoe.charty.common.toChartDataCollection
+import com.himanshoe.charty.pie.model.PieData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -190,36 +194,47 @@ fun EditPlan(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.padding(start = 30.dp, end = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+                modifier = Modifier.padding(start = 30.dp, end = 55.dp),
+                verticalArrangement = Arrangement.spacedBy(15.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.Start
             ) {
                 for (i in 0..2) {
                     when (i) {
                         0 -> CustomText().TextWithDiffColor(
-                            R.color.red01,
-                            "${stringResource(R.string.carb)}${String.format(Locale.US, "%.1f", carbgram)}克", 15.sp
+                            setcolor = R.color.light_red,
+                            text = stringResource(R.string.carb) +
+                                    "${String.format(Locale.US, "%.1f", carbgram)}克",
+                            setsize = 20.sp
                         )
 
                         1 -> CustomText().TextWithDiffColor(
-                            R.color.dark_blue,
-                            "${stringResource(R.string.protein)}${String.format(Locale.US, "%.1f", proteingram)}克", 15.sp
+                            setcolor = R.color.sky_blue,
+                            text = stringResource(R.string.protein) +
+                                    "${String.format(Locale.US, "%.1f", proteingram)}克",
+                            setsize = 20.sp
                         )
 
                         2 -> CustomText().TextWithDiffColor(
-                            R.color.dark_green,
-                            "${stringResource(R.string.fat)}${String.format(Locale.US, "%.1f", fatgram)}克", 15.sp
+                            setcolor = R.color.dark_green,
+                            text = stringResource(R.string.fat) +
+                                    "${String.format(Locale.US, "%.1f", fatgram)}克",
+                            setsize = 20.sp
                         )
                     }
                 }
             }
 
             Column(
+                modifier = Modifier.padding(end = 10.dp)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.myplanimg),
-                    contentDescription = "",
-                    modifier = Modifier
+                val data = listOf(
+                    PieData(carbpercent, carbpercent, colorResource(R.color.light_red)),
+                    PieData(proteinpercent, proteinpercent, colorResource(R.color.sky_blue)),
+                    PieData(fatpercent, fatpercent, colorResource(R.color.light_green)),
+                )
+                CreatePieChart(
+                    dataCollection = data.toChartDataCollection(),
+                    modifier = Modifier.wrapContentSize()
                 )
             }
         }
