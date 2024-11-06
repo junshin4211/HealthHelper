@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.sql.Date
 
 object SelectedDateRepository {
     private val _dataFlow = MutableStateFlow(SelectedDateVO())
@@ -16,5 +17,9 @@ object SelectedDateRepository {
 
     fun setUserId(userId:UInt){
         _dataFlow.value.userId.value = userId.toInt()
+    }
+
+    fun setDate(selectedDate:Date){
+        _dataFlow.value.selectedDate.value = selectedDate
     }
 }
