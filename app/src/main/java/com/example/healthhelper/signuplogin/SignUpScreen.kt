@@ -58,7 +58,9 @@ fun SignUpScreen(
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
-        focusedContainerColor = Color.White
+        focusedContainerColor = Color.White,
+        focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
+       // unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
 
     Box(
@@ -92,7 +94,7 @@ fun SignUpScreen(
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -120,7 +122,7 @@ fun SignUpScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -148,7 +150,7 @@ fun SignUpScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors,
@@ -175,7 +177,7 @@ fun SignUpScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White),
                     colors = textFieldColors
@@ -189,7 +191,7 @@ fun SignUpScreen(
                         .weight(1f)
                         .height(56.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .background(Color.White)
                         .clickable { viewModel.toggleGenderDropdown() }
                         .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -202,7 +204,7 @@ fun SignUpScreen(
                         Text(
                             text = if (uiState.formState.gender.isEmpty()) "性別"
                             else uiState.formState.gender,
-                            color = Color.Gray,
+                            color = Color(0xFF40434B),
                             fontSize = 16.sp
                         )
 
@@ -240,7 +242,7 @@ fun SignUpScreen(
                 label = { Text("電話") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors,
@@ -262,7 +264,7 @@ fun SignUpScreen(
                 label = { Text("信箱") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -278,14 +280,15 @@ fun SignUpScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.calender),
                             contentDescription = "生日",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.Gray
                         )
                     }
                 },
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -365,51 +368,80 @@ fun SignUpScreen(
                             Icon(
                                 painter = painterResource(id = R.drawable.upload),
                                 contentDescription = "上傳證書",
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Gray
                             )
                         }
                     },
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White),
                     colors = textFieldColors
                 )
             }
 
-            Button(
-                onClick = {
-                    viewModel.submitForm(
-                        context = context,
-                        onSuccess = {
-                            Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
-                            navController.navigate("LoginScreen")
-                        },
-                        onError = { errorMessage ->
-                            Toast.makeText(
-                                context,
-                                errorMessage,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
-                },
+            // 並排的按鈕
+            Row(
                 modifier = Modifier
-                    .width(150.dp)
-                    .padding(vertical = 16.dp)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD75813)),
-                enabled = !isLoading
+                    .fillMaxWidth()  // 讓 Row 佔滿寬度
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center,  // 置中對齊
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White
+                // 取消按鈕
+                Button(
+                    onClick = {
+                        navController.navigate("LoginScreen") {
+                         //   popUpTo("LoginScreen") { inclusive = true }
+                        }
+                    },
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFAEAD1))
+                ) {
+                    Text(
+                        text = "取消",
+                        fontSize = 16.sp,
+                        color = Color(0xFFD75813)
                     )
-                } else {
-                    Text(text = "註冊", fontSize = 16.sp, color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))  // 按鈕之間的間距
+
+                // 註冊按鈕
+                Button(
+                    onClick = {
+                        viewModel.submitForm(
+                            context = context,
+                            onSuccess = {
+                                Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
+                                navController.navigate("LoginScreen")
+                            },
+                            onError = { errorMessage ->
+                                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    },
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD75813)),
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White
+                        )
+                    } else {
+                        Text(text = "註冊", fontSize = 16.sp, color = Color.White)
+                    }
                 }
             }
         }

@@ -1,6 +1,8 @@
 package com.example.healthhelper.signuplogin
 
 
+
+
 data class User(
 
     var userId: Int = 0,
@@ -10,7 +12,9 @@ data class User(
     var userEmail: String = "",
     var phoneno: String? = null,
     var gender: Int? = null,
-    var birthday: String? = null
+    var birthday: String? = null,
+    var photoUrl: String?=null
+
 
 
 ) {

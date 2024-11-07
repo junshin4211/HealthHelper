@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.healthhelper.screen.Main
 import com.example.healthhelper.signuplogin.LoginMain
+import com.example.healthhelper.signuplogin.LoginScreen
 
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
@@ -17,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             HealthHelperTheme {
-                Main()
+                LoginMain()
             }
         }
     }
@@ -28,6 +29,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     HealthHelperTheme {
-        Main()
+        LoginMain()
     }
 }

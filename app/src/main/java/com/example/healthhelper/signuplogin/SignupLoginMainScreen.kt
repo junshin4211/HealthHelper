@@ -1,26 +1,25 @@
 package com.example.healthhelper.signuplogin
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.StateFlow
+import com.example.healthhelper.screen.Main
 
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun LoginMain() {
     val navController = rememberNavController()
-    val loginViewModel: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
+  //  val loginViewModel: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
 
     NavHost(navController = navController, startDestination = "LoginScreen") {
         composable("LoginScreen") {
             LoginScreen(navController)
         }
+
         composable("SignUpScreen") {
             SignUpScreen(navController)
         }
@@ -30,11 +29,18 @@ fun LoginMain() {
             val user = UserManager.getUser() ?: User()
             UpdateInfoScreen(user, navController)
         }
+
+        composable("Main") {
+            val user = UserManager.getUser() ?: User()
+            Main(user,navController)
+        }
+
+
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginMain() {
-    LoginMain()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewLoginMain() {
+//    LoginMain()
+//}

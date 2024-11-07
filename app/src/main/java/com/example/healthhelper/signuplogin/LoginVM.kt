@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.healthhelper.web.serverUrl
+import com.example.healthhelper.web.httpPost
 
 
 class LoginVM : ViewModel() {
@@ -86,6 +88,7 @@ class LoginVM : ViewModel() {
                         Username: ${user.username}
                         Email: ${user.userEmail}
                         RoleID: ${user.roleID}
+                      photoUrl:${user.photoUrl}
                     """.trimIndent())
 
                 onSuccess(user.userId)

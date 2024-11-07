@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 
 import com.example.healthhelper.community.CmtController
@@ -44,10 +45,11 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
 import com.example.healthhelper.dietary.screen.DietDiaryMainScreen
+import com.example.healthhelper.signuplogin.User
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun Main(tabViewModel: TabViewModel = viewModel()) {
+fun Main(user:User,navController: NavHostController, tabViewModel: TabViewModel = viewModel()) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()
     var tabIndex by remember { mutableIntStateOf(0) }
 
@@ -67,16 +69,12 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
         ) {
             when (tabIndex) {
                 0 -> MainPersonScreen()
-
                 1 -> CmtController()
-
-
                 2 -> { DietDiaryMainScreen() }
-
                 3 -> Plan()
                 4 -> RequestAccessLocationPermission(onGrant = {
-                        MainMapSearchScreen()
-                    })
+                    MainMapSearchScreen()
+                })
             }
         }
         if (tabVisibility.value) {
@@ -178,10 +176,10 @@ fun RequestAccessLocationPermission(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HealthHelperTheme {
-        Main()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    HealthHelperTheme {
+//        Main()
+//    }
+//}
