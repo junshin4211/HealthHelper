@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.components.dropdown.dropmenu
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -21,22 +22,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
+import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +55,7 @@ fun MyExposedDropDownMenuWithCheckBox(
     outlinedTextFieldColor: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     readOnly: Boolean = true,
 ) {
+    val context = LocalContext.current
     val TAG="tag_MyExposedDropDownMenuWithCheckBox"
 
     var expanded by remember { mutableStateOf(false) }
@@ -91,7 +97,7 @@ fun MyExposedDropDownMenuWithCheckBox(
                 items(options) {
                     DropdownMenuItem(
                         text = {
-                            MenuItem(it)
+                            MenuItem(context,it)
                         },
                         onClick = {
                             expanded = false
@@ -110,8 +116,12 @@ fun MyExposedDropDownMenuWithCheckBox(
 
 @Composable
 fun MenuItem(
-    selectedFoodItemVO: SelectedFoodItemVO
+    context:Context,
+    selectedFoodItemVO: SelectedFoodItemVO,
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
+    val selectedMealsOptionVO by mealsOptionViewModel.selectedData.collectAsState()
+
     var isChecked by remember { mutableStateOf(selectedFoodItemVO.isCheckedWhenSelection.value) }
     Row(
         modifier = Modifier
@@ -133,6 +143,9 @@ fun MenuItem(
             onCheckedChange = {
                 isChecked = it
                 SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItemVO,it)
+                SelectedFoodItemsRepository.setMealValue(
+                    selectedFoodItemVO,
+                    context.getString(selectedMealsOptionVO.nameResId))
             },
         )
     }

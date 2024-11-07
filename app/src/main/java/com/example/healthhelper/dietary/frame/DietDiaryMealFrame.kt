@@ -94,11 +94,6 @@ fun DietDiaryMealFrame(
 
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-    val selectedFoodItems = remember { mutableStateOf(foodItems) }
-
-    var deleteButtonIsClicked by remember { mutableStateOf(false) }
-    var addIconButtonIsClicked by remember { mutableStateOf(false) }
-    var downloadButtonIsClicked by remember { mutableStateOf(false) }
     var saveGraphTextButtonIsClicked by remember { mutableStateOf(false) }
     var saveTextRecordTextButtonIsClicked by remember { mutableStateOf(false) }
 
@@ -106,15 +101,17 @@ fun DietDiaryMealFrame(
 
     val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
 
-    if (enterStatusVO.isFirstEnter.value) {
-        availableFoodItems = foodItems.filter {
+    Log.e(TAG,"In DietDiaryMealFrame function,foodItems:${foodItems}")
+    Log.e(TAG,"In DietDiaryMealFrame function,selectedMealOption:${selectedMealOption},stringResource(selectedMealOption.nameResId):${stringResource(selectedMealOption.nameResId)}")
+    availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
+        foodItems.filter {
             it.meal.value in listOf(
                 stringResource(selectedMealOption.nameResId),
                 stringResource(MealCategoryEnum.EMPTY_STRING.title)
             )
         }
     } else {
-        availableFoodItems = foodItems.filter {
+        foodItems.filter {
             it.meal.value in listOf(
                 stringResource(selectedMealOption.nameResId),
             )
