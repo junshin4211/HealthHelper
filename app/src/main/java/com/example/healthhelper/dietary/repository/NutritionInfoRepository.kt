@@ -28,7 +28,7 @@ object NutritionInfoRepository {
             carbon = NutritionInfoPairVO(
                 name = stringResource(R.string.carb),
                 value = 1.0,
-                unit = "${stringResource(R.string.grams)}",
+                unit = stringResource(R.string.grams),
             ),
             protein = NutritionInfoPairVO(
                 name = stringResource(R.string.protein),
@@ -38,7 +38,7 @@ object NutritionInfoRepository {
             fiber = NutritionInfoPairVO(
                 name = stringResource(R.string.fiber),
                 value = 1.0,
-                unit = "${stringResource(R.string.grams)}",
+                unit = stringResource(R.string.grams),
             ),
             sugar = NutritionInfoPairVO(
                 name = stringResource(R.string.sugar),

@@ -1,22 +1,26 @@
 package com.example.healthhelper.dietary.components.dropdown.dropmenu
 
-import android.util.Log
+import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,16 +29,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.SearchIcon
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
-import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
+import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,17 +54,12 @@ fun MyExposedDropDownMenuWithCheckBox(
     onValueChangedEvent: (String) -> Unit,
     outlinedTextFieldColor: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     readOnly: Boolean = true,
-    selectedFoodItemsViewModel: SelectedFoodItemsViewModel= viewModel(),
 ) {
+    val context = LocalContext.current
     val TAG="tag_MyExposedDropDownMenuWithCheckBox"
-
-    val selectedFoodItems by selectedFoodItemsViewModel.data.collectAsState()
 
     var expanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        Log.d(TAG,"options:${options}")
-    }
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
@@ -86,36 +88,65 @@ fun MyExposedDropDownMenuWithCheckBox(
         )
 
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = option.name,
-                                textAlign = TextAlign.Center,
-                                fontSize = 18.sp,
-                                modifier = Modifier.width(100.dp)
-                            )
-                            Checkbox(
-                                modifier = Modifier.padding(10.dp,0.dp),
-                                checked = option.isCheckedWhenSelection.value,
-                                onCheckedChange = {
-                                    option.isCheckedWhenSelection.value = it
-                                    SelectedFoodItemsRepository.setCheckedWhenSelectionState(option,it)
-                                }
-                            )
-                        }
-                    },
-                    onClick = {
-                        expanded = false
-                        onValueChangedEvent(option.name)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .width(500.dp)
+                    .height(700.dp)
+                    .background(color = colorResource(R.color.backgroundcolor)),
+            ) {
+                items(options) {
+                    DropdownMenuItem(
+                        text = {
+                            MenuItem(context,it)
+                        },
+                        onClick = {
+                            expanded = false
+                            onValueChangedEvent(it.name.value)
+                        },
+                    )
+                    HorizontalDivider(
+                        color = colorResource(R.color.primarycolor),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+fun MenuItem(
+    context:Context,
+    selectedFoodItemVO: SelectedFoodItemVO,
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
+) {
+    val selectedMealsOptionVO by mealsOptionViewModel.selectedData.collectAsState()
+
+    var isChecked by remember { mutableStateOf(selectedFoodItemVO.isCheckedWhenSelection.value) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+
+    ) {
+        Text(
+            text = selectedFoodItemVO.name.value,
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp,
+            modifier = Modifier.width(100.dp),
+            color = colorResource(R.color.primarycolor),
+        )
+        Checkbox(
+            modifier = Modifier.padding(10.dp,0.dp),
+            checked = isChecked,
+            onCheckedChange = {
+                isChecked = it
+                SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItemVO,it)
+                SelectedFoodItemsRepository.setMealValue(
+                    selectedFoodItemVO,
+                    context.getString(selectedMealsOptionVO.nameResId))
+            },
+        )
     }
 }

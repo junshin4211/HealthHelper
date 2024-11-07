@@ -1,5 +1,6 @@
 package com.example.healthhelper.community.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ fun CmtNavbarComponent(navController: NavHostController) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .background(colorResource(R.color.backgroundcolor))
             .fillMaxWidth()
             .padding(12.dp)
     ) {

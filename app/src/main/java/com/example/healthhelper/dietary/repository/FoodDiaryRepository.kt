@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object FoodDiaryRepository {
-    private val _dataFlow = MutableStateFlow<MutableList<FoodDiaryVO>>(mutableListOf<FoodDiaryVO>())
+    private val _dataFlow = MutableStateFlow(mutableListOf<FoodDiaryVO>())
     val dataFlow: StateFlow<MutableList<FoodDiaryVO>> = _dataFlow.asStateFlow()
 
     fun setData(newData: FoodDiaryVO) {

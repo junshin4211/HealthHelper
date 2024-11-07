@@ -1,7 +1,7 @@
 package com.example.healthhelper.community
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,7 +18,8 @@ fun CmtController(
         composable(
             route = CmtScreenEnum.CmtMainScreen.name
         ) {
-            CmtMainScreen(navController = navController)
+            val postVM: PostVM = viewModel()
+            CmtMainScreen(navController = navController, postVM = postVM)
         }
         composable(
             route = CmtScreenEnum.CreatePostScreen.name
