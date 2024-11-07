@@ -8,6 +8,9 @@ import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,43 +20,47 @@ import java.time.temporal.ChronoUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyDatePickerDialog(
-    onConfirm: (message: Long?) -> Unit,
+    onConfirm: (Long?) -> Unit,
     onDismiss: () -> Unit
 ) {
     val today = Instant.now().truncatedTo(ChronoUnit.DAYS).toEpochMilli()
-    val datePickerState = rememberDatePickerState()
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = today // 設置初始日期為今天
+    )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            // 如果所選日期小於或等於今天，啟用「確認」按鈕
-            androidx.compose.material3.Button(
+            Button(
                 onClick = {
                     onConfirm(datePickerState.selectedDateMillis)
+                    onDismiss() // 加入這行來確保點擊確認後關閉對話框
                 },
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = if (datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! <= today) {
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (datePickerState.selectedDateMillis != null &&
+                        datePickerState.selectedDateMillis!! <= today) {
                         Color(0xFFD75813)
                     } else {
-                        Color.Gray // 禁用按鈕
+                        Color.Gray
                     }
                 ),
-                enabled = datePickerState.selectedDateMillis != null && datePickerState.selectedDateMillis!! <= today // 禁用超過今天的日期
+                enabled = datePickerState.selectedDateMillis != null &&
+                        datePickerState.selectedDateMillis!! <= today
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "確認",
                     color = Color.White
                 )
             }
         },
         dismissButton = {
-            androidx.compose.material3.Button(
+            Button(
                 onClick = onDismiss,
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFFEED)
                 )
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "取消",
                     color = Color(0xFFD75813)
                 )
@@ -73,8 +80,16 @@ fun MyDatePickerDialog(
                     selectedDayContainerColor = Color(0xFFF19204),
                     todayContentColor = Color(0xFFFFA500),
                     todayDateBorderColor = Color(0xFFFFA500),
-
-                    )
+                    // 保持其他顏色設定
+                    containerColor = Color(0xFFEFE9F4),
+                    titleContentColor = Color(0xFFD75813),
+                    headlineContentColor = Color(0xFFD75813),
+                    weekdayContentColor = Color(0xFF555555),
+                    subheadContentColor = Color(0xFF555555),
+                    yearContentColor = Color(0xFF555555),
+                    currentYearContentColor = Color(0xFFD75813),
+                    dayContentColor = Color(0xFF555555),
+                )
             )
         }
     }

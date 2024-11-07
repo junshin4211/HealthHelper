@@ -1,11 +1,13 @@
 package com.example.healthhelper.plan.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,30 +19,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
+import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.plan.ui.CreateToggleButton
+import com.example.healthhelper.plan.ui.CustomDialog
 import com.example.healthhelper.plan.ui.CustomIcon
 import com.example.healthhelper.plan.ui.CustomList
+import com.example.healthhelper.plan.ui.CustomSnackBar
+import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
+import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManagePlan(
-    navcontroller: NavHostController = rememberNavController(),
-    planViewModel: PlanVM,
-    onShowDelete: @Composable () -> Unit,
+    planVM: PlanVM,
+    managePlanVM: ManagePlanVM,
+    showdelete: Boolean,
+    tabViewModel: TabViewModel,
+    scope: CoroutineScope,
+    snackbarHostState: SnackbarHostState,
 ) {
+    tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
-    var activatepannel by remember { mutableStateOf(planViewModel.panneelname) }
-    val plan by planViewModel.planState.collectAsState()
+    val tag = "tag_ManagePlan"
+    val planUCImpl = remember { PlanUCImpl() }
+
+    var activatepannel by remember { mutableStateOf(planVM.panneelname) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedPlan by remember { mutableStateOf(PlanModel()) }
+
+    val deletePlanSuccess = stringResource(R.string.deleteplansuccess)
+    val deletePlanFailed = stringResource(R.string.deleteplanfailed)
+
+    planUCImpl.fetchList(managePlanVM)
+
+    //get plan list
+    val myPlanList by managePlanVM.myPlanListState.collectAsState(initial = emptyList())
+    Log.d(tag, "get list $myPlanList")
+    val completePlanList by managePlanVM.completePlanListState.collectAsState(initial = emptyList())
+    Log.d(tag, "get list $completePlanList")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,19 +78,54 @@ fun ManagePlan(
                 CreateToggleButton(
                     onLeftClick = {},
                     onRightClick = {
-                        planViewModel.panneelname = PlanPage.CompletedPlan.name
-                        activatepannel = planViewModel.panneelname
+                        planVM.panneelname = PlanPage.CompletedPlan.name
+                        activatepannel = planVM.panneelname
                     },
                     leftText = PlanPage.MyPlan.getPlanTitle(context),
                     rightText = PlanPage.CompletedPlan.getPlanTitle(context)
+                )
+
+                CustomList().ItemList(
+                    inputList = myPlanList,
+                    onItemClick = {
+                        //TODO 導入到計畫詳細頁面
+                    },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.protein),
+                            contentDescription = "planType",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    },
+                    trialingIcon = {
+                        when (showdelete) {
+                            true -> {
+                                CustomIcon().CreateDelete(
+                                    size = 1.0f,
+                                    onDeleteClick = {
+                                        selectedPlan = it
+                                        showDeleteDialog = true
+                                    }
+                                )
+                            }
+
+                            else -> {
+                                CustomIcon().CreateArrow(
+                                    isRight = true,
+                                    size = 3.0f,
+                                    color = R.color.black_300
+                                )
+                            }
+                        }
+                    }
                 )
             }
 
             PlanPage.CompletedPlan.name -> {
                 CreateToggleButton(
                     onLeftClick = {
-                        planViewModel.panneelname = PlanPage.MyPlan.name
-                        activatepannel = planViewModel.panneelname
+                        planVM.panneelname = PlanPage.MyPlan.name
+                        activatepannel = planVM.panneelname
                     },
                     onRightClick = {
                     },
@@ -75,23 +136,76 @@ fun ManagePlan(
                     leftText = PlanPage.MyPlan.getPlanTitle(context),
                     rightText = PlanPage.CompletedPlan.getPlanTitle(context)
                 )
+
+                CustomList().ItemList(
+                    inputList = completePlanList,
+                    onItemClick = {
+                        //TODO 導入到計畫詳細頁面
+                    },
+                    leadingIcon = {
+                        Image(
+                            painter = painterResource(id = R.drawable.protein),
+                            contentDescription = "planType",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    },
+                    trialingIcon = {
+                        when (showdelete) {
+                            true -> {
+                                CustomIcon().CreateDelete(
+                                    size = 1.0f,
+                                    onDeleteClick = {
+                                        selectedPlan = it
+                                        showDeleteDialog = true
+                                    }
+                                )
+                            }
+
+                            else -> {
+                                CustomIcon().CreateArrow(
+                                    isRight = true,
+                                    size = 3.0f,
+                                    color = R.color.black_300
+                                )
+                            }
+                        }
+                    }
+                )
             }
         }
-
-        CustomList().PlanList(
-            plans = plan,
-            onItemClick = { },
-            leadingicon = {
-                Image(
-                    painter = painterResource(id = R.drawable.protein),
-                    contentDescription = "plantype",
-                    modifier = Modifier.padding(16.dp)
-                )
-            },
-            trialingicon = {
-                onShowDelete()
-            }
-        )
+        if (showDeleteDialog)
+        {
+            CustomDialog().DeleteDataDialog(
+                title = R.string.deleteplantitle,
+                onConfirm = {
+                    scope.launch {
+                        val isSuccess = managePlanVM.deletePlan(
+                            plan = selectedPlan,
+                            userId = 2, //TODO 換成給定的userid
+                            userDietPlanID = selectedPlan.userDietPlanId,
+                            finishState = 0
+                        )
+                        if (isSuccess) {
+                            CustomSnackBar().CreateSnackBar(
+                                message = deletePlanSuccess,
+                                snackbarHostState = snackbarHostState
+                            )
+                            Log.d(tag, deletePlanSuccess)
+                        } else {
+                            CustomSnackBar().CreateSnackBar(
+                                message = deletePlanFailed,
+                                snackbarHostState = snackbarHostState
+                            )
+                            Log.d(tag, deletePlanFailed)
+                        }
+                    }
+                    showDeleteDialog = false
+                },
+                onDismiss = {
+                    showDeleteDialog = false
+                }
+            )
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.healthhelper.signuplogin
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -10,36 +12,45 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 class LoginVM : ViewModel() {
+
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
-
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
     private val gson = Gson()
 
+    // 更新帳號輸入
     fun updateAccount(account: String) {
         _uiState.update { currentState ->
             currentState.copy(formState = currentState.formState.copy(account = account))
         }
     }
 
+    // 更新密碼輸入
     fun updatePassword(password: String) {
         _uiState.update { currentState ->
             currentState.copy(formState = currentState.formState.copy(password = password))
         }
     }
 
+    // 切換密碼顯示狀態
     fun togglePasswordVisibility() {
         _uiState.update { currentState ->
-            currentState.copy(formState = currentState.formState.copy(
-                passwordVisible = !currentState.formState.passwordVisible
-            ))
+            currentState.copy(
+                formState = currentState.formState.copy(
+                    passwordVisible = !currentState.formState.passwordVisible
+                )
+            )
         }
     }
 
-    fun submitLogin(onSuccess: (Int) -> Unit, onError: (String) -> Unit) {  // 修改這裡，加入 Int 參數
+    fun submitLogin(
+        context: Context,
+        onSuccess: (Int) -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
@@ -51,28 +62,47 @@ class LoginVM : ViewModel() {
                 }
 
                 val result = httpPost(url, jsonObject.toString())
+                println("Debug - Server response: $result")
 
-                if (result.isNotBlank()) {
-                    val response = gson.fromJson(result, JsonObject::class.java)
-                    if (response.get("success")?.asBoolean == true) {
-                        val userId = response.get("userId").asInt
-                        onSuccess(userId)
-                    } else {
-                        onError(response.get("message")?.asString ?: "登入失敗")
-                    }
-                } else {
-                    onError("伺服器無回應")
+                val response = gson.fromJson(result, JsonObject::class.java)
+                if (response.get("success")?.asBoolean != true) {
+                    throw Exception(response.get("message")?.asString ?: "登入失敗")
                 }
+
+                val user = gson.fromJson(result, User::class.java)
+
+                UserManager.setUser(user)
+
+                _uiState.update { currentState ->
+                    currentState.copy(loggedInUser = user)
+                }
+
+                val tag = "UserInfo"
+
+                Log.d(tag, """
+                        LoginSuccess：
+                        UserId: ${user.userId}
+                        Account: ${user.account}
+                        Username: ${user.username}
+                        Email: ${user.userEmail}
+                        RoleID: ${user.roleID}
+                    """.trimIndent())
+
+                onSuccess(user.userId)
             } catch (e: Exception) {
-                onError(e.message ?: "登入失敗")
+                println("Debug - Network error: ${e.message}")
+                e.printStackTrace()
+                onError("${e.message}")
             } finally {
                 _isLoading.value = false
             }
         }
     }
+
+
 }
 
 data class LoginUiState(
     val formState: LoginProperty = LoginProperty(),
-    val isSubmitEnabled: Boolean = false
+    val loggedInUser: User? = null
 )

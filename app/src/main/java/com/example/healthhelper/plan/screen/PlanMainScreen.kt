@@ -4,8 +4,15 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
@@ -13,11 +20,14 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -34,6 +44,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
+import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
@@ -41,21 +52,23 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 @Composable
 fun PlanMain(context: Context = LocalContext.current,
              navcontroller: NavHostController = rememberNavController(),
-             tabViewModel: TabViewModel = viewModel(),
-             planViewModel: PlanVM
+             tabVM: TabViewModel = viewModel(),
+             planVM: PlanVM,
 ) {
-    tabViewModel.setTabVisibility(true)
+    val tag = "tag_PlanMain"
+    tabVM.setTabVisibility(true)
+    val formatter = PlanUCImpl()::dateTimeFormat;
+
+    PlanUCImpl().fetchSingle(planVM)
+    val myPlan by planVM.myPlanState.collectAsState()
+    val completePlan by planVM.completePlanState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = colorResource(id = R.color.backgroundcolor)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        HorizontalDivider(
-            color = colorResource(id = R.color.darkgray),
-            thickness = 2.dp
-        )
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.Start),
@@ -67,6 +80,10 @@ fun PlanMain(context: Context = LocalContext.current,
             CreateBar(context, navcontroller)
         }
 
+        HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            color = colorResource(R.color.darkgray), thickness = 2.dp
+        )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -116,7 +133,7 @@ fun PlanMain(context: Context = LocalContext.current,
             ) {
                 Text(
                     //放SQL最新計畫的名稱
-                    text = "${PlanPage.HighProtein.getPlanTitle(context)}飲食",
+                    text = myPlan.categoryName,
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -130,9 +147,10 @@ fun PlanMain(context: Context = LocalContext.current,
                         //.padding(start = 15.dp)
                 )
 
+
                 Text(
                     //放SQL最新計畫的時間
-                    text = "2024/10/18~2024/10/31",
+                    text = "${formatter(myPlan.startDateTime)}~${formatter(myPlan.endDateTime)}",
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -152,7 +170,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         TextButton(
             onClick = {
-                planViewModel.panneelname = PlanPage.MyPlan.name
+                planVM.panneelname = PlanPage.MyPlan.name
                 navcontroller.navigate(PlanPage.ManagePlan.name)
             },
             modifier = Modifier
@@ -223,8 +241,8 @@ fun PlanMain(context: Context = LocalContext.current,
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    //放SQL最新計畫的名稱
-                    text = "${PlanPage.HighProtein.getPlanTitle(context)}飲食",
+                    //放SQL最近已完成計畫的名稱
+                    text = completePlan.categoryName,
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -240,7 +258,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
                 Text(
                     //放SQL最新計畫的時間
-                    text = "2024/10/18~2024/10/31",
+                    text = "${formatter(completePlan.startDateTime)}~${formatter(completePlan.endDateTime)}",
 
                     style = TextStyle(
                         fontSize = 16.sp,
@@ -259,7 +277,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         TextButton(
             onClick = {
-                planViewModel.panneelname = PlanPage.CompletedPlan.name
+                planVM.panneelname = PlanPage.CompletedPlan.name
                 navcontroller.navigate(PlanPage.ManagePlan.name)
             },
             modifier = Modifier
@@ -289,73 +307,80 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
         containerColor = colorResource(id = R.color.backgroundcolor),
         divider = {
             HorizontalDivider(
-                color = colorResource(R.color.darkgray), thickness = 2.dp
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent, // 設置為透明
+                thickness = 2.dp
             )
         }
     ) {
         PlanPage.entries.forEachIndexed { index, description ->
-            if (index >= 5)
-            {
+            if (index >= 5) {
                 Tab(
-                    text = {
-                        Text(
-                            text = description.getPlanTitle(context),
-                            color = colorResource(id = R.color.primarycolor),
-                            fontWeight = FontWeight(600)
-                        )
-                    },
                     selected = tabindex == index,
                     onClick = {
                         tabindex = index
                         navcontroller.navigate(description.name)
                     },
-                    icon = {
-                        when (index) {
-                            5 -> Icon(
-                                painter = painterResource(R.drawable.protein),
-                                contentDescription = description.getPlanTitle(context),
-                                tint = colorResource(id = R.color.primarycolor)
-                            )
+                    text = {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(vertical = 4.dp) // 控制內部的間距
+                        ) {
+                            when (index) {
+                                5 -> Icon(
+                                    painter = painterResource(R.drawable.protein),
+                                    contentDescription = description.getPlanTitle(context),
+                                    tint = colorResource(id = R.color.primarycolor),
+                                    modifier = Modifier.size(30.dp) // 控制圖標大小
+                                )
 
-                            6 -> Icon(
-                                painter = painterResource(R.drawable.lowcarb),
-                                contentDescription = description.getPlanTitle(context),
-                                tint = colorResource(id = R.color.primarycolor)
-                            )
+                                6 -> Icon(
+                                    painter = painterResource(R.drawable.lowcarb),
+                                    contentDescription = description.getPlanTitle(context),
+                                    tint = colorResource(id = R.color.primarycolor),
+                                    modifier = Modifier.size(30.dp)
+                                )
 
-                            7 -> Icon(
-                                painter = painterResource(R.drawable.ketone),
-                                contentDescription = description.getPlanTitle(context),
-                                tint = colorResource(id = R.color.primarycolor)
-                            )
+                                7 -> Icon(
+                                    painter = painterResource(R.drawable.ketone),
+                                    contentDescription = description.getPlanTitle(context),
+                                    tint = colorResource(id = R.color.primarycolor),
+                                    modifier = Modifier.size(30.dp)
+                                )
 
-                            8 -> Icon(
-                                painter = painterResource(R.drawable.mediterra),
-                                contentDescription = description.getPlanTitle(context),
-                                tint = colorResource(id = R.color.primarycolor)
-                            )
+                                8 -> Icon(
+                                    painter = painterResource(R.drawable.mediterra),
+                                    contentDescription = description.getPlanTitle(context),
+                                    tint = colorResource(id = R.color.primarycolor),
+                                    modifier = Modifier.size(30.dp)
+                                )
 
-                            9 -> Icon(
-                                painter = painterResource(R.drawable.custom),
-                                contentDescription = description.getPlanTitle(context),
-                                tint = colorResource(id = R.color.primarycolor)
+                                9 -> Icon(
+                                    painter = painterResource(R.drawable.custom),
+                                    contentDescription = description.getPlanTitle(context),
+                                    tint = colorResource(id = R.color.primarycolor),
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
+                            Text(
+                                text = description.getPlanTitle(context),
+                                color = colorResource(id = R.color.primarycolor),
+                                fontWeight = FontWeight(600)
                             )
                         }
                     }
                 )
             }
-
         }
     }
-
-
 }
+
 
 @Preview
 @Composable
 fun PlanMainScreenPreview() {
     HealthHelperTheme {
-        PlanMain(planViewModel = viewModel())
+        //PlanMain(planViewModel = viewModel(), myPlan = emptyList(), completePlan = emptyList())
 
     }
 }

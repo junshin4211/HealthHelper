@@ -1,5 +1,6 @@
 package com.example.healthhelper.plan.ui
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,32 +23,42 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.DateRange
+import com.example.healthhelper.plan.usecase.PlanUCImpl
+import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import java.time.Instant
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
 
 @Composable
 fun CreateDatePicker(
     dateSelected: String?,
-    dateStart: Boolean = true
+    dateStart: Boolean = true,
+    EditPlanVM: EditPlanVM
 ) {
-    var date by remember { mutableStateOf(LocalDate.now()) }
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val tag = "tag_CreateDatePicker"
     var showDatePicker by remember { mutableStateOf(false) }
-    var getdate by remember { mutableStateOf(date.format(formatter)) }
+    val dateFormatter = PlanUCImpl()::dateTimeFormat;
+    val stringDateFormatter = PlanUCImpl()::stringToTimeStamp;
+    var getdate by remember { mutableStateOf("") }
+//    val todayByZone = ZonedDateTime.now(ZoneId.of("Asia/Taipei"))
+    val todayByZone = LocalDateTime.now(ZoneId.of("Asia/Taipei"))
+    LaunchedEffect(dateSelected, dateStart) {
+        Log.d(tag, "LaunchedEffect ${ZonedDateTime.now(ZoneId.of("Asia/Taipei"))}")
+        // 初始化日期格式並更新到 ViewModel
+        rangeFormatter(dateSelected ?: DateRange.AWeek.name, dateStart,todayByZone) { selectedDate ->
+            getdate = dateFormatter(selectedDate)
+            val timestamp = stringDateFormatter(selectedDate)
 
-    if (!dateStart) {
-        date = LocalDate.now().plusWeeks(1L)
-    }
-
-    dateformatter(dateSelected ?: DateRange.AWeek.name,
-        dateStart,
-        onDateselect = {
-            date = it
-            getdate = date.format(formatter)
+            if (dateStart) {
+                EditPlanVM.updateStartDateTime(timestamp)
+                Log.d(tag, "dateStart ${EditPlanVM.planSetState.value}")
+            } else {
+                EditPlanVM.updateEndDateTime(timestamp)
+                Log.d(tag, "!dateStart ${EditPlanVM.planSetState.value}")
+            }
         }
-    )
+    }
 
     TextField(
         readOnly = true,
@@ -91,11 +103,20 @@ fun CreateDatePicker(
         CreateDatePickerDialog(
             onConfirm = { utcTimeMillis ->
                 utcTimeMillis?.let {
-                    date = Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
-                        .toLocalDate()
+                    val date = Instant.ofEpochMilli(it).atZone(ZoneId.of("Asia/Taipei"))
+                        .toLocalDateTime()
+//                    val date = Instant.ofEpochMilli(it).atZone(ZoneId.of("Asia/Taipei"))
+                    getdate = dateFormatter(date)
+
+                    if (dateStart) {
+                        EditPlanVM.updateStartDateTime(stringDateFormatter(date))
+                        Log.d(tag,"!dateStart ${EditPlanVM.planSetState.value}")
+                    } else {
+                        EditPlanVM.updateEndDateTime(stringDateFormatter(date))
+                        Log.d(tag,"!dateStart ${EditPlanVM.planSetState.value}")
+                    }
                 }
                 showDatePicker = false
-                getdate = date.format(formatter)
             },
             onDismiss = {
                 showDatePicker = false
@@ -104,12 +125,12 @@ fun CreateDatePicker(
     }
 }
 
-fun dateformatter(
+fun rangeFormatter(
     dateSelected: String,
     dateStart: Boolean,
-    onDateselect: (LocalDate) -> Unit
+    today: LocalDateTime,
+    onDateselect: (LocalDateTime) -> Unit
 ) {
-    val today = LocalDate.now()
     if (dateStart) {
         onDateselect(today)
     } else {
@@ -118,14 +139,13 @@ fun dateformatter(
 
             DateRange.HalfMonth.name -> onDateselect(today.plusWeeks(2L))
 
-
             DateRange.AMonth.name -> onDateselect(today.plusMonths(1L))
-
 
             DateRange.ThreeMonth.name -> onDateselect(today.plusMonths(3L))
 
-
             DateRange.SixMonth.name -> onDateselect(today.plusMonths(6L))
+
+            else -> onDateselect(today)
         }
     }
 }

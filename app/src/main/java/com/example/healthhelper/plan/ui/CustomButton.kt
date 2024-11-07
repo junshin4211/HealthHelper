@@ -18,7 +18,8 @@ class CustomButton {
         text:String,
         @ColorRes color:Int,
         width:Int = 120,
-        onClick:()->Unit
+        onClick:()->Unit,
+        textcolor:Int = R.color.black
         ){
         Button(
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = color)),
@@ -27,7 +28,7 @@ class CustomButton {
             modifier = Modifier
                 .width(width.dp)
         ){
-            CustomText().TextWithDiffColor(setcolor = R.color.black, text = text, setsize = 20.sp)
+            CustomText().TextWithDiffColor(setcolor = textcolor, text = text, setsize = 20.sp)
         }
 
     }
