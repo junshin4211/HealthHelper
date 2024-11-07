@@ -1,5 +1,7 @@
 package com.example.healthhelper.community
 
+import java.sql.Timestamp
+
 data class Post(
     var postId: String = "",
     var userId : String = "",
@@ -7,7 +9,7 @@ data class Post(
     var content: String = "",
     var likesAmount: Int = 0,
     var img: Int = 0,
-    var postTime: String = ""
+    var postDate: String = "",
 ) {
     override fun equals(other: Any?): Boolean {
         return this.postId == (other as? Post)?.postId

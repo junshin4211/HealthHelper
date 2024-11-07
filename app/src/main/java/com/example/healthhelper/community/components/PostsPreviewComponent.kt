@@ -31,6 +31,8 @@ import com.example.healthhelper.community.CmtScreenEnum
 import com.example.healthhelper.community.Post
 import com.example.healthhelper.signuplogin.SignUpProperty
 import com.example.healthhelper.signuplogin.SignUpUiState
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun PostsPreviewComponent(navController: NavHostController, post: Post) {
@@ -141,8 +143,16 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
 //                        modifier = Modifier.padding(start = 4.dp)
 //                    )
                     Spacer(modifier = Modifier.weight(1f))
+                    // 解析和格式化日期
+                    val dateString = runCatching {
+                        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                        val date = LocalDateTime.parse(post.postDate, inputFormatter)
+                        date.format(outputFormatter)
+                    }.getOrElse { post.postDate } // 若解析失敗，使用原始字串
+
                     Text(
-                        text = post.postTime,
+                        text = dateString,
                         fontSize = 16.sp,
                         fontWeight = FontWeight(600),
                         color = colorResource(R.color.primarycolor)
