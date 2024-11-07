@@ -1,9 +1,11 @@
 package com.example.healthhelper.dietary.components.combo
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,15 +21,28 @@ fun NutritionInfoCombo(
 ){
     val TAG = "tag_NutritionInfoCombo"
 
-    Row(
+    LazyRow(
+        modifier = Modifier.size(400.dp,400.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
-        NutritionInfoText(
-            nutritionInfoVO = nutritionInfoVO,
-            title = title,
-            showTitle = showTitle,
-        )
-        Spacer(modifier = Modifier.width(20.dp))
-        NutritionPieChart(nutritionInfoVO)
+        item {
+            NutritionInfoText(
+                nutritionInfoVO = nutritionInfoVO,
+                title = title,
+                showTitle = showTitle,
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.width(20.dp))
+        }
+        item {
+            LazyColumn(
+                modifier = Modifier.size(190.dp,200.dp),
+            ){
+                item {
+                    NutritionPieChart(nutritionInfoVO)
+                }
+            }
+        }
     }
 }
