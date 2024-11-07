@@ -2,7 +2,6 @@ package com.example.healthhelper
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
@@ -18,7 +17,7 @@ fun InitializeRepository(
         // Fetch data from database and set it to stateflow in SelectedFoodItemsRepository.
         val foodNameVOs = selectedFoodItemsViewModel.fetchDataFromWebRequest()
         val selectedFoodItemVOs = foodNameVOs.map{ foodNameVO ->
-            SelectedFoodItemVO(name = mutableStateOf(foodNameVO.foodname))
+            SelectedFoodItemVO(name = foodNameVO.foodName)
         }
         SelectedFoodItemsRepository.setData(newData = selectedFoodItemVOs.toMutableList())
     }
