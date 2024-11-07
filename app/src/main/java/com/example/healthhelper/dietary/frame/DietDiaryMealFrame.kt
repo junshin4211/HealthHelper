@@ -276,7 +276,6 @@ fun DietDiaryMealFrame(
                                     outerButtonModifier = Modifier.size(400.dp, 40.dp),
                                     saveGraph = {
                                         saveGraphTextButtonIsClicked = !saveGraphTextButtonIsClicked
-                                        saveTextRecordTextButtonIsClicked = saveGraphTextButtonIsClicked
                                         saveGraphTextButtonHasClicked = true
                                         saveTextRecordTextButtonHasClicked = true
                                     },
@@ -284,7 +283,6 @@ fun DietDiaryMealFrame(
                                     leftTextButtonText = saveGraphButtonText,
                                     saveTextRecord = {
                                         saveTextRecordTextButtonIsClicked = !saveTextRecordTextButtonIsClicked
-                                        saveGraphTextButtonIsClicked = saveTextRecordTextButtonIsClicked
                                         saveTextRecordTextButtonHasClicked = true
                                         saveGraphTextButtonHasClicked = true
                                     },
