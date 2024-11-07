@@ -1,15 +1,16 @@
 package com.example.healthhelper.healthyMap.model
 
 data class RestaurantInfo(
-    val id: String,
-    val name: String,
-    val city: String,
-    val region: String,
-    val address: String,
-    val latitude: Double,
-    val longitude: Double,
-    val rating: Double,
-    val homePhone: String,
-    val phone: String,
-    val web: String
+    val rID: Int,
+    val rname: String,
+    val rcity: String,
+    val rregion: String,
+    val raddress: String,
+    val rlatitude: Double,
+    val rlongitude: Double,
+    val rrating: Float,
+    val rphone: String,
+    val rweb: String? = null,
+    val rphotoUrl: String? = null,
+    val ufid: Int? = null
 )

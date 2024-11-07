@@ -1,5 +1,7 @@
 package com.example.healthhelper.healthyMap
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -7,85 +9,107 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.healthyMap.model.ResturantsFavorList
 import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
+import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun FavoriteListScreen(
-    favorListViewModel: FavorListViewModel = viewModel(),
-    isFavorite: Boolean
-){
-    val resturants by favorListViewModel.resturantsState.collectAsState()
+    favorListViewModel: FavorListViewModel,
+    isFavorite: Boolean,
+    navController: NavHostController,
+) {
+    val favorResturants by favorListViewModel.favorResturantsState.collectAsState()
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val filteredResturants = resturants.filter { it.like == 1 }
+    var selectedRestaurants by remember { mutableStateOf(setOf<String>()) }
+
+    LaunchedEffect(Unit) {
+        favorListViewModel.fetchFavorListByUser()
+    }
+
+    val currentDestination = navController.currentBackStackEntry?.destination
+    LaunchedEffect(currentDestination) {
+        if (currentDestination?.route?.startsWith("MapSearchScreen") == true) {
+            scope.launch {
+                selectedRestaurants.forEach { restaurantId ->
+                    favorListViewModel.deleteFavor(restaurantId.toInt())
+                }
+                selectedRestaurants = emptySet()
+            }
+        }
+    }
+
     Column {
         if (isFavorite) {
             FavoriteList(
-//                resturants = resturants,
-                resturants = filteredResturants,
-                onItemClick = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            "${it.resturantsName}\n${it.address}", withDismissAction = true
-                        )
-                    }
+                resturants = favorResturants,
+                onItemClick = { restaurant ->
+                    navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.rID}")
                 },
-                onLikeClick = { resturant ->
-                    if(resturant.like == 1) {
-                        favorListViewModel.removeLike(resturant)
-                    }else {
-                        favorListViewModel.addLike(resturant)
-                    }
-                }
+                onLikeClick = { restaurant ->
+                    selectedRestaurants =
+                        if (selectedRestaurants.contains(restaurant.rID.toString())) {
+                            selectedRestaurants - restaurant.rID.toString()
+                        } else {
+                            selectedRestaurants + restaurant.rID.toString()
+                        }
+                },
+                selectedRestaurants = selectedRestaurants
             )
         }
     }
 }
 
+
 @Composable
 fun FavoriteList(
-    resturants: List<ResturantsFavorList>,
-    onItemClick: (ResturantsFavorList) -> Unit,
-    onLikeClick: (ResturantsFavorList) -> Unit,
+    resturants: List<RestaurantInfo>,
+    onItemClick: (RestaurantInfo) -> Unit,
+    onLikeClick: (RestaurantInfo) -> Unit,
+    selectedRestaurants: Set<String>,
 ) {
     LazyColumn(
         modifier = Modifier.padding(top = 8.dp)
     ) {
-        items(resturants) { resturant ->
+        items(resturants) { restaurant ->
             ListItem(
                 modifier = Modifier.clickable {
-                    onItemClick(resturant)
+                    onItemClick(restaurant)
                 },
-                headlineContent = { Text(resturant.resturantsName) },
-                supportingContent = { Text(resturant.address) },
+                colors = ListItemDefaults.colors(colorResource(R.color.backgroundcolor)),
+                headlineContent = { Text(restaurant.rname) },
+                supportingContent = { Text(restaurant.raddress) },
                 trailingContent = {
                     IconButton(onClick = {
-                        onLikeClick(resturant)
+                        onLikeClick(restaurant)
                     }) {
                         Icon(
-                            Icons.Filled.Favorite,
+                            imageVector = if (selectedRestaurants.contains(restaurant.rID.toString())) Icons.Outlined.FavoriteBorder else Icons.Filled.Favorite,
                             contentDescription = stringResource(R.string.cancelFavor),
-                            tint = if (resturant.like == 1) colorResource(R.color.primarycolor) else colorResource(R.color.footer)
+                            tint = colorResource(R.color.primarycolor)
                         )
                     }
                 }
@@ -94,4 +118,5 @@ fun FavoriteList(
         }
     }
 }
+
 

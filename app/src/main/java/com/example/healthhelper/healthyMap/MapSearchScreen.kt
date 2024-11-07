@@ -2,7 +2,6 @@ package com.example.healthhelper.healthyMap
 
 import android.location.Location
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +27,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +39,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
@@ -50,25 +47,23 @@ import com.example.healthhelper.healthyMap.model.District
 import com.example.healthhelper.healthyMap.model.LatLngRange
 import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import com.example.healthhelper.healthyMap.source.CityDistrictsLoader
-import com.example.healthhelper.healthyMap.mapVM.RestaurantViewModel
 
 
 @Composable
 fun MapSearchScreen(
+    restaurantsByDistrict: Map<String, List<RestaurantInfo>>,
+    allRestaurants: List<RestaurantInfo>,
     navController: NavHostController,
-    restaurantViewModel: RestaurantViewModel = viewModel(),
-    userLat:Double,
-    userLng: Double
+    userLat: Double,
+    userLng: Double,
 ) {
     var inputText by remember { mutableStateOf("") }
     var selectedCity by remember { mutableStateOf<City?>(null) }
     var selectedDistrict by remember { mutableStateOf<District?>(null) }
     var selectedSearchMethod by remember { mutableStateOf(0) }
     var isShowSearchMethod by remember { mutableStateOf(true) }
-    val restaurantsByDistrict by restaurantViewModel.restaurantsByDistrict.collectAsState()
-    val allRestaurants by restaurantViewModel.allRestaurants.collectAsState()
-    var textFieldCurrentListMethod by remember { mutableIntStateOf(1) }
 
+    var textFieldCurrentListMethod by remember { mutableIntStateOf(1) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -77,7 +72,11 @@ fun MapSearchScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .border(4.dp, colorResource(R.color.primarycolor), shape = RoundedCornerShape(15.dp)),
+                .border(
+                    4.dp,
+                    colorResource(R.color.primarycolor),
+                    shape = RoundedCornerShape(15.dp)
+                ),
             value = inputText,
             onValueChange = { inputText = it },
             placeholder = { Text(text = stringResource(R.string.searchMap)) },
@@ -238,7 +237,7 @@ fun CityList(
         items(cities) { city ->
             ListItem(
                 modifier = Modifier.clickable { onItemClick(city) },
-                colors = ListItemDefaults. colors(colorResource(R.color.backgroundcolor)),
+                colors = ListItemDefaults.colors(colorResource(R.color.backgroundcolor)),
                 headlineContent = { Text(city.name) },
                 trailingContent = {
                     Icon(
@@ -262,7 +261,7 @@ fun RegionList(
         items(city.districts) { district ->
             ListItem(
                 modifier = Modifier.clickable { onItemClick(district) },
-                colors = ListItemDefaults. colors(colorResource(R.color.backgroundcolor)),
+                colors = ListItemDefaults.colors(colorResource(R.color.backgroundcolor)),
                 headlineContent = { Text(district.name) },
                 trailingContent = {
                     Icon(
@@ -286,18 +285,21 @@ fun RestaurantList(
     restaurantsByDistrict: Map<String, List<RestaurantInfo>>,
 ) {
     val restaurants = restaurantsByDistrict[district.name] ?: emptyList()
+    val sortedRestaurants = restaurants.map { restaurant ->
+        val distance = if (userLat != null && userLng != null) {
+            calculateDistance(userLat, userLng, restaurant.rlatitude, restaurant.rlongitude)
+        } else {
+            "N/A"
+        }
+        restaurant to distance
+    }.sortedBy { it.second }
+
     LazyColumn(modifier = Modifier.padding(16.dp)) {
-        items(restaurants) { restaurant ->
-            val distance = if (userLat != null && userLng != null) {
-                calculateDistance(userLat, userLng, restaurant.latitude, restaurant.longitude)
-            } else {
-                "N/A"
-            }
+        items(sortedRestaurants) { (restaurant, distance) ->
             RestaurantListItem(navController, restaurant, distance)
         }
     }
 }
-
 
 @Composable
 fun RestaurantFilter(
@@ -308,44 +310,51 @@ fun RestaurantFilter(
     userLng: Double?,
     navController: NavController,
 ) {
-    val latLngRange = findNearbyRestaurantsLatLngRange(userLat, userLng, distance = 3.0)
+    val latLngRange = findNearbyRestaurantsLatLngRange(userLat, userLng, distance = 2.0)
 
     val filteredRestaurants = when (textFieldCurrentListMethod) {
         1 -> {
             if (latLngRange != null) {
                 restaurants.filter { restaurant ->
-                    restaurant.latitude in latLngRange.minLat..latLngRange.maxLat &&
-                            restaurant.longitude in latLngRange.minLng..latLngRange.maxLng
+                    restaurant.rlatitude in latLngRange.minLat..latLngRange.maxLat &&
+                            restaurant.rlongitude in latLngRange.minLng..latLngRange.maxLng
                 }
             } else {
                 emptyList()
             }
         }
+
         2 -> {
             restaurants.filter {
-                it.name.contains(inputText, ignoreCase = true) || it.region.contains(
+                it.rname.contains(inputText, ignoreCase = true) || it.rregion.contains(
                     inputText,
                     ignoreCase = true
                 )
             }
         }
+
         else -> throw IllegalArgumentException("餐廳列表顯示錯誤")
     }
+
+    // 計算距離並排序
+    val sortedFilteredRestaurants = filteredRestaurants.map { restaurant ->
+        val distance = if (userLat != null && userLng != null) {
+            calculateDistance(userLat, userLng, restaurant.rlatitude, restaurant.rlongitude)
+        } else {
+            "N/A"
+        }
+        restaurant to distance
+    }.sortedBy { it.second } // 根據距離排序
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        items(filteredRestaurants) { restaurant ->
-            val distance = if (userLat != null && userLng != null) {
-                calculateDistance(userLat, userLng, restaurant.latitude, restaurant.longitude)
-            } else {
-                "N/A"
-            }
+        items(sortedFilteredRestaurants) { (restaurant, distance) ->
             RestaurantListItem(navController, restaurant, distance)
         }
-        if (filteredRestaurants.isEmpty()) {
+        if (sortedFilteredRestaurants.isEmpty()) {
             item {
                 Text(
                     text = stringResource(R.string.noMatchRestaurant),
@@ -356,19 +365,20 @@ fun RestaurantFilter(
     }
 }
 
+
 @Composable
 fun RestaurantListItem(
     navController: NavController,
     restaurant: RestaurantInfo,
-    distance: String
+    distance: String,
 ) {
     ListItem(
         modifier = Modifier.clickable {
-            navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.id}")
+            navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.rID}")
         },
         colors = ListItemDefaults.colors(colorResource(R.color.backgroundcolor)),
-        headlineContent = { Text(restaurant.name) },
-        supportingContent = { Text(restaurant.address) },
+        headlineContent = { Text(restaurant.rname) },
+        supportingContent = { Text(restaurant.raddress) },
         trailingContent = {
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -394,7 +404,7 @@ fun RestaurantListItem(
 fun findNearbyRestaurantsLatLngRange(
     userLat: Double?,
     userLng: Double?,
-    distance: Double
+    distance: Double,
 ): LatLngRange? {
 
     if (userLat == null || userLng == null) {
@@ -413,7 +423,12 @@ fun findNearbyRestaurantsLatLngRange(
     return LatLngRange(minLat, maxLat, minLng, maxLng)
 }
 
-fun calculateDistance(userLat: Double, userLng: Double, restaurantLat:Double, restaurantLng:Double): String {
+fun calculateDistance(
+    userLat: Double,
+    userLng: Double,
+    restaurantLat: Double,
+    restaurantLng: Double,
+): String {
     val results = FloatArray(1)
     Location.distanceBetween(
         userLat,

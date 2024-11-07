@@ -45,7 +45,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 import com.example.healthhelper.dietary.screen.DietDiaryMainScreen
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun Main(tabViewModel: TabViewModel = viewModel()) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()
@@ -67,12 +67,8 @@ fun Main(tabViewModel: TabViewModel = viewModel()) {
         ) {
             when (tabIndex) {
                 0 -> MainPersonScreen()
-
                 1 -> CmtController()
-
-
                 2 -> { DietDiaryMainScreen() }
-
                 3 -> Plan()
                 4 -> RequestAccessLocationPermission(onGrant = {
                         MainMapSearchScreen()
