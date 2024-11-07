@@ -43,7 +43,7 @@ import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.FoodItemTopAppBar
 import com.example.healthhelper.dietary.components.button.DeleteButton
-import com.example.healthhelper.dietary.components.button.SaveButton
+import com.example.healthhelper.dietary.components.button.MyButton
 import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
@@ -73,7 +73,10 @@ fun FoodItemInfoFrame(
     val mealOptionNames by remember { mutableStateOf(mutableListOf<String>()) }
 
     LaunchedEffect(Unit) {
-        Log.e(TAG,"At LaunchedEffect was called in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
+        Log.e(
+            TAG,
+            "At LaunchedEffect was called in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}"
+        )
         mealOptions.forEach {
             mealOptionNames.add(context.getString(it.nameResId))
         }
@@ -179,7 +182,7 @@ fun FoodItemInfoFrame(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     DeleteButton(
-                        buttonModifier = Modifier.size(100.dp,40.dp),
+                        buttonModifier = Modifier.size(100.dp, 40.dp),
                         onClick = {
                             deleteButtonIsClicked = true
                             saveButtonIsClicked = false
@@ -187,13 +190,16 @@ fun FoodItemInfoFrame(
                         buttonColors = DefaultColorViewModel.buttonColors,
                     )
                     Spacer(modifier = Modifier.width(20.dp))
-                    SaveButton(
-                        buttonModifier = Modifier.size(100.dp,40.dp),
+                    MyButton(
+                        buttonModifier = Modifier.size(100.dp, 40.dp),
                         onClick = {
                             saveButtonIsClicked = true
                             deleteButtonIsClicked = false
                         },
                         buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                        text = {
+                            Text(stringResource(R.string.save))
+                        },
                     )
                 }
                 Spacer(
@@ -253,7 +259,10 @@ fun FoodItemInfoFrame(
         navController.navigateUp()
     } else if (saveButtonIsClicked) {
 
-        Log.e(TAG,"When saveButtonIsClicked is true in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
+        Log.e(
+            TAG,
+            "When saveButtonIsClicked is true in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}"
+        )
 
         Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
             .show()

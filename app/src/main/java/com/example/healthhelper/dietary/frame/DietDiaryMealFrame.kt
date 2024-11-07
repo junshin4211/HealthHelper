@@ -2,11 +2,11 @@ package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,12 +19,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -42,11 +43,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,14 +55,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
+import com.example.healthhelper.dietary.components.button.DietDiaryDescriptionButton
+import com.example.healthhelper.dietary.components.button.DietDiaryImageButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
-import com.example.healthhelper.dietary.components.combo.SaveGraphAndTextRecordButton
+import com.example.healthhelper.dietary.components.picker.photopicker.MySinglePhotoPicker
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
-import com.example.healthhelper.dietary.repository.DietDiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DietDiaryIconViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
@@ -106,8 +105,11 @@ fun DietDiaryMealFrame(
     var saveGraphButtonText by remember { mutableStateOf(context.getString(R.string.save_graph)) }
     var saveDescriptionButtonText by remember { mutableStateOf(context.getString(R.string.text_record)) }
 
+    var dietDiaryImageButtonIsClicked by remember { mutableStateOf(false) }
+
     var description by remember { mutableStateOf("") }
     var oldDescription by remember { mutableStateOf("") }
+
 
     LaunchedEffect(Unit) {
         description = dietDiaryVO.description.value
@@ -131,10 +133,19 @@ fun DietDiaryMealFrame(
         }
     }
 
-    LaunchedEffect(Unit) {
-        saveGraphTextButtonHasClicked = false
-        deletingGraphState = false
-        deletingTextFieldState = false
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            selectedImageUri = uri
+        }
+    )
+
+    val pickSinglePhotoAction: @Composable () -> Unit = {
+        MySinglePhotoPicker.pickSinglePhoto(
+            pickImageLauncher,
+            selectedImageUri,
+        )
     }
 
     Log.e(TAG, "At startup,selectedMealOption:${selectedMealOption}")
@@ -263,8 +274,31 @@ fun DietDiaryMealFrame(
                             }
                         Column(
                             modifier = Modifier
-                                .weight(0.3f)
+                                .weight(0.3f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp,16.dp),
+                                horizontalArrangement = Arrangement.Center,
+                            ) {
+                                DietDiaryImageButton(
+                                    buttonModifier = Modifier.size(130.dp, 40.dp),
+                                    onClick = {
+                                        dietDiaryImageButtonIsClicked = true
+                                    },
+                                    buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                                )
+                                Spacer(modifier = Modifier.width(20.dp))
+                                DietDiaryDescriptionButton(
+                                    buttonModifier = Modifier.size(130.dp, 40.dp),
+                                    onClick = {
+
+                                    },
+                                    buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                                )
+                            }
                             Column(
                                 modifier = Modifier
                                     .padding(16.dp)
@@ -272,56 +306,7 @@ fun DietDiaryMealFrame(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Top,
                             ) {
-                                SaveGraphAndTextRecordButton(
-                                    outerButtonModifier = Modifier.size(400.dp, 40.dp),
-                                    saveGraph = {
-                                        saveGraphTextButtonIsClicked = !saveGraphTextButtonIsClicked
-                                        saveGraphTextButtonHasClicked = true
-                                        saveTextRecordTextButtonHasClicked = true
-                                    },
-                                    leftTextButtonTextFontSize = 20.sp,
-                                    leftTextButtonText = saveGraphButtonText,
-                                    saveTextRecord = {
-                                        saveTextRecordTextButtonIsClicked = !saveTextRecordTextButtonIsClicked
-                                        saveTextRecordTextButtonHasClicked = true
-                                        saveGraphTextButtonHasClicked = true
-                                    },
-                                    rightTextButtonTextFontSize = 20.sp,
-                                    rightTextButtonText = saveDescriptionButtonText,
-                                    )
-                                if (saveGraphTextButtonIsClicked || saveTextRecordTextButtonIsClicked) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(600.dp, 200.dp)
-                                            .padding(16.dp)
-                                    ) {
-                                        Image(
-                                            painterResource(dietDiaryVO.iconResId),
-                                            contentDescription = "",
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.FillBounds,
-                                        )
-                                    }
-                                    Box(
-                                        modifier = Modifier
-                                            .size(600.dp, 100.dp)
-                                            .padding(16.dp)
-                                            .border(
-                                                1.dp,
-                                                Color.Black,
-                                            ),
-                                    ) {
-                                        TextField(
-                                            value = description,
-                                            onValueChange = {
-                                                if(it != "") {
-                                                    description = it
-                                                }
-                                            },
-                                            modifier = Modifier.fillMaxSize(),
-                                        )
-                                    }
-                                }
+
                                 Spacer(modifier = Modifier.height(10.dp))
                                 NutritionInfoCombo(
                                     nutritionInfoVO = nutritionInfo,
@@ -352,63 +337,10 @@ fun DietDiaryMealFrame(
         iconButtonIsClickable = false
     }
 
-    LaunchedEffect(deletingGraphState) {
-        saveGraphButtonText = if (!deletingGraphState) context.getString(R.string.save_graph) else context.getString(R.string.delete_graph)
-
-        // TODO
-        if(!deletingGraphState){
-            // TODO Delete
-            DietDiaryDescriptionRepository.setIconResId(R.drawable.meal_icon)
-            Toast.makeText(context,"Delete the graph successfully.",Toast.LENGTH_LONG).show()
-        }else{
-            DietDiaryDescriptionRepository.setIconResId(R.drawable.postpic)
-            Toast.makeText(context,"Save the graph successfully.",Toast.LENGTH_LONG).show()
-        }
+    if(dietDiaryImageButtonIsClicked){
+        pickSinglePhotoAction()
+        dietDiaryImageButtonIsClicked = false
     }
-
-    LaunchedEffect(deletingTextFieldState) {
-        saveDescriptionButtonText = if(!deletingTextFieldState) context.getString(R.string.text_record) else context.getString(R.string.save_text_record)
-
-        // TODO
-        if(!deletingTextFieldState){
-            // TODO Clear
-            // DietDiaryDescriptionRepository.setDescription("")
-            Toast.makeText(context,"Clear the description in OutlinedTextField successfully.",Toast.LENGTH_LONG).show()
-        }else{
-            DietDiaryDescriptionRepository.setDescription(description)
-            Toast.makeText(context,"Save the description in OutlinedTextField successfully.",Toast.LENGTH_LONG).show()
-        }
-    }
-
-    LaunchedEffect(saveGraphTextButtonIsClicked) {
-        if (saveGraphTextButtonHasClicked && saveGraphTextButtonIsClicked) {
-            deletingGraphState = !deletingGraphState
-        }
-    }
-
-    LaunchedEffect(saveTextRecordTextButtonIsClicked) {
-        if (saveTextRecordTextButtonHasClicked && saveTextRecordTextButtonIsClicked) {
-            deletingTextFieldState = !deletingTextFieldState
-        }
-    }
-
-    // test
-    LaunchedEffect(saveGraphTextButtonIsClicked) {
-        Log.e(TAG,"test. saveGraphTextButtonIsClicked is changed to ${saveGraphTextButtonIsClicked}")
-    }
-
-    LaunchedEffect(saveTextRecordTextButtonIsClicked) {
-        Log.e(TAG,"test. saveTextRecordTextButtonIsClicked is changed to ${saveTextRecordTextButtonIsClicked}")
-    }
-
-    LaunchedEffect(deletingGraphState) {
-        Log.e(TAG,"test. deletingGraphState is changed to ${deletingGraphState}")
-    }
-
-    LaunchedEffect(deletingTextFieldState) {
-        Log.e(TAG,"test. deletingGraphState is changed to ${deletingTextFieldState}")
-    }
-    // end test
 }
 
 @Composable
