@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.healthhelper.dietary.components.piechart.NutritionPieChart
@@ -22,7 +25,7 @@ fun NutritionInfoCombo(
     val TAG = "tag_NutritionInfoCombo"
 
     LazyRow(
-        modifier = Modifier.size(400.dp,400.dp),
+        modifier = Modifier.size(400.dp,450.dp).verticalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center,
     ) {
         item {
@@ -38,6 +41,7 @@ fun NutritionInfoCombo(
         item {
             LazyColumn(
                 modifier = Modifier.size(190.dp,200.dp),
+                horizontalAlignment = Alignment.End,
             ){
                 item {
                     NutritionPieChart(nutritionInfoVO)

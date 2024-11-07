@@ -156,7 +156,7 @@ fun DietDiaryMainFrame(
                             Text(
                                 text = "${stringResource(R.string.total_title)}:",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
+                                fontSize = 24.sp,
                             )
                         }
                     )

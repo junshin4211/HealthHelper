@@ -1,6 +1,7 @@
 package com.example.healthhelper.dietary.components.piechart
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,17 +42,19 @@ fun NutritionPieChart(
     )
     CreatePieChart(
         dataCollection = data.toChartDataCollection(),
-        modifier = Modifier.size(100.dp, 100.dp)
+        modifier = Modifier.size(100.dp, 100.dp),
     )
 
     LazyColumn(
-        modifier = Modifier.height(100.dp)
+        modifier = Modifier.height(100.dp),
+        horizontalAlignment = Alignment.End,
     ) {
         items(texts.size) { index ->
             val entry = data[index]
             val text = texts[index]
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
             ) {
                 Text(
                     text = "${text}:${round(entry.yValue * 100 / data.size)}%",
