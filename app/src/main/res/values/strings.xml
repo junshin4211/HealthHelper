@@ -208,4 +208,5 @@
     <string name="weightKg">體重(kg)</string>
     <string name="body_fatpercent">體脂(%)</string>
     <string name="BodyDatatrend">變化趨勢</string>
+    <string name="empty_string" />
 </resources>

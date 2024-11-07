@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 
 data class SelectedFoodItemVO(
-    val name:MutableState<String>,
+    val name: MutableState<String>,
     var meal:MutableState<String> =  mutableStateOf(""),
     var grams:MutableState<Double> = mutableDoubleStateOf(100.0),
 
