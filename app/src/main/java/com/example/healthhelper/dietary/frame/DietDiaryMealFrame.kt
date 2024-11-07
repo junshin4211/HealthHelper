@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -32,6 +36,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,6 +48,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -53,12 +60,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
+import com.example.healthhelper.attr.viewmodel.DefaultTextStyleViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.DietAppTopBar
 import com.example.healthhelper.dietary.components.button.DietDiaryDescriptionButton
 import com.example.healthhelper.dietary.components.button.DietDiaryImageButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
-import com.example.healthhelper.dietary.components.picker.photopicker.MySinglePhotoPicker
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
@@ -70,6 +78,7 @@ import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
+import com.example.healthhelper.person.widget.SaveButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
@@ -85,6 +94,7 @@ fun DietDiaryMealFrame(
     val TAG = "tag_DietDiaryMealFrame"
 
     val context = LocalContext.current
+
     val verticalScrollState = rememberScrollState()
 
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
@@ -92,31 +102,27 @@ fun DietDiaryMealFrame(
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
     val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
     val dietDiaryVO by dietDiaryIconViewModel.data.collectAsState()
+    val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
+
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-    var saveGraphTextButtonHasClicked by remember { mutableStateOf(false) }
-    var saveGraphTextButtonIsClicked by remember { mutableStateOf(false) }
-    var deletingGraphState by remember { mutableStateOf(false) }
-    var saveTextRecordTextButtonIsClicked by remember { mutableStateOf(false) }
-    var saveTextRecordTextButtonHasClicked by remember { mutableStateOf(false) }
-    var deletingTextFieldState by remember { mutableStateOf(false) }
-    var iconButtonIsClickable by remember { mutableStateOf(false) }
+    var descriptionText by remember { mutableStateOf("") }
 
-    var saveGraphButtonText by remember { mutableStateOf(context.getString(R.string.save_graph)) }
-    var saveDescriptionButtonText by remember { mutableStateOf(context.getString(R.string.text_record)) }
+    var dietDiaryImageButtonText by remember { mutableStateOf(context.getString(R.string.add_graph)) }
+    var dietDiaryDescriptionButtonText by remember { mutableStateOf(context.getString(R.string.add_description)) }
 
+    var iconButtonIsClicked by remember { mutableStateOf(false) }
     var dietDiaryImageButtonIsClicked by remember { mutableStateOf(false) }
+    var dietDiaryDescriptionButtonIsClicked by remember { mutableStateOf(false) }
+    var saveFoodDescriptionButtonIsClicked by remember { mutableStateOf(false) }
 
-    var description by remember { mutableStateOf("") }
-    var oldDescription by remember { mutableStateOf("") }
+    var isDeletePhotoEventTriggeredMeetPrerequisites by remember { mutableStateOf(false) }
+    var isDeletePhotoEventTriggered by remember { mutableStateOf(false) }
 
+    var isCleanEventTriggeredMeetPrerequisites by remember { mutableStateOf(false) }
+    var isCleanEventTriggered by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        description = dietDiaryVO.description.value
-        oldDescription = dietDiaryVO.description.value
-    }
-
-    val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
+    var shouldShowDescription by remember { mutableStateOf(false) }
 
     availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
         foodItems.filter {
@@ -140,16 +146,6 @@ fun DietDiaryMealFrame(
             selectedImageUri = uri
         }
     )
-
-    val pickSinglePhotoAction: @Composable () -> Unit = {
-        MySinglePhotoPicker.pickSinglePhoto(
-            pickImageLauncher,
-            selectedImageUri,
-        )
-    }
-
-    Log.e(TAG, "At startup,selectedMealOption:${selectedMealOption}")
-    Log.e(TAG, "At startup,availableFoodItems:${availableFoodItems}")
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
@@ -247,7 +243,7 @@ fun DietDiaryMealFrame(
                                                     SelectedFoodItemsRepository.setSelectedData(
                                                         foodItem
                                                     )
-                                                    iconButtonIsClickable = true
+                                                    iconButtonIsClicked = true
                                                 }) {
                                                     Icon(
                                                         imageVector = Icons.Default.KeyboardArrowRight,
@@ -280,7 +276,7 @@ fun DietDiaryMealFrame(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(0.dp,16.dp),
+                                    .padding(0.dp, 16.dp),
                                 horizontalArrangement = Arrangement.Center,
                             ) {
                                 DietDiaryImageButton(
@@ -289,15 +285,46 @@ fun DietDiaryMealFrame(
                                         dietDiaryImageButtonIsClicked = true
                                     },
                                     buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                                    text = { Text(dietDiaryImageButtonText) }
                                 )
                                 Spacer(modifier = Modifier.width(20.dp))
                                 DietDiaryDescriptionButton(
                                     buttonModifier = Modifier.size(130.dp, 40.dp),
                                     onClick = {
-
+                                        dietDiaryDescriptionButtonIsClicked = true
+                                        if (isCleanEventTriggeredMeetPrerequisites) {
+                                            descriptionText = ""
+                                        }
                                     },
                                     buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                                    text = { Text(dietDiaryDescriptionButtonText) }
                                 )
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp, 16.dp),
+                                horizontalArrangement = Arrangement.Center,
+                            ) {
+                                selectedImageUri?.let { uri ->
+                                    Image(
+                                        painter = rememberAsyncImagePainter(uri),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(200.dp)
+                                            .clip(RoundedCornerShape(8.dp)),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                                MyOutLinedTextField(
+                                    value = descriptionText,
+                                    onValueChange = {
+                                        Log.e(TAG, "it:${it}")
+                                        descriptionText = it
+                                    },
+                                    isVisible = shouldShowDescription,
+                                )
+                                isCleanEventTriggered = false
                             }
                             Column(
                                 modifier = Modifier
@@ -319,6 +346,12 @@ fun DietDiaryMealFrame(
                                         )
                                     }
                                 )
+
+                                SaveButton(
+                                    onClick = {
+                                        saveFoodDescriptionButtonIsClicked = true
+                                    }
+                                )
                             }
                         }
                     }
@@ -327,19 +360,50 @@ fun DietDiaryMealFrame(
         }
     })
 
-    if (iconButtonIsClickable) {
+    if (iconButtonIsClicked) {
         SelectedFoodItemsRepository.setSelectedDataMealValue(stringResource(selectedMealOption.nameResId))
         SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItem, true)
         Log.e(TAG, "At IconButton onClick event triggers,selectedFoodItem:${selectedFoodItem}")
         navController.navigate(
             DietDiaryScreenEnum.FoodItemInfoFrame.name
         )
-        iconButtonIsClickable = false
+        iconButtonIsClicked = false
     }
 
-    if(dietDiaryImageButtonIsClicked){
-        pickSinglePhotoAction()
+    if (dietDiaryImageButtonIsClicked) {
+        pickImageLauncher.launch(
+            PickVisualMediaRequest(
+                ActivityResultContracts.PickVisualMedia.ImageOnly
+            )
+        )
+
+
         dietDiaryImageButtonIsClicked = false
+    }
+
+    LaunchedEffect(selectedImageUri) {
+        Log.e(TAG, "After opening the photo picker, selectedImageUri:${selectedImageUri}")
+        val id = if (selectedImageUri != null) R.string.delete_graph else R.string.add_graph
+        dietDiaryImageButtonText = context.getString(id)
+    }
+
+
+    if (dietDiaryDescriptionButtonIsClicked) {
+        dietDiaryDescriptionButtonText = context.getString(R.string.clear_description_text)
+        shouldShowDescription = true
+        isCleanEventTriggeredMeetPrerequisites = true
+        dietDiaryDescriptionButtonIsClicked = false
+    }
+
+    if (saveFoodDescriptionButtonIsClicked) {
+        Log.e(TAG, "saveFoodDescriptionButtonIsClicked is true.")
+        SaveFoodDescription(
+            navController = navController,
+            context = context,
+            foodIconUri = selectedImageUri,
+            foodDescription = descriptionText,
+        )
+        saveFoodDescriptionButtonIsClicked = false
     }
 }
 
@@ -360,4 +424,35 @@ fun MyCheckBox(
                 context.getString(mealsOptionVO.nameResId)
             )
         })
+}
+
+@Composable
+fun MyOutLinedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    isVisible: Boolean,
+) {
+    if (isVisible) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.size(200.dp, 60.dp),
+            textStyle = DefaultTextStyleViewModel.outlinedTextFieldTextStyle,
+            maxLines = 1,
+        )
+    }
+}
+
+@Composable
+fun SaveFoodDescription(
+    navController: NavHostController,
+    context: Context,
+    foodIconUri: Uri?,
+    foodDescription: String,
+) {
+    Toast.makeText(
+        context,
+        context.getString(R.string.save_food_description_successfully),
+        Toast.LENGTH_LONG
+    ).show()
 }

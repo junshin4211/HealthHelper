@@ -25,7 +25,7 @@ fun NutritionInfoCombo(
     val TAG = "tag_NutritionInfoCombo"
 
     LazyRow(
-        modifier = Modifier.size(400.dp,450.dp).verticalScroll(rememberScrollState()),
+        modifier = Modifier.size(400.dp,165.dp).verticalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.Center,
     ) {
         item {
