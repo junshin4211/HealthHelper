@@ -40,7 +40,7 @@ fun SearchTextFieldWithDropDownMenuItem(
             queryText.value = input
             if(queryText.value != "") {
                 availableOptions =
-                    availableFoodItems.filter { it.name.value.contains(queryText.value) }.toMutableList()
+                    availableFoodItems.filter { it.name.contains(queryText.value) }.toMutableList()
             }else{
                 availableOptions = availableFoodItems
             }

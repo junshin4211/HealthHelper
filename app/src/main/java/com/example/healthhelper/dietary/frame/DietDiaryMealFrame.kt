@@ -197,7 +197,7 @@ fun DietDiaryMealFrame(
                                                     )
 
                                                     Text(
-                                                        text = foodItem.name.value,
+                                                        text = foodItem.name,
                                                         color = colorResource(R.color.primarycolor),
                                                         lineHeight = 1.27.em,
                                                         style = MaterialTheme.typography.titleLarge,
