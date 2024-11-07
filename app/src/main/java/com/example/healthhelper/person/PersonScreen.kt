@@ -204,8 +204,3 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Na
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PersonPreview() {
-//    PersonScreen(rememberNavController())
-//}

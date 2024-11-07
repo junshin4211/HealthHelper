@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
-import com.example.healthhelper.person.model.ErrorMsg
 import com.example.healthhelper.person.model.UserPhoto
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
@@ -78,10 +77,11 @@ class UserPhotoUploadVM : ViewModel() {
         val result = httpPost(url, jsonObject.toString())
         val response = gson.fromJson(result, JsonObject::class.java)
         Log.d("dataout", response.get("errMsg").toString())
+
         if (response.get("result").asBoolean) {
             refreshUserPhoto()
         }
-        ErrorMsg.errMsg = response.get("errMsg").toString()
+
         return response.get("result").asBoolean
     }
 
