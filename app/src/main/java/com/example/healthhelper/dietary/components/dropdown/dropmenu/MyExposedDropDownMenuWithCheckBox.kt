@@ -95,7 +95,7 @@ fun MyExposedDropDownMenuWithCheckBox(
                         },
                         onClick = {
                             expanded = false
-                            onValueChangedEvent(it.name)
+                            onValueChangedEvent(it.name.value)
                         },
                     )
                     HorizontalDivider(
@@ -121,7 +121,7 @@ fun MenuItem(
 
     ) {
         Text(
-            text = selectedFoodItemVO.name,
+            text = selectedFoodItemVO.name.value,
             textAlign = TextAlign.Center,
             fontSize = 18.sp,
             modifier = Modifier.width(100.dp),

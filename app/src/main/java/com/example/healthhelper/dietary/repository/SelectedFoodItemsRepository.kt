@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.repository
 
+import androidx.compose.runtime.mutableStateOf
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,10 +21,10 @@ object SelectedFoodItemsRepository {
 
     private fun fetchData():MutableList<SelectedFoodItemVO> {
         val foodItems = mutableListOf(
-            SelectedFoodItemVO(name = "Apple"),
-            SelectedFoodItemVO(name = "Banana"),
-            SelectedFoodItemVO(name = "Grape"),
-            SelectedFoodItemVO(name = "Orange"),
+            SelectedFoodItemVO(name = mutableStateOf("Apple")),
+            SelectedFoodItemVO(name = mutableStateOf("Banana")),
+            SelectedFoodItemVO(name = mutableStateOf("Grape")),
+            SelectedFoodItemVO(name = mutableStateOf("Orange")),
         )
         return foodItems
     }
