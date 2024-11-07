@@ -65,8 +65,6 @@ fun EditPlan(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     navcontroller: NavHostController = rememberNavController(),
-    planVM: PlanVM,
-    ManagePlanVM: ManagePlanVM
 ) {
     val tag = "tag_EditPlan"
     val scrollstate = rememberScrollState()

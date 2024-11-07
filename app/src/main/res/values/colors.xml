@@ -40,6 +40,7 @@
     <color name="a_little_light_gray">#6B6B6B</color>
     <color name="gray_400">#B2B5B9</color>
     <color name="gray_300">#B4B7C9</color>
+    <color name="gray_250">#D9D9D9</color>
     <color name="gray_200">#F3F3F3</color>
     <color name="gray_100">#EFF2FC</color>
 

@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CustomText
+import com.example.healthhelper.plan.viewmodel.CheckPlanVM
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
@@ -48,7 +49,8 @@ fun Plan(
     tabViewModel: TabViewModel = viewModel(),
     planVM: PlanVM = viewModel(),
     managePlanVM: ManagePlanVM = viewModel(),
-    EditPlanVM: EditPlanVM = viewModel()
+    EditPlanVM: EditPlanVM = viewModel(),
+    checkPlanVM: CheckPlanVM = viewModel()
 ) {
     val tag = "tag_PlanNav"
     val context = LocalContext.current
@@ -73,7 +75,8 @@ fun Plan(
                 onShowDelete = {
                     showdeleteicon = planVM.showdelete
                 },
-                planViewModel = planVM
+                planViewModel = planVM,
+                checkPlanVM = checkPlanVM
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -100,8 +103,6 @@ fun Plan(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
                     navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.LowCarb.name) {
@@ -112,8 +113,6 @@ fun Plan(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
                     navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.Ketone.name) {
@@ -124,8 +123,6 @@ fun Plan(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
                     navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.Mediterra.name) {
@@ -136,28 +133,24 @@ fun Plan(
                     scope = scope,
                     snackbarHostState = snackbarHostState,
                     navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.Custom.name) {
                 CustomEditPlan(
                     planname = PlanPage.Custom,
-                    tabViewModel = tabViewModel,
-                    EditPlanVM = EditPlanVM,
+                    tabVM = tabViewModel,
+                    editPlanVM = EditPlanVM,
                     scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
+                    snackBarHostState = snackbarHostState,
+                    navController = navController,
                 )
             }
             composable(route = PlanPage.ManagePlan.name) {
                 ManagePlan(
                     planVM = planVM,
                     managePlanVM = managePlanVM,
-                    showdeleteicon,
-                    tabViewModel,
+                    showdelete = showdeleteicon,
+                    tabVM = tabViewModel,
                     scope = scope,
                     snackbarHostState = snackbarHostState
                 )
@@ -165,11 +158,10 @@ fun Plan(
             composable(route = PlanPage.CheckPlan.name)
             {
                 CheckPlan(
-                    navcontroller = navController,
-                    tabViewModel,
-                    planVM,
-                    managePlanVM,
-                    currentScreen
+                    tabVM = tabViewModel,
+                    planVM = planVM,
+                    managePlanVM = managePlanVM,
+                    checkVM = checkPlanVM
                 )
             }
         }
@@ -185,7 +177,8 @@ fun PlanAppBar(
     onShowDelete: () -> Unit,
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
-    planViewModel: PlanVM
+    planViewModel: PlanVM,
+    checkPlanVM: CheckPlanVM
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
@@ -202,7 +195,9 @@ fun PlanAppBar(
                     PlanPage.DietPlan -> {
                         PlanPage.DietPlan.getPlanTitle(context)
                     }
-
+                    PlanPage.CheckPlan -> {
+                        checkPlanVM.getCateGoryName()
+                    }
                     else -> {
                         currentScreen.getPlanTitle(context) + "飲食計畫" // 其他頁面的標題
                     }

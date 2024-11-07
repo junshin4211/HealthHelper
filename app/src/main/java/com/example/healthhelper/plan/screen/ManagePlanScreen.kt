@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -43,11 +42,11 @@ fun ManagePlan(
     planVM: PlanVM,
     managePlanVM: ManagePlanVM,
     showdelete: Boolean,
-    tabViewModel: TabViewModel,
+    tabVM: TabViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
 ) {
-    tabViewModel.setTabVisibility(false)
+    tabVM.setTabVisibility(false)
     val context = LocalContext.current
     val tag = "tag_ManagePlan"
     val planUCImpl = remember { PlanUCImpl() }

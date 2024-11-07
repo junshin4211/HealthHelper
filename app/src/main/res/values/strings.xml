@@ -182,4 +182,10 @@
     <string name="add_data_successfully">新增資料成功</string>
     <string name="grams">克</string>
     <string name="save_data_successfully">儲存資料成功</string>
+    <string name="finishratecontent">完成目標日數/經過天數\ne.g.計畫進行到第5天,碳水每日目標達成3天\n完成率為60%</string>
+    <string name="alltime">全部時間</string>
+    <string name="date">日期</string>
+    <string name="averagecalorie">平均卡路里</string>
+    <string name="over">超過</string>
+    <string name="under">剩餘</string>
 </resources>
