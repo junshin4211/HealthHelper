@@ -1,10 +1,10 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
-import androidx.annotation.DrawableRes
+import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 data class DietDiaryDescriptionVO(
-    @DrawableRes var iconResId: Int,
+    var uri: Uri? = null,
     val description: MutableState<String> = mutableStateOf(""),
 )

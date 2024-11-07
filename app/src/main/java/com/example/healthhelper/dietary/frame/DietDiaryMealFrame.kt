@@ -72,6 +72,7 @@ import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
+import com.example.healthhelper.dietary.repository.DietDiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DietDiaryIconViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
@@ -377,7 +378,6 @@ fun DietDiaryMealFrame(
             )
         )
 
-
         dietDiaryImageButtonIsClicked = false
     }
 
@@ -450,6 +450,8 @@ fun SaveFoodDescription(
     foodIconUri: Uri?,
     foodDescription: String,
 ) {
+    DietDiaryDescriptionRepository.setUri(foodIconUri)
+    DietDiaryDescriptionRepository.setDescription(foodDescription)
     Toast.makeText(
         context,
         context.getString(R.string.save_food_description_successfully),
