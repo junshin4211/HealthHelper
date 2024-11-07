@@ -28,7 +28,8 @@ fun PieChartWithText(
 ){
     val currentFontSize by remember { mutableStateOf(fontSize) }
     Column(
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier.padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ){
         GraphDrawer.drawPieChart(
             entries = entries,

@@ -3,6 +3,7 @@ package com.example.healthhelper.dietary.frame
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +47,7 @@ import com.example.healthhelper.dietary.components.button.SaveButton
 import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.repository.EnterStatusRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
@@ -55,35 +58,29 @@ fun FoodItemInfoFrame(
     navController: NavHostController,
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
-    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
-    title: String,
-    mealOptionName: String,
 ) {
 
     val TAG = "tag_FoodItemInfoFrame"
 
     val context = LocalContext.current
 
-    val mealOption by mealOptionViewModel.data.collectAsState()
+    val mealOptions by mealOptionViewModel.data.collectAsState()
 
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
-    val selectedMealOptions by mealsOptionViewModel.data.collectAsState()
-
-    val options by remember { mutableStateOf(mutableListOf("")) }
-
-    val selectedMealOption = selectedMealOptions.first() { it.text == mealOptionName }
-    var selectedMealsOptionState by remember { mutableStateOf(selectedMealOption) }
-
-    val mutableStateString = remember { mutableStateOf(selectedMealOption.name) }
 
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var saveButtonIsClicked by remember { mutableStateOf(false) }
+    val mealOptionNames by remember { mutableStateOf(mutableListOf<String>()) }
 
     LaunchedEffect(Unit) {
-        Log.e(TAG, "selectedMealOption:${selectedMealOption}")
-        mealOption.forEach {
-            options.add(it.name)
+        Log.e(TAG,"At LaunchedEffect was called in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
+        mealOptions.forEach {
+            mealOptionNames.add(context.getString(it.nameResId))
         }
+    }
+
+    LaunchedEffect(Unit) {
+        EnterStatusRepository.setIsFirstEnter(false)
     }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -91,7 +88,7 @@ fun FoodItemInfoFrame(
             FoodItemTopAppBar(
                 navController = navController,
                 title = {
-                    Text(selectedMealOption.name)
+                    Text(selectedFoodItem.meal.value)
                 }
             )
         },
@@ -99,7 +96,8 @@ fun FoodItemInfoFrame(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .background(color = colorResource(R.color.backgroundcolor)),
             ) {
                 Column(
 
@@ -150,16 +148,15 @@ fun FoodItemInfoFrame(
                     ) {
                         MyExposedDropDownMenu(
                             navController = navController,
-                            mutableStateValue = mutableStateString,
+                            mutableStateValue = selectedFoodItem.meal,
                             label = {},
                             modifier = Modifier.width(200.dp),
                             onValueChangedEvent = {
-                                mutableStateString.value = it
-                                selectedMealsOptionState = selectedMealOptions.first() { option -> option.name == mutableStateString.value }
+                                selectedFoodItem.meal.value = it
                             },
-                            options = options,
+                            options = mealOptionNames,
                             outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
-                            readOnly = false,
+                            readOnly = true,
                         )
                         Image(
                             painter = painterResource(R.drawable.meal_icon),
@@ -182,6 +179,7 @@ fun FoodItemInfoFrame(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     DeleteButton(
+                        buttonModifier = Modifier.size(100.dp,40.dp),
                         onClick = {
                             deleteButtonIsClicked = true
                             saveButtonIsClicked = false
@@ -190,6 +188,7 @@ fun FoodItemInfoFrame(
                     )
                     Spacer(modifier = Modifier.width(20.dp))
                     SaveButton(
+                        buttonModifier = Modifier.size(100.dp,40.dp),
                         onClick = {
                             saveButtonIsClicked = true
                             deleteButtonIsClicked = false
@@ -254,16 +253,12 @@ fun FoodItemInfoFrame(
         navController.navigateUp()
     } else if (saveButtonIsClicked) {
 
-        SelectedFoodItemsRepository.updateData(selectedFoodItem, selectedFoodItem)
+        Log.e(TAG,"When saveButtonIsClicked is true in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
 
         Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
             .show()
         saveButtonIsClicked = false
-        /*
-        We can directly use `navController.navigateUp` method to jump back to previous page since we need to passed the data.
-        We have to use `navController.navigate` method with arguments to do this.
-        navController.navigateUp()
-         */
-        navController.navigate("${DietDiaryScreenEnum.DietDiaryMealFrame.name}/${selectedMealsOptionState.text}")
+        navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
+
     }
 }

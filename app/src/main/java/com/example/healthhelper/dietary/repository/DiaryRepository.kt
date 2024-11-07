@@ -6,16 +6,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object DiaryRepository {
-    private val _dataFlow = MutableStateFlow<MutableList<DiaryVO>>(mutableListOf<DiaryVO>())
+    private val _dataFlow = MutableStateFlow(mutableListOf<DiaryVO>())
     val dataFlow: StateFlow<MutableList<DiaryVO>> = _dataFlow.asStateFlow()
 
-    fun setData(newData: DiaryVO) {
+    fun setData(newData: List<DiaryVO>) {
         _dataFlow.value.clear()
-        _dataFlow.value.add(newData)
+        _dataFlow.value.addAll(newData)
     }
 
-    fun addData(newData: DiaryVO){
-        _dataFlow.value.add(newData)
+    fun addData(newData: List<DiaryVO>){
+        _dataFlow.value.addAll(newData)
     }
 
     fun removeAt(index:Int){
