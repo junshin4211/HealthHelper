@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.sql.Date
 
 object DiaryInfoUpdatorRepository {
     private val _dataFlow = MutableStateFlow(DiaryInfoUpdatorVO())
@@ -19,5 +20,8 @@ object DiaryInfoUpdatorRepository {
     }
     fun setDiaryId(diaryId:Int){
         _dataFlow.value.diaryID = diaryId
+    }
+    fun setDate(date:Date){
+        _dataFlow.value.createDate = date
     }
 }

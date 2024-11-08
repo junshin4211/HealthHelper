@@ -12,7 +12,7 @@ data class DiaryInfoUpdatorVO(
     var userID: Int = -1,
 
     @SerializedName("createDate")
-    val createDate: Date = Date(0),
+    var createDate: Date = Date(0),
 
     @SerializedName("createTime")
     val createTime: Time = Time(0),
