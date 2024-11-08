@@ -348,6 +348,8 @@ fun DietDiaryMealFrame(
                                     }
                                 )
 
+                                Spacer(modifier = Modifier.height(10.dp))
+
                                 SaveButton(
                                     onClick = {
                                         saveFoodDescriptionButtonIsClicked = true
@@ -449,9 +451,19 @@ fun SaveFoodDescription(
     context: Context,
     foodIconUri: Uri?,
     foodDescription: String,
+    diaryDescriptionViewModel: DietDiaryIconViewModel = viewModel(),
 ) {
     DietDiaryDescriptionRepository.setUri(foodIconUri)
     DietDiaryDescriptionRepository.setDescription(foodDescription)
+
+    val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
+
+    LaunchedEffect(Unit) {
+        // try to insert diaryDescriptionVO to database. (i.e. when there are no record about given diaryDescriptionVO.diaryId, insert it.
+        // Otherwise, update it by given diaryDescriptionVO.diaryId.
+        val affectedRows = diaryDescriptionViewModel.tryToInsert(diaryDescriptionVO)
+    }
+
     Toast.makeText(
         context,
         context.getString(R.string.save_food_description_successfully),
