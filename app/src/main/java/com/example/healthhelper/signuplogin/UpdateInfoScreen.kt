@@ -197,13 +197,13 @@ fun UpdateInfoScreen(
                 colors = textFieldColors
             )
 
-            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
-                Text(
-                    text = uiState.formState.phoneErrorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 1.dp)
-                )
-            }
+//            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
+//                Text(
+//                    text = uiState.formState.phoneErrorMessage,
+//                    color = Color.Red,
+//                    modifier = Modifier.padding(top = 1.dp)
+//                )
+//            }
 
             // Email
             TextField(
@@ -294,7 +294,7 @@ fun UpdateInfoScreen(
                         onSuccess = {
                             Toast.makeText(context, "更新成功", Toast.LENGTH_SHORT).show()
                             navController.navigate("LoginScreen") {
-                               // popUpTo("LoginScreen") { inclusive = true }
+
                             }
                         },
                         onError = { error ->

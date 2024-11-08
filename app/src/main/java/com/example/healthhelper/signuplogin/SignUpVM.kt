@@ -139,6 +139,17 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
+    fun updateUserRole(isNutritionist: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                formState = currentState.formState.copy(
+                    isNutritionist = isNutritionist,
+                    isNormalUser = !isNutritionist
+                )
+            )
+        }
+    }
+
     // 檔案處理
     fun handleFileSelection(context: Context, uri: Uri) {
 
@@ -219,6 +230,7 @@ class SignUpViewModel : ViewModel() {
                 val jsonObject = JsonObject().apply {
                     addProperty("account", _uiState.value.formState.account)
                     addProperty("password", _uiState.value.formState.password)
+                    addProperty("cPassword", _uiState.value.formState.confirmPassword)
                     addProperty("username", _uiState.value.formState.username)
                     addProperty("userEmail", _uiState.value.formState.email)
                     addProperty("phoneno", _uiState.value.formState.phone)
