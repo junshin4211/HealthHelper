@@ -3,7 +3,6 @@ package com.example.healthhelper.dietary.screen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,25 +13,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.healthhelper.dietary.dataclasses.vo.SelectedMealOptionVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
-import com.example.healthhelper.dietary.frame.AddNewDietDiaryItemFrame
 import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.dietary.frame.DietDiaryMealFrame
 import com.example.healthhelper.dietary.frame.FoodItemInfoFrame
 import com.example.healthhelper.dietary.frame.SearchHintFrame
-import com.example.healthhelper.dietary.repository.SelectedFoodItemRepository
-import com.example.healthhelper.dietary.repository.SelectedMealOptionRepository
-import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
+import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 
 @Composable
 fun DietDiaryMainScreen(
     navController: NavHostController = rememberNavController(),
-    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
-    val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
+    val TAG = "tag_DietDiaryMainScreen"
 
-    SelectedMealOptionRepository.setData(SelectedMealOptionVO(name = "breakfast"))
+    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
 
     Scaffold(
         modifier = Modifier
@@ -58,27 +53,15 @@ fun DietDiaryMainScreen(
             ) {
                 DietDiaryMealFrame(
                     navController = navController,
-                    title = {
-                        Text(
-                            text = selectedMealOption.name,
-                            maxLines = 1,
-                        )
-                    }
-                )
-            }
-
-            composable(
-                route = DietDiaryScreenEnum.AddNewDietDiaryItemFrame.name
-            ) {
-                AddNewDietDiaryItemFrame(
-                    navController = navController,
                 )
             }
 
             composable(
                 route = DietDiaryScreenEnum.FoodItemInfoFrame.name
             ) {
-                FoodItemInfoFrame(navController = navController)
+                FoodItemInfoFrame(
+                    navController = navController,
+                )
             }
             composable(
                 route = DietDiaryScreenEnum.SearchHintFrame.name

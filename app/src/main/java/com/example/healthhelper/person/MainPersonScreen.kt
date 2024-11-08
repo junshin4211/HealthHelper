@@ -1,32 +1,25 @@
-package com.example.healthhelper.person
+﻿package com.example.healthhelper.person
 
 import android.Manifest
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.person.personVM.AchievementViewModel
+import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
+import com.example.healthhelper.person.personVM.UserPhotoUploadVM
+import com.example.healthhelper.person.personVM.WeightViewModel
+import com.example.healthhelper.screen.TabViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -36,8 +29,12 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 fun MainPersonScreen(
     navController: NavHostController = rememberNavController(),
+    weightViewModel: WeightViewModel = viewModel(),
+    achievementVM: AchievementViewModel = viewModel(),
+    cloudPhotoUploadVM: CloudPhotoUploadVM = viewModel(),
+    userPhotoUploadVM: UserPhotoUploadVM = viewModel(),
+    tabViewModel: TabViewModel = viewModel()
 ) {
-//    val backStackEntry by navController.currentBackStackEntryAsState()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     NavHost(
@@ -46,7 +43,10 @@ fun MainPersonScreen(
     ) {
         composable(route = PersonScreenEnum.personScreen.name) {
             PersonScreen(
-                navController = navController
+                navController = navController,
+                achievementVM = achievementVM,
+                userPhotoUploadVM = userPhotoUploadVM,
+                tabViewModel = tabViewModel
             )
         }
         composable(route = PersonScreenEnum.cameraPreviewScreen.name) {
@@ -56,27 +56,43 @@ fun MainPersonScreen(
                         imageUri = uri
                         navController.navigate(PersonScreenEnum.photoPreviewScreen.name)
                     },
-                    onCancelClick = {
-                        imageUri = null
-                        navController.popBackStack(PersonScreenEnum.personScreen.name, false)
-                    }
+                    navController = navController,
+                    tabViewModel = tabViewModel
                 )
             })
         }
+        composable(route = PersonScreenEnum.photoPreviewScreen.name) {
+            PhotoPreviewScreen(
+                navController =navController,
+                imageUri = imageUri,
+                onRejectClick = { navController.popBackStack() },
+                userPhotoUploadVM = userPhotoUploadVM,
+                cloudPhotoUploadVM = cloudPhotoUploadVM,
+            )
+        }
         composable(route = PersonScreenEnum.pickPhotoScreen.name) {
-            PickPhotoScreen(navController)
+            PickPhotoScreen(
+                navController,
+                cloudPhotoUploadVM = cloudPhotoUploadVM,
+                userPhotoUploadVM = userPhotoUploadVM
+            )
         }
         composable(route = PersonScreenEnum.weightScreen.name) {
-            WeightScreen(navController)
+            WeightScreen(navController, weightViewModel = weightViewModel)
         }
         composable(route = PersonScreenEnum.weightSettingScreen.name) {
-            WeightSettingScreen(navController)
+            WeightSettingScreen(navController, weightViewModel = weightViewModel)
         }
-        composable(route = PersonScreenEnum.weightReviseScreen.name) {
-            WeightReviseScreen(navController)
+        composable(route = "${PersonScreenEnum.weightReviseScreen.name}/{recordId}") { backStackEntry ->
+            val recordId = backStackEntry.arguments?.getString("recordId")
+            WeightReviseScreen(
+                navController,
+                weightViewModel = weightViewModel,
+                recordId = recordId
+            )
         }
         composable(route = PersonScreenEnum.achivementScreen.name) {
-            AchievementScreen(navController = navController)
+            AchievementScreen(achievementVM = achievementVM, navController = navController)
         }
 
     }
@@ -85,7 +101,7 @@ fun MainPersonScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestCameraPermission(
-    onGrant: @Composable () -> Unit
+    onGrant: @Composable () -> Unit,
 ) {
     val cameraPermissionState = rememberPermissionState(
         Manifest.permission.CAMERA

@@ -13,7 +13,8 @@
     <color name="blue04">#E6EEFF</color>
     <color name="red01">#FE1010</color>
     <color name="darkgray">#9F9BAA</color>
-    <color name="light_green">#00FF7B</color>
+    <color name="light_green">#8AFF80</color>
+    <color name="dark_green">#20A628</color>
     <color name="light_gray">#EFF1F5</color>
     //主題一 橘色
     <color name="backgroundcolor">#FFFEED</color>
@@ -32,15 +33,19 @@
     //dark blue
     <color name = "dark_blue">#3F68A7</color>
     <color name = "heavy_dark_blue">#2A579F</color>
+    <color name="dark_blue_100">#565973</color>
 
     //gray color
     //light gray
     <color name="very_light_gray">#8E8E8E</color>
     <color name="a_little_light_gray">#6B6B6B</color>
+    <color name="gray_600">#FF9397AD</color>
+    <color name="gray_500">#FF84858A</color>
     <color name="gray_400">#B2B5B9</color>
     <color name="gray_300">#B4B7C9</color>
     <color name="gray_200">#F3F3F3</color>
     <color name="gray_100">#EFF2FC</color>
+
 
     //dark gray
     <color name="dark_gray">#505050</color>
@@ -52,4 +57,11 @@
 
     //red color
     <color name="red_100">#F8312A</color>
+
+
+    //white color
+    <color name="white_100">#EBEBEB</color>
+
+    <color name="light_red">#F17355</color>
+
 </resources>

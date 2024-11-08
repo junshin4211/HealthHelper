@@ -86,7 +86,7 @@ dependencies {
     implementation(libs.charty)
     implementation(libs.coil.compose)
 
-//    camera
+    //camera
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.extensions)
     implementation(libs.androidx.camera.core)
@@ -96,6 +96,8 @@ dependencies {
 //    implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
+    implementation(libs.cloudinary.android)
+    implementation( "com.google.guava:guava:31.0.1-android")
 
 
     testImplementation(libs.junit)

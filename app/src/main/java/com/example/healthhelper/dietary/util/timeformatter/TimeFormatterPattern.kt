@@ -1,5 +1,5 @@
 package com.example.healthhelper.dietary.util.timeformatter
 
 object TimeFormatterPattern {
-    val pattern = "hh:mm a"
+    val pattern = "HH:mm:ss"
 }
