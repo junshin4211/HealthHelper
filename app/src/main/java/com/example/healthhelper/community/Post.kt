@@ -3,7 +3,7 @@ package com.example.healthhelper.community
 import java.sql.Timestamp
 
 data class Post(
-    var postId: String = "",
+    var postId: Int = 0,
     var userId : String = "",
     var title: String = "",
     var content: String = "",

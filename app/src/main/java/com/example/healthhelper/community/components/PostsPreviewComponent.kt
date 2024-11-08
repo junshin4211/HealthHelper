@@ -44,7 +44,7 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
             color = colorResource(id = R.color.backgroundcolor),
             shape = RoundedCornerShape(15.dp)
         )
-        .clickable { navController.navigate(CmtScreenEnum.PersonalPostScreen.name) }) {
+        .clickable { navController.navigate("${CmtScreenEnum.PersonalPostScreen.name}/${post.postId}") }) {
 
         Column(
             modifier = Modifier
