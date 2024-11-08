@@ -17,7 +17,7 @@ class FoodDiaryViewModel: ViewModel()  {
     suspend fun sendWebRequest(
         foodDiaryVO: FoodDiaryVO,
     ):Int{
-        val url = DietDiaryUrl.insertDietDiary
+        val url = DietDiaryUrl.insertDietDiaryUrl
         return try {
             val result = httpPost(url, gson.toJson(foodDiaryVO))
             val collectionType = object : TypeToken<Int>() {}.type

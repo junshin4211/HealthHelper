@@ -68,13 +68,14 @@ import com.example.healthhelper.dietary.components.button.DietDiaryDescriptionBu
 import com.example.healthhelper.dietary.components.button.DietDiaryImageButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
+import com.example.healthhelper.dietary.dataclasses.vo.DiaryDescriptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
-import com.example.healthhelper.dietary.repository.DietDiaryDescriptionRepository
+import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
-import com.example.healthhelper.dietary.viewmodel.DietDiaryIconViewModel
+import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
@@ -90,7 +91,7 @@ fun DietDiaryMealFrame(
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     enterStatusViewModel: EnterStatusViewModel = viewModel(),
-    dietDiaryIconViewModel: DietDiaryIconViewModel = viewModel(),
+    diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
@@ -98,16 +99,19 @@ fun DietDiaryMealFrame(
 
     val verticalScrollState = rememberScrollState()
 
+    // load diary description from database and try to set it into repo -- DiaryDescriptionRepository if one can.
+    LoadFoodDescription(context)
+
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
     val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
-    val dietDiaryVO by dietDiaryIconViewModel.data.collectAsState()
+    val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
     val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
 
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-    var descriptionText by remember { mutableStateOf("") }
+    var descriptionText by remember { mutableStateOf(diaryDescriptionVO.description) }
 
     var dietDiaryImageButtonText by remember { mutableStateOf(context.getString(R.string.add_graph)) }
     var dietDiaryDescriptionButtonText by remember { mutableStateOf(context.getString(R.string.add_description)) }
@@ -446,15 +450,35 @@ fun MyOutLinedTextField(
 }
 
 @Composable
+fun LoadFoodDescription(
+    context: Context,
+    diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
+){
+    val currentDiaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
+    LaunchedEffect(Unit) {
+        val currentDiaryId = currentDiaryDescriptionVO.diaryId
+        val targetDiaryDescriptionVO = DiaryDescriptionVO(diaryId = currentDiaryId)
+        val queriedDiaryDescriptionVOs = diaryDescriptionViewModel.fetchDataFromDatabase(targetDiaryDescriptionVO)
+        if(queriedDiaryDescriptionVOs.isEmpty()){ // load data failed as it is empty.
+            Toast.makeText(context,context.getString(R.string.load_diary_description_failed),Toast.LENGTH_LONG).show()
+            return@LaunchedEffect
+        }
+
+        // only set first elem of the array into repo -- DiaryDescriptionRepository.
+        DiaryDescriptionRepository.setData(queriedDiaryDescriptionVOs[0])
+        Toast.makeText(context,context.getString(R.string.load_diary_description_successfully),Toast.LENGTH_LONG).show()
+    }
+}
+@Composable
 fun SaveFoodDescription(
     navController: NavHostController,
     context: Context,
     foodIconUri: Uri?,
     foodDescription: String,
-    diaryDescriptionViewModel: DietDiaryIconViewModel = viewModel(),
+    diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
 ) {
-    DietDiaryDescriptionRepository.setUri(foodIconUri)
-    DietDiaryDescriptionRepository.setDescription(foodDescription)
+    DiaryDescriptionRepository.setUri(foodIconUri)
+    DiaryDescriptionRepository.setDescription(foodDescription)
 
     val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
 
@@ -469,4 +493,6 @@ fun SaveFoodDescription(
         context.getString(R.string.save_food_description_successfully),
         Toast.LENGTH_LONG
     ).show()
+
+    navController.navigateUp()
 }

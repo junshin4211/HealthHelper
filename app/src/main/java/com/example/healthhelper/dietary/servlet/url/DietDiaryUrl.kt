@@ -9,9 +9,12 @@ object DietDiaryUrl {
     val queryByDateUrl : String
         get() = "${serverUrl}/dietDiary/query/byDate"
 
-    val insertDietDiary : String
+    val insertDietDiaryUrl : String
         get() = "${serverUrl}/dietDiary/insert/insertDietDiary"
 
-    val tryToInsertDiaryDescription : String
+    val tryToInsertDiaryDescriptionUrl : String
+        get() = "${serverUrl}/dietDiary/diaryDescription/tryToInsert"
+
+    val selectDiaryDescriptionUrl : String
         get() = "${serverUrl}/dietDiary/diaryDescription/tryToInsert"
 }

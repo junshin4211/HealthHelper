@@ -216,4 +216,6 @@
     <string name="add_graph">新增圖片</string>
     <string name="clear_description_text">清除敘述</string>
     <string name="save_food_description_successfully">有關食物的敘述成儲存成功</string>
+    <string name="load_diary_description_successfully">載入日記相關資訊成功</string>
+    <string name="load_diary_description_failed">載入日記相關資訊失敗</string>
 </resources>
