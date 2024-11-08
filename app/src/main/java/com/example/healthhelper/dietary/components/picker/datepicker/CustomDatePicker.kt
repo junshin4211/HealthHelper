@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.components.picker.datepicker
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,9 +33,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
+import com.example.healthhelper.dietary.repository.DiaryInfoUpdatorRepository
 import com.example.healthhelper.dietary.repository.DiaryRepository
 import com.example.healthhelper.dietary.repository.SelectedDateRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
+import com.example.healthhelper.dietary.viewmodel.DiaryInfoUpdatorViewModel
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
 import java.sql.Date
@@ -48,11 +51,13 @@ import java.time.format.DateTimeFormatter
 fun CustomDatePicker(
     diaryViewModel: DiaryViewModel = viewModel(),
     selectedDateViewModel: SelectedDateViewModel = viewModel(),
+    diaryInfoUpdatorViewModel: DiaryInfoUpdatorViewModel = viewModel(),
 ) {
     val TAG = "tag_CustomDatePicker"
     val context = LocalContext.current
 
     val selectedDateVO by selectedDateViewModel.selectedDate.collectAsState()
+    val diaryInfoUpdatorVO by diaryInfoUpdatorViewModel.data.collectAsState()
 
     val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
@@ -78,10 +83,24 @@ fun CustomDatePicker(
 
     LaunchedEffect(selectedDate) {
         if(selectedDate!=context.getString(R.string.noChoose)){
+
             val date = Date.valueOf(selectedDate)
+
+            // set the date to DiaryInfoUpdatorRepository
+            // so that one can update info of nutrition with given diaryID and date (to `fooddiary` table)
+            DiaryInfoUpdatorRepository.setDate(date)
+
+            // update info of nutrition with given diaryID and date (to `fooddiary` table)
+            val affectedRows = diaryInfoUpdatorViewModel.updateDiaryInfo(diaryInfoUpdatorVO)
+
+            // set the date to SelectedDateRepository
             SelectedDateRepository.setDate(date)
             val diaryVOs = diaryViewModel.fetchDataFromWebRequest(selectedDateVO)
             DiaryRepository.setData(diaryVOs)
+
+            
+            Toast.makeText(context,context.getString(R.string.update_nutrition_info_successfully),
+                Toast.LENGTH_LONG).show()
         }
     }
     Surface(
