@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,12 +67,12 @@ import com.example.healthhelper.dietary.components.button.DietDiaryDescriptionBu
 import com.example.healthhelper.dietary.components.button.DietDiaryImageButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
-import com.example.healthhelper.dietary.dataclasses.vo.DiaryDescriptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
-import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
+import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
+import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
@@ -447,52 +446,4 @@ fun MyOutLinedTextField(
             maxLines = 1,
         )
     }
-}
-
-@Composable
-fun LoadFoodDescription(
-    context: Context,
-    diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
-){
-    val currentDiaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
-    LaunchedEffect(Unit) {
-        val currentDiaryId = currentDiaryDescriptionVO.diaryId
-        val targetDiaryDescriptionVO = DiaryDescriptionVO(diaryId = currentDiaryId)
-        val queriedDiaryDescriptionVOs = diaryDescriptionViewModel.fetchDataFromDatabase(targetDiaryDescriptionVO)
-        if(queriedDiaryDescriptionVOs.isEmpty()){ // load data failed as it is empty.
-            Toast.makeText(context,context.getString(R.string.load_diary_description_failed),Toast.LENGTH_LONG).show()
-            return@LaunchedEffect
-        }
-
-        // only set first elem of the array into repo -- DiaryDescriptionRepository.
-        DiaryDescriptionRepository.setData(queriedDiaryDescriptionVOs[0])
-        Toast.makeText(context,context.getString(R.string.load_diary_description_successfully),Toast.LENGTH_LONG).show()
-    }
-}
-@Composable
-fun SaveFoodDescription(
-    navController: NavHostController,
-    context: Context,
-    foodIconUri: Uri?,
-    foodDescription: String,
-    diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
-) {
-    DiaryDescriptionRepository.setUri(foodIconUri)
-    DiaryDescriptionRepository.setDescription(foodDescription)
-
-    val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
-
-    LaunchedEffect(Unit) {
-        // try to insert diaryDescriptionVO to database. (i.e. when there are no record about given diaryDescriptionVO.diaryId, insert it.
-        // Otherwise, update it by given diaryDescriptionVO.diaryId.
-        val affectedRows = diaryDescriptionViewModel.tryToInsert(diaryDescriptionVO)
-    }
-
-    Toast.makeText(
-        context,
-        context.getString(R.string.save_food_description_successfully),
-        Toast.LENGTH_LONG
-    ).show()
-
-    navController.navigateUp()
 }
