@@ -6,10 +6,10 @@ import java.sql.Time
 
 data class FoodDiaryVO(
     @SerializedName("diaryID")
-    var diaryID: Int = -1,
+    var diaryID: Int = 2,
 
     @SerializedName("userID")
-    var userID: Int = -1,
+    var userID: Int = 2,
 
     @SerializedName("createDate")
     var createDate: Date = Date(0),

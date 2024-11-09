@@ -1,26 +1,27 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
+import androidx.compose.runtime.MutableState
 import com.google.gson.annotations.SerializedName
 
 data class NutritionInfoVO(
     @SerializedName("fat")
-    val fat:NutritionInfoPairVO,
+    val fat:MutableState<NutritionInfoPairVO>,
 
     @SerializedName("carbon")
-    val carbon:NutritionInfoPairVO,
+    val carbon:MutableState<NutritionInfoPairVO>,
 
     @SerializedName("protein")
-    val protein:NutritionInfoPairVO,
+    val protein:MutableState<NutritionInfoPairVO>,
 
     @SerializedName("fiber")
-    val fiber:NutritionInfoPairVO,
+    val fiber:MutableState<NutritionInfoPairVO>,
 
     @SerializedName("sugar")
-    val sugar:NutritionInfoPairVO,
+    val sugar:MutableState<NutritionInfoPairVO>,
 
     @SerializedName("sodium")
-    val sodium:NutritionInfoPairVO,
+    val sodium:MutableState<NutritionInfoPairVO>,
 
     @SerializedName("calories")
-    val calories:NutritionInfoPairVO,
+    val calories:MutableState<NutritionInfoPairVO>,
 )

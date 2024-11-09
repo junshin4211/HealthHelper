@@ -22,7 +22,7 @@ class DiaryInfoUpdatorViewModel: ViewModel() {
             val gson = GsonForSqlDateAndSqlTime.gson
             val dataOut = gson.toJson(diaryInfoUpdatorVO)
             val result = httpPost(url, dataOut)
-            val collectionType = object : TypeToken<DiaryInfoUpdatorVO>() {}.type
+            val collectionType = object : TypeToken<Int>() {}.type
             gson.fromJson(result, collectionType) ?: -1
         } catch (e: Exception) {
             Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)

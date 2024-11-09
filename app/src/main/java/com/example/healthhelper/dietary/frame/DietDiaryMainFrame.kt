@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +46,8 @@ import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
+import com.example.healthhelper.dietary.repository.NutritionInfoRepository
+import com.example.healthhelper.dietary.viewmodel.FoodDiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
@@ -55,6 +58,7 @@ fun DietDiaryMainFrame(
     navController: NavHostController,
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
+    foodDiaryViewModel: FoodDiaryViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMainFrame"
 
@@ -63,12 +67,18 @@ fun DietDiaryMainFrame(
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
     val selectedMealsOption by mealsOptionViewModel.selectedData.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
+    val foodDiaryVO by foodDiaryViewModel.data.collectAsState()
 
     var currentMealOption by remember { mutableStateOf(mealsOptions[0]) }
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
     val verticalScrollState2 = rememberScrollState()
+
+    LaunchedEffect(foodDiaryVO) {
+        Log.e(TAG,"LaunchedEffect(foodDiaryVO) blocked was called,foodDiaryVO:${foodDiaryVO}")
+        NutritionInfoRepository.setNutritionInfo(foodDiaryVO)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

@@ -1,7 +1,10 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
+import androidx.annotation.StringRes
+import androidx.compose.runtime.MutableState
+
 data class NutritionInfoPairVO(
-    val name:String,
-    val value:Double,
-    val unit:String,
+    @StringRes val nameResId:Int,
+    var amount:MutableState<Double>,
+    @StringRes val unitResId:Int,
 )

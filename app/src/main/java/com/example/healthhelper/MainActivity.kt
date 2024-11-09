@@ -16,7 +16,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             HealthHelperTheme {
                 Initialize()
+                EmulateInitialize()
                 Main()
+                //LoginMain()
             }
         }
     }

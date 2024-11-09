@@ -219,4 +219,8 @@
     <string name="load_diary_description_successfully">載入日記相關資訊成功</string>
     <string name="load_diary_description_failed">載入日記相關資訊失敗</string>
     <string name="update_nutrition_info_successfully">更新有關營養資訊成功</string>
+    <string name="kilo_cals">千大卡</string>
+    <string name="milli_grams">毫克</string>
+    <string name="fetch_nutrition_info_successfully">獲取有關營養資訊成功</string>
+    <string name="fetch_nutrition_info_failed">獲取有關營養資訊失敗</string>
 </resources>

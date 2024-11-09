@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.components.picker.datepicker
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,12 +34,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
-import com.example.healthhelper.dietary.repository.DiaryInfoUpdatorRepository
-import com.example.healthhelper.dietary.repository.DiaryRepository
-import com.example.healthhelper.dietary.repository.SelectedDateRepository
+import com.example.healthhelper.dietary.repository.FoodDiaryRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
 import com.example.healthhelper.dietary.viewmodel.DiaryInfoUpdatorViewModel
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodDiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
 import java.sql.Date
 import java.time.Instant
@@ -50,6 +50,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 fun CustomDatePicker(
     diaryViewModel: DiaryViewModel = viewModel(),
+    foodDiaryViewModel: FoodDiaryViewModel = viewModel(),
     selectedDateViewModel: SelectedDateViewModel = viewModel(),
     diaryInfoUpdatorViewModel: DiaryInfoUpdatorViewModel = viewModel(),
 ) {
@@ -57,6 +58,7 @@ fun CustomDatePicker(
     val context = LocalContext.current
 
     val selectedDateVO by selectedDateViewModel.selectedDate.collectAsState()
+    val foodDiaryVO by foodDiaryViewModel.data.collectAsState()
     val diaryInfoUpdatorVO by diaryInfoUpdatorViewModel.data.collectAsState()
 
     val today = LocalDate.now()
@@ -83,23 +85,24 @@ fun CustomDatePicker(
 
     LaunchedEffect(selectedDate) {
         if(selectedDate!=context.getString(R.string.noChoose)){
-
+            Log.e(TAG,"LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
             val date = Date.valueOf(selectedDate)
 
-            // set the date to DiaryInfoUpdatorRepository
-            // so that one can update info of nutrition with given diaryID and date (to `fooddiary` table)
-            DiaryInfoUpdatorRepository.setDate(date)
+            FoodDiaryRepository.setCreateDate(date)
 
-            // update info of nutrition with given diaryID and date (to `fooddiary` table)
-            val affectedRows = diaryInfoUpdatorViewModel.updateDiaryInfo(diaryInfoUpdatorVO)
+            val queriedFoodDiaryVOs = foodDiaryViewModel.selectByUserIdAndCreateDate(foodDiaryVO)
 
-            // set the date to SelectedDateRepository
-            SelectedDateRepository.setDate(date)
-            val diaryVOs = diaryViewModel.getDiaryIdByUserIdAndDate(selectedDateVO)
-            DiaryRepository.setData(diaryVOs)
+            if(queriedFoodDiaryVOs.isEmpty()) {
+                Toast.makeText(
+                    context, context.getString(R.string.fetch_nutrition_info_failed),
+                    Toast.LENGTH_LONG
+                ).show()
+                return@LaunchedEffect
+            }
 
-            
-            Toast.makeText(context,context.getString(R.string.update_nutrition_info_successfully),
+            FoodDiaryRepository.setData(queriedFoodDiaryVOs[0])
+
+            Toast.makeText(context,context.getString(R.string.fetch_nutrition_info_successfully),
                 Toast.LENGTH_LONG).show()
         }
     }
