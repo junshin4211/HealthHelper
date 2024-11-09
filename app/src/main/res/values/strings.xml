@@ -188,4 +188,8 @@
     <string name="averagecalorie">平均卡路里</string>
     <string name="over">超過</string>
     <string name="under">剩餘</string>
+    <string name="nutritionstitle">營養成分</string>
+    <string name="fiber">纖維</string>
+    <string name="sugar">糖</string>
+    <string name="sodium">鈉</string>
 </resources>

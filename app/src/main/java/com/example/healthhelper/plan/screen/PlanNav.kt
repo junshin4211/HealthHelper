@@ -92,7 +92,8 @@ fun Plan(
                 PlanMain(
                     navcontroller = navController,
                     tabVM = tabViewModel,
-                    planVM = planVM
+                    planVM = planVM,
+                    checkPlanVM = checkPlanVM
                 )
             }
             composable(route = PlanPage.HighProtein.name) {

@@ -3,9 +3,9 @@ package com.example.healthhelper.plan.model
 import java.util.Date
 
 data class DiaryNutritionModel(
-    val diaryID: Int = -1,
-    val userID: Int = -1,
-    val createdate: Date = Date(0),
+    val diaryId: Int = -1,
+    val userId: Int = -1,
+    val createDate: Date = Date(0),
     val totalFat: Float = 0.0f,
     val totalCarbon: Float = 0.0f,
     val totalFiber: Float = 0.0f,
@@ -15,11 +15,11 @@ data class DiaryNutritionModel(
     val totalCalories: Float = 0.0f
 ) {
     override fun equals(other: Any?): Boolean {
-        return this.diaryID == (other as DiaryNutritionModel).diaryID
+        return this.diaryId == (other as DiaryNutritionModel).diaryId
     }
 
     override fun hashCode(): Int {
-        return diaryID.hashCode()
+        return diaryId.hashCode()
     }
 
 }

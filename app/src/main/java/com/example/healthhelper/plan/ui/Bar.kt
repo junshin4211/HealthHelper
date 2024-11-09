@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,7 +34,7 @@ fun CreateAnimationBar(
     offset: Dp = 0.dp
 ) {
     // 使用 remember 來儲存動畫進度的狀態
-    var animatedValue by remember { mutableStateOf(0f) }
+    var animatedValue by remember { mutableFloatStateOf(0f) }
 
     // 使用 LaunchedEffect 在組件首次啟動時觸發動畫
     LaunchedEffect(currentvalue) {

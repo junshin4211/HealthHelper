@@ -60,3 +60,16 @@ enum class DateRange(@StringRes val title: Int){
 
 }
 
+enum class NutritionType(@StringRes val title: Int){
+    Carb(title = R.string.carb),
+    Protein(title = R.string.protein),
+    Fat(title = R.string.fat),
+    Fiber(title = R.string.fiber),
+    Sugar(title = R.string.sugar),
+    Sodium(title = R.string.sodium);
+
+    fun getNutritionTitle(context: Context):String{
+        return context.getString(title)
+    }
+}
+
