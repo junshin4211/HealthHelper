@@ -119,10 +119,7 @@ fun DietDiaryMealFrame(
     var dietDiaryImageButtonIsClicked by remember { mutableStateOf(false) }
     var dietDiaryDescriptionButtonIsClicked by remember { mutableStateOf(false) }
     var saveFoodDescriptionButtonIsClicked by remember { mutableStateOf(false) }
-
-    var isDeletePhotoEventTriggeredMeetPrerequisites by remember { mutableStateOf(false) }
-    var isDeletePhotoEventTriggered by remember { mutableStateOf(false) }
-
+    
     var isCleanEventTriggeredMeetPrerequisites by remember { mutableStateOf(false) }
     var isCleanEventTriggered by remember { mutableStateOf(false) }
 
