@@ -1,6 +1,7 @@
 package com.example.healthhelper.dietary.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import com.example.healthhelper.dietary.dataclasses.vo.FoodVO
 import com.example.healthhelper.dietary.gson.gson
 import com.example.healthhelper.dietary.repository.FoodRepository
@@ -9,7 +10,7 @@ import com.example.healthhelper.web.httpPost
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.StateFlow
 
-class FoodViewModel {
+class FoodViewModel : ViewModel() {
     private val repository = FoodRepository
     val data: StateFlow<FoodVO>
         get() = repository.dataFlow

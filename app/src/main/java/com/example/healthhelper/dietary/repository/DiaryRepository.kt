@@ -13,12 +13,4 @@ object DiaryRepository {
         _dataFlow.value.clear()
         _dataFlow.value.addAll(newData)
     }
-
-    fun addData(newData: List<DiaryVO>){
-        _dataFlow.value.addAll(newData)
-    }
-
-    fun removeAt(index:Int){
-        _dataFlow.value.removeAt(index)
-    }
 }

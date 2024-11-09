@@ -4,14 +4,14 @@ import com.google.gson.annotations.SerializedName
 
 data class FoodItemVO(
     @SerializedName("diaryID")
-    val diaryId:Int,
+    var diaryID:Int,
 
     @SerializedName("foodID")
-    val foodId: Int,
+    var foodID: Int,
 
     @SerializedName("mealCategoryID")
-    val mealCategoryId: Int? = null,
+    var mealCategoryID: Int = 0,
 
     @SerializedName("grams")
-    val grams: Double,
+    var grams: Double,
 )

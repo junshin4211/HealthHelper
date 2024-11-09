@@ -29,4 +29,20 @@ class DiaryInfoUpdatorViewModel: ViewModel() {
             -1
         }
     }
+
+    suspend fun selectDiaryInfoByUserId(
+        diaryInfoUpdatorVO: DiaryInfoUpdatorVO,
+    ):List<DiaryInfoUpdatorVO>{
+        val url = DietDiaryUrl.queryByDateUrl
+        return try {
+            val gson = GsonForSqlDateAndSqlTime.gson
+            val dataOut = gson.toJson(diaryInfoUpdatorVO)
+            val result = httpPost(url, dataOut)
+            val collectionType = object : TypeToken<DiaryInfoUpdatorVO>() {}.type
+            gson.fromJson(result, collectionType) ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
+            emptyList()
+        }
+    }
 }

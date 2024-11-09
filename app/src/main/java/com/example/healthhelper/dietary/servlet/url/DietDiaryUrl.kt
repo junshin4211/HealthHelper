@@ -33,4 +33,7 @@ object DietDiaryUrl {
 
     val selectByUserIdAndCreateDateUrl:String
         get() = "${serverUrl}/dietDiary/query/byDate"
+
+    val selectFoodItemByDiaryIdAndMealCategoryIdUrl: String
+        get() = "${serverUrl}/dietDiary/foodItem/selectFoodItemByDiaryIdAndMealCategoryId"
 }

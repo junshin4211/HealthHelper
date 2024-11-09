@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.repository.FoodDiaryRepository
+import com.example.healthhelper.dietary.repository.SelectedDateRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
 import com.example.healthhelper.dietary.viewmodel.DiaryInfoUpdatorViewModel
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -86,13 +87,40 @@ fun CustomDatePicker(
     LaunchedEffect(selectedDate) {
         if(selectedDate!=context.getString(R.string.noChoose)){
             Log.e(TAG,"LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
+
+            // get date by formatting the given String.
             val date = Date.valueOf(selectedDate)
 
-            FoodDiaryRepository.setCreateDate(date)
+            // set data of repo so that its corresponding view model can access it.
+            SelectedDateRepository.setDate(date)
+
+            // set data of repo so that its corresponding view model can access it.
+            FoodDiaryRepository.setCreateDate(selectedDateVO.selectedDate.value)
+
+            val queriedDiaryInfoUpdatorVO = diaryInfoUpdatorViewModel.selectDiaryInfoByUserId(diaryInfoUpdatorVO)
+            if(queriedDiaryInfoUpdatorVO.isEmpty()){ // fetch data failed.
+                Toast.makeText(
+                    context, context.getString(R.string.fetch_diary_id_failed),
+                    Toast.LENGTH_LONG
+                ).show()
+                return@LaunchedEffect
+            }
+
+            // fetch data successfully.
+            Toast.makeText(
+                context, context.getString(R.string.fetch_diary_id_successfully),
+                Toast.LENGTH_LONG
+            ).show()
+
+            // get id of diary by user id and create date of id of diaries.
+            val queriedDiaryId = queriedDiaryInfoUpdatorVO[0].diaryID
+
+            // only set first elem of list to repo -- FoodDiaryRepository.
+            FoodDiaryRepository.setDiaryId(queriedDiaryId)
 
             val queriedFoodDiaryVOs = foodDiaryViewModel.selectByUserIdAndCreateDate(foodDiaryVO)
 
-            if(queriedFoodDiaryVOs.isEmpty()) {
+            if(queriedFoodDiaryVOs.isEmpty()) { // fetch data failed.
                 Toast.makeText(
                     context, context.getString(R.string.fetch_nutrition_info_failed),
                     Toast.LENGTH_LONG
@@ -100,6 +128,8 @@ fun CustomDatePicker(
                 return@LaunchedEffect
             }
 
+            // fetch data successfully.
+            // only set first elem of list to repo -- FoodDiaryRepository.
             FoodDiaryRepository.setData(queriedFoodDiaryVOs[0])
 
             Toast.makeText(context,context.getString(R.string.fetch_nutrition_info_successfully),

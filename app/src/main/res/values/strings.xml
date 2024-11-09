@@ -223,4 +223,8 @@
     <string name="milli_grams">毫克</string>
     <string name="fetch_nutrition_info_successfully">獲取有關營養資訊成功</string>
     <string name="fetch_nutrition_info_failed">獲取有關營養資訊失敗</string>
+    <string name="load_food_item_successfully">載入食物項目成功</string>
+    <string name="load_food_item_failed">載入食物項目失敗</string>
+    <string name="fetch_diary_id_failed">存取日記編號失敗</string>
+    <string name="fetch_diary_id_successfully">存取日記編號成功</string>
 </resources>

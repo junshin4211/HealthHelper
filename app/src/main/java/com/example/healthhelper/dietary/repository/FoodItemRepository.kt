@@ -9,11 +9,31 @@ import kotlinx.coroutines.flow.update
 object FoodItemRepository {
     val TAG = "tag_MealsOptionRepository"
 
-    private val _dataFlow: MutableStateFlow<FoodItemVO> = MutableStateFlow(FoodItemVO(1,1,grams = 1.0))
-    val dataFlow: StateFlow<FoodItemVO>
-        get() = _dataFlow.asStateFlow()
+    private val _datasFlow: MutableStateFlow<MutableList<FoodItemVO>> = MutableStateFlow(mutableListOf())
+    val datasFlow: StateFlow<List<FoodItemVO>>
+        get() = _datasFlow.asStateFlow()
 
-    fun setData(newData:FoodItemVO){
-        _dataFlow.update { newData }
+    private val _selectedDataFlow: MutableStateFlow<FoodItemVO> = MutableStateFlow(FoodItemVO(2,2, grams = 2.0))
+    val selectedDataFlow: StateFlow<FoodItemVO>
+        get() = _selectedDataFlow.asStateFlow()
+
+    fun setDatas(newDatas:List<FoodItemVO>){
+        _datasFlow.update { newDatas.toMutableList() }
+    }
+
+    fun setSelectedDiaryId(diaryId:Int){
+        _selectedDataFlow.value.diaryID = diaryId
+    }
+
+    fun setSelectedFoodId(foodId:Int){
+        _selectedDataFlow.value.foodID = foodId
+    }
+
+    fun setSelectedMealCategoryId(mealCategoryId:Int){
+        _selectedDataFlow.value.mealCategoryID = mealCategoryId
+    }
+
+    fun setSelectedGrams(grams:Double){
+        _selectedDataFlow.value.grams = grams
     }
 }

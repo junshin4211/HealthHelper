@@ -72,8 +72,10 @@ import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
+import com.example.healthhelper.dietary.interaction.database.LoadFoodItem
 import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
 import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
+import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
@@ -123,11 +125,18 @@ fun DietDiaryMealFrame(
 
     var shouldShowDescription by remember { mutableStateOf(false) }
 
+    // get id of meal category that indicates the meal.
     val currentMealCategoryId = getMealCategoryId(context)
-    DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
 
+    // set the data in repo so that its corresponding view model can access it.
+    DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
     // load diary description from database and try to set it into repo -- DiaryDescriptionRepository if one can.
     LoadFoodDescription(context)
+
+    // set the data in repo so that its corresponding view model can access it.
+    FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
+    // load food items about this diaryId from database and try to set it into repo -- FoodItemRepository if one can.
+    LoadFoodItem(context)
 
     availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
         foodItems.filter {
