@@ -55,12 +55,13 @@ import com.example.healthhelper.community.components.CmtNavbarComponent
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import kotlinx.coroutines.launch
 
+@JvmOverloads
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PersonalPostScreen(
     navController: NavHostController,
     commentVM: CommentVM,
-//                       postVM: PostVM,
+    postVM: PostVM,
     postId: String?,
 ) {
 //    val comments = fetchComments()
@@ -82,6 +83,7 @@ fun PersonalPostScreen(
         }
     )
 
+
     LaunchedEffect(postId) {
         postId?.toInt()?.let {
             comments = commentVM.filterComment(it)
@@ -96,7 +98,7 @@ fun PersonalPostScreen(
         ) {
             // Navbar 元件
             item {
-//                CmtNavbarComponent(navController = navController, postVM = postVM)
+                CmtNavbarComponent(navController = navController, postVM = postVM)
             }
 
             // Profile row
@@ -385,11 +387,11 @@ fun PersonalPostScreen(
 //}
 
 
-@Preview(showBackground = true)
-@Composable
-fun PersonalPostScreenPreview() {
-    HealthHelperTheme {
-        val commentVM: CommentVM = viewModel()
-        PersonalPostScreen(rememberNavController(), commentVM = commentVM, postId = "2")
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PersonalPostScreenPreview() {
+//    HealthHelperTheme {
+//        val commentVM: CommentVM = viewModel()
+//        PersonalPostScreen(rememberNavController(), commentVM = commentVM, postId = "2")
+//    }
+//}

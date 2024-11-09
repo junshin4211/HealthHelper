@@ -73,8 +73,7 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            //username資料未引入
-                            text ="userName",
+                            text =post.userName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.black_200)
@@ -98,23 +97,6 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                         )
                     }
                 }
-//                Column(
-//                    modifier = Modifier.padding(8.dp)
-//                ) {
-//                    Spacer(modifier = Modifier.height(10.dp))
-//                    val imagePainter = runCatching { painterResource(id = post.picture) }
-//                        .getOrElse { painterResource(id = R.drawable.postpic) }
-//                    Image(
-//                            painter = imagePainter,
-//                        contentDescription = "貼文圖片",
-//                        modifier = Modifier
-//                            .width(189.dp)
-//                            .height(107.dp)
-//                            .background(colorResource(id = R.color.backgroundcolor))
-//                    )
-//                }
-
-
                 Column(
                     modifier = Modifier.padding(8.dp)
                 ) {
