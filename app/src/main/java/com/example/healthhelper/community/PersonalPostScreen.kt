@@ -96,7 +96,7 @@ fun PersonalPostScreen(
         ) {
             // Navbar 元件
             item {
-                CmtNavbarComponent(navController = navController)
+//                CmtNavbarComponent(navController = navController, postVM = postVM)
             }
 
             // Profile row

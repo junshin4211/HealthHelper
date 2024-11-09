@@ -23,6 +23,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -44,7 +45,8 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
             color = colorResource(id = R.color.backgroundcolor),
             shape = RoundedCornerShape(15.dp)
         )
-        .clickable { navController.navigate(CmtScreenEnum.PersonalPostScreen.name) }) {
+        .clickable { navController.navigate("${CmtScreenEnum.PersonalPostScreen.name}/${post.postId}") }
+    ) {
 
         Column(
             modifier = Modifier
@@ -75,25 +77,25 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
                             text = stringResource(id = R.string.userName),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = colorResource(R.color.black_200)
+                            color = colorResource(R.color.black_200),
                         )
-                        IconButton(
-                            onClick = {
-                                navController.navigate(CmtScreenEnum.EditPostScreen.name)
-                            },
-                            modifier = Modifier,
-
-                            ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.my_posts_edit),
-                                contentDescription = "Create Post",
-                                modifier = Modifier
-                                    .padding(1.dp)
-                                    .width(16.22415.dp)
-                                    .height(16.22415.dp),
-                                colorResource(id = R.color.primarycolor)
-                            )
-                        }
+//                        IconButton(
+//                            onClick = {
+//                                navController.navigate(CmtScreenEnum.EditPostScreen.name)
+//                            },
+//                            modifier = Modifier,
+//
+//                            ) {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.my_posts_edit),
+//                                contentDescription = "Create Post",
+//                                modifier = Modifier
+//                                    .padding(1.dp)
+//                                    .width(16.22415.dp)
+//                                    .height(16.22415.dp),
+//                                colorResource(id = R.color.primarycolor)
+//                            )
+//                        }
                     }
                     Column(
                     ) {
@@ -109,6 +111,8 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
                             color = colorResource(id = R.color.dark_blue_100),
                             fontWeight = FontWeight.Bold,
                             lineHeight = 10.sp,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
