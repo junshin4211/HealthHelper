@@ -3,6 +3,7 @@ package com.example.healthhelper
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -20,7 +21,11 @@ class MainActivity : ComponentActivity() {
                 LoginMain()
             }
         }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {}
+        })
     }
+
 }
 
 
