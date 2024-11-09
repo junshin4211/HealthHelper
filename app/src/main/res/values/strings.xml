@@ -227,4 +227,6 @@
     <string name="load_food_item_failed">載入食物項目失敗</string>
     <string name="fetch_diary_id_failed">存取日記編號失敗</string>
     <string name="fetch_diary_id_successfully">存取日記編號成功</string>
+    <string name="save_food_item_failed">儲存食物項目失敗</string>
+    <string name="save_food_item_successfully">儲存食物項目成功</string>
 </resources>

@@ -39,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -74,11 +75,13 @@ import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
 import com.example.healthhelper.dietary.interaction.database.LoadFoodItem
 import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
+import com.example.healthhelper.dietary.interaction.database.SaveFoodItem
 import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
@@ -94,6 +97,7 @@ fun DietDiaryMealFrame(
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     enterStatusViewModel: EnterStatusViewModel = viewModel(),
     diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
@@ -151,6 +155,13 @@ fun DietDiaryMealFrame(
                 stringResource(selectedMealOption.nameResId),
             )
         }
+    }
+
+    DisposableEffect(Unit) {
+        SaveFoodItem(
+            context = context,
+            foodItemViewModel = foodItemViewModel,
+        )
     }
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
