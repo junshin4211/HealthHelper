@@ -54,13 +54,13 @@ fun SignUpScreen(
     }
 
     val textFieldColors = TextFieldDefaults.colors(
-      //  errorContainerColor = Color(0xFFFFCDD2),
+      //errorContainerColor = Color(0xFFFFCDD2),
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
         focusedContainerColor = Color.White,
         focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
-       // unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
+       //unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
 
     Box(
@@ -405,7 +405,7 @@ fun SignUpScreen(
                 // 取消按鈕
                 Button(
                     onClick = {
-                        navController.navigate("Main") {
+                        navController.navigate("LoginScreen") {
                          //   popUpTo("LoginScreen") { inclusive = true }
                         }
                     },
@@ -431,7 +431,7 @@ fun SignUpScreen(
                             context = context,
                             onSuccess = {
                                 Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
-                                navController.navigate("Main")
+                                navController.navigate("LoginScreen")
                             },
                             onError = { errorMessage ->
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
