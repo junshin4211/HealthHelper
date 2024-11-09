@@ -4,12 +4,14 @@ import java.sql.Timestamp
 
 data class Post(
     var postId: Int = 0,
-    var userId : String = "",
+    var userId : Int = 0,
     var title: String = "",
     var content: String = "",
-    var likesAmount: Int = 0,
-    var img: Int = 0,
+    var likepost: Int = 0,
+    var picture: String? = null,
     var postDate: String = "",
+    var userName: String = "",
+    var photoUrl: String = ""
 ) {
     override fun equals(other: Any?): Boolean {
         return this.postId == (other as? Post)?.postId
