@@ -3,6 +3,7 @@ package com.example.healthhelper.dietary.frame
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Checkbox
@@ -32,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +51,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -60,7 +64,9 @@ import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
+import com.example.healthhelper.dietary.repository.DietDiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
+import com.example.healthhelper.dietary.viewmodel.DietDiaryIconViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
@@ -75,6 +81,7 @@ fun DietDiaryMealFrame(
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     enterStatusViewModel: EnterStatusViewModel = viewModel(),
+    dietDiaryIconViewModel: DietDiaryIconViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
@@ -83,46 +90,56 @@ fun DietDiaryMealFrame(
 
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
-
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
     val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
-
-
-    Log.e(TAG, "-".repeat(50))
-
-    Log.e(TAG, "foodItems:${foodItems}")
-
+    val dietDiaryVO by dietDiaryIconViewModel.data.collectAsState()
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-    val selectedFoodItems = remember { mutableStateOf(foodItems) }
-
-    var deleteButtonIsClicked by remember { mutableStateOf(false) }
-    var addIconButtonIsClicked by remember { mutableStateOf(false) }
-    var downloadButtonIsClicked by remember { mutableStateOf(false) }
+    var saveGraphTextButtonHasClicked by remember { mutableStateOf(false) }
     var saveGraphTextButtonIsClicked by remember { mutableStateOf(false) }
+    var deletingGraphState by remember { mutableStateOf(false) }
     var saveTextRecordTextButtonIsClicked by remember { mutableStateOf(false) }
-
+    var saveTextRecordTextButtonHasClicked by remember { mutableStateOf(false) }
+    var deletingTextFieldState by remember { mutableStateOf(false) }
     var iconButtonIsClickable by remember { mutableStateOf(false) }
+
+    var saveGraphButtonText by remember { mutableStateOf(context.getString(R.string.save_graph)) }
+    var saveDescriptionButtonText by remember { mutableStateOf(context.getString(R.string.text_record)) }
+
+    var description by remember { mutableStateOf("") }
+    var oldDescription by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        description = dietDiaryVO.description.value
+        oldDescription = dietDiaryVO.description.value
+    }
 
     val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
 
-    if (enterStatusVO.isFirstEnter.value) {
-        availableFoodItems = foodItems.filter {
+    availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
+        foodItems.filter {
             it.meal.value in listOf(
                 stringResource(selectedMealOption.nameResId),
                 stringResource(MealCategoryEnum.EMPTY_STRING.title)
             )
         }
     } else {
-        availableFoodItems = foodItems.filter {
+        foodItems.filter {
             it.meal.value in listOf(
                 stringResource(selectedMealOption.nameResId),
             )
         }
     }
 
+    LaunchedEffect(Unit) {
+        saveGraphTextButtonHasClicked = false
+        deletingGraphState = false
+        deletingTextFieldState = false
+    }
+
     Log.e(TAG, "At startup,selectedMealOption:${selectedMealOption}")
     Log.e(TAG, "At startup,availableFoodItems:${availableFoodItems}")
+
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
             navController = navController,
@@ -256,16 +273,22 @@ fun DietDiaryMealFrame(
                                 verticalArrangement = Arrangement.Top,
                             ) {
                                 SaveGraphAndTextRecordButton(
-                                    outerButtonModifier = Modifier.size(250.dp, 40.dp),
+                                    outerButtonModifier = Modifier.size(400.dp, 40.dp),
                                     saveGraph = {
-                                        saveGraphTextButtonIsClicked = true
-                                        saveTextRecordTextButtonIsClicked = false
+                                        saveGraphTextButtonIsClicked = !saveGraphTextButtonIsClicked
+                                        saveGraphTextButtonHasClicked = true
+                                        saveTextRecordTextButtonHasClicked = true
                                     },
+                                    leftTextButtonTextFontSize = 20.sp,
+                                    leftTextButtonText = saveGraphButtonText,
                                     saveTextRecord = {
-                                        saveTextRecordTextButtonIsClicked = true
-                                        saveGraphTextButtonIsClicked = false
+                                        saveTextRecordTextButtonIsClicked = !saveTextRecordTextButtonIsClicked
+                                        saveTextRecordTextButtonHasClicked = true
+                                        saveGraphTextButtonHasClicked = true
                                     },
-                                )
+                                    rightTextButtonTextFontSize = 20.sp,
+                                    rightTextButtonText = saveDescriptionButtonText,
+                                    )
                                 if (saveGraphTextButtonIsClicked || saveTextRecordTextButtonIsClicked) {
                                     Box(
                                         modifier = Modifier
@@ -273,7 +296,7 @@ fun DietDiaryMealFrame(
                                             .padding(16.dp)
                                     ) {
                                         Image(
-                                            painterResource(R.drawable.postpic),
+                                            painterResource(dietDiaryVO.iconResId),
                                             contentDescription = "",
                                             modifier = Modifier.fillMaxSize(),
                                             contentScale = ContentScale.FillBounds,
@@ -288,9 +311,14 @@ fun DietDiaryMealFrame(
                                                 Color.Black,
                                             ),
                                     ) {
-                                        Text(
-                                            modifier = Modifier.padding(16.dp),
-                                            text = "Hello World!!!"
+                                        TextField(
+                                            value = description,
+                                            onValueChange = {
+                                                if(it != "") {
+                                                    description = it
+                                                }
+                                            },
+                                            modifier = Modifier.fillMaxSize(),
                                         )
                                     }
                                 }
@@ -302,6 +330,7 @@ fun DietDiaryMealFrame(
                                         Text(
                                             text = "${stringResource(R.string.total_title)}:",
                                             fontWeight = FontWeight.Bold,
+                                            fontSize = 24.sp,
                                         )
                                     }
                                 )
@@ -322,6 +351,64 @@ fun DietDiaryMealFrame(
         )
         iconButtonIsClickable = false
     }
+
+    LaunchedEffect(deletingGraphState) {
+        saveGraphButtonText = if (!deletingGraphState) context.getString(R.string.save_graph) else context.getString(R.string.delete_graph)
+
+        // TODO
+        if(!deletingGraphState){
+            // TODO Delete
+            DietDiaryDescriptionRepository.setIconResId(R.drawable.meal_icon)
+            Toast.makeText(context,"Delete the graph successfully.",Toast.LENGTH_LONG).show()
+        }else{
+            DietDiaryDescriptionRepository.setIconResId(R.drawable.postpic)
+            Toast.makeText(context,"Save the graph successfully.",Toast.LENGTH_LONG).show()
+        }
+    }
+
+    LaunchedEffect(deletingTextFieldState) {
+        saveDescriptionButtonText = if(!deletingTextFieldState) context.getString(R.string.text_record) else context.getString(R.string.save_text_record)
+
+        // TODO
+        if(!deletingTextFieldState){
+            // TODO Clear
+            // DietDiaryDescriptionRepository.setDescription("")
+            Toast.makeText(context,"Clear the description in OutlinedTextField successfully.",Toast.LENGTH_LONG).show()
+        }else{
+            DietDiaryDescriptionRepository.setDescription(description)
+            Toast.makeText(context,"Save the description in OutlinedTextField successfully.",Toast.LENGTH_LONG).show()
+        }
+    }
+
+    LaunchedEffect(saveGraphTextButtonIsClicked) {
+        if (saveGraphTextButtonHasClicked && saveGraphTextButtonIsClicked) {
+            deletingGraphState = !deletingGraphState
+        }
+    }
+
+    LaunchedEffect(saveTextRecordTextButtonIsClicked) {
+        if (saveTextRecordTextButtonHasClicked && saveTextRecordTextButtonIsClicked) {
+            deletingTextFieldState = !deletingTextFieldState
+        }
+    }
+
+    // test
+    LaunchedEffect(saveGraphTextButtonIsClicked) {
+        Log.e(TAG,"test. saveGraphTextButtonIsClicked is changed to ${saveGraphTextButtonIsClicked}")
+    }
+
+    LaunchedEffect(saveTextRecordTextButtonIsClicked) {
+        Log.e(TAG,"test. saveTextRecordTextButtonIsClicked is changed to ${saveTextRecordTextButtonIsClicked}")
+    }
+
+    LaunchedEffect(deletingGraphState) {
+        Log.e(TAG,"test. deletingGraphState is changed to ${deletingGraphState}")
+    }
+
+    LaunchedEffect(deletingTextFieldState) {
+        Log.e(TAG,"test. deletingGraphState is changed to ${deletingTextFieldState}")
+    }
+    // end test
 }
 
 @Composable
@@ -336,6 +423,9 @@ fun MyCheckBox(
         onCheckedChange = {
             isChecked = !isChecked
             SelectedFoodItemsRepository.setCheckingWhenSelectionState(foodItem, it)
-            SelectedFoodItemsRepository.setMealValue(foodItem,context.getString(mealsOptionVO.nameResId))
+            SelectedFoodItemsRepository.setMealValue(
+                foodItem,
+                context.getString(mealsOptionVO.nameResId)
+            )
         })
 }

@@ -1,8 +1,6 @@
 package com.example.healthhelper.signuplogin
 
 import android.util.Log
-
-
 object UserManager {
     private var _currentUser: User? = null
 
@@ -18,6 +16,7 @@ object UserManager {
             Gender: ${user.gender}
             Birthday: ${user.birthday}
             RoleID: ${user.roleID}
+            photoUrl:${user.photoUrl}
         """.trimIndent())
     }
 
@@ -25,7 +24,7 @@ object UserManager {
         return _currentUser
     }
 
-    fun clearUser() {
-        _currentUser = null
-    }
+//    fun clearUser() {
+//        _currentUser = null
+//    }
 }

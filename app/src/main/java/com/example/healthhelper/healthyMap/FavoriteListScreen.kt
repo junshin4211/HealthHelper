@@ -1,7 +1,5 @@
 package com.example.healthhelper.healthyMap
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -17,7 +15,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -114,7 +111,7 @@ fun FavoriteList(
                     }
                 }
             )
-            HorizontalDivider()
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp), color = colorResource(R.color.primarycolor))
         }
     }
 }

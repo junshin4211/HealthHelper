@@ -18,7 +18,7 @@ fun InitializeRepository(
         // Fetch data from database and set it to stateflow in SelectedFoodItemsRepository.
         val foodNameVOs = selectedFoodItemsViewModel.fetchDataFromWebRequest()
         val selectedFoodItemVOs = foodNameVOs.map{ foodNameVO ->
-            SelectedFoodItemVO(name = mutableStateOf(foodNameVO.foodName) )
+            SelectedFoodItemVO(name = mutableStateOf(foodNameVO.foodName))
         }
         SelectedFoodItemsRepository.setData(newData = selectedFoodItemVOs.toMutableList())
     }

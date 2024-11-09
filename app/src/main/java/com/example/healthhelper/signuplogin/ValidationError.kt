@@ -15,7 +15,9 @@ class SignUpValidator {
         object InvalidEmail : ValidationError("Email格式不正確")
         object InvalidPhone : ValidationError("手機號碼格式不正確")
         object InvalidRoleID : ValidationError("使用者身分必須選擇")
+        object EmptyConfirmPassword : ValidationError("確認密碼必須填寫")
         object EmptyCertificate : ValidationError("營養師必須上傳證書")
+        object PasswordsDoNotMatch : ValidationError("密碼與確認密碼不相符")
     }
 
     fun validateSignUp(formState: SignUpProperty, accountExists: Boolean): List<ValidationError> {
@@ -34,6 +36,12 @@ class SignUpValidator {
             errors.add(Errors.EmptyPassword)
         } else if (formState.password.length > 30) {
             errors.add(Errors.PasswordTooLong)
+        }
+
+        if (formState.confirmPassword.isEmpty()) {
+            errors.add(Errors.EmptyConfirmPassword)
+        } else if (formState.password != formState.confirmPassword) {
+            errors.add(Errors.PasswordsDoNotMatch)
         }
 
         // 驗證姓名
@@ -55,6 +63,11 @@ class SignUpValidator {
         // 驗證電話
         if (formState.phone.isNotEmpty() && !formState.phone.matches(Regex("^09\\d{8}$"))) {
             errors.add(Errors.InvalidPhone)
+        }
+
+        // 驗證使用者身分
+        if (!formState.isNutritionist && !formState.isNormalUser) {
+            errors.add(Errors.InvalidRoleID)
         }
 
         // 驗證身分和證書

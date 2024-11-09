@@ -84,6 +84,7 @@ fun WeightScreen(
         stringResource(R.string.body_fatpercent)
     )
 
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {

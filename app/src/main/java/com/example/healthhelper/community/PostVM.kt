@@ -17,9 +17,12 @@ import java.util.Base64
 class PostVM : ViewModel() {
     private val _postSelectedState = MutableStateFlow(Post())
     val postSelectedState: StateFlow<Post> = _postSelectedState.asStateFlow()
-    fun setSelectedPost(post: Post) {
-        _postSelectedState.value = post
-    }
+
+
+//    fun setSelectedPost(post: Post) {
+//        _postSelectedState.value = post
+//    }
+
 
     private val _postsState = MutableStateFlow(emptyList<Post>())
     val postsState: StateFlow<List<Post>> = _postsState.asStateFlow()

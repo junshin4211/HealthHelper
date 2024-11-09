@@ -198,7 +198,7 @@ fun AchievementList(
             fontSize = 12.sp,
             color = Color.DarkGray
         )
-        if (achievements.isEmpty()) {
+        if (achievements.isEmpty() || achievements == null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Lock,
@@ -332,9 +332,3 @@ fun AchievementDetailDialog(
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AchievementScreenPreview() {
-//    AchievementScreen(navController = rememberNavController())
-//}

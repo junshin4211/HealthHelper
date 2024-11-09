@@ -21,7 +21,7 @@ fun NutritionInfoText(
         infos.forEach {
             Text(
                 text = it,
-                fontSize = 12.sp,
+                fontSize = 20.sp,
             )
         }
     }

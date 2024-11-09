@@ -211,7 +211,7 @@ fun WeightSettingScreen(
                     val weightValue = weight.toDoubleOrNull()
                     val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
 
-                    if (heightValue != null && weightValue != null) {
+                    if (heightValue != null && weightValue != null && heightValue > 0 && weightValue > 0) {
                         val bmi = weightViewModel.calculateBMI(heightValue, weightValue)
                         if (bmi != 0.0) {
                             coroutineScope.launch {
@@ -226,6 +226,7 @@ fun WeightSettingScreen(
                     }
                 }
             )
+            Spacer(modifier = Modifier.padding(top = 8.dp))
             Text(text = errMsg, color = Color.Red)
         }
 

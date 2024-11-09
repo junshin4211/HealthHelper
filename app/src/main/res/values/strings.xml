@@ -183,7 +183,7 @@
     <string name="grams">克</string>
     <string name="save_data_successfully">儲存資料成功</string>
     <string name="milli">毫</string>
-    <string name="fiber">纖維質</string>
+    <string name="fiber">膳食纖維</string>
     <string name="sugar">糖</string>
     <string name="sodium">鈉</string>
     <string name="kilo">千</string>
@@ -194,7 +194,7 @@
     <string name="dinner_name">dinner</string>
     <string name="supper_name">supper</string>
     <string name="save_graph">儲存圖片</string>
-    <string name="save_text_record">文字記錄</string>
+    <string name="text_record">文字記錄</string>
     <string name="photoClipRange">影像擷取範圍</string>
     <string name="failValueHeightWeight">請輸入有效的身高和體重</string>
     <string name="noBodyData">資料不足繪圖</string>
@@ -208,5 +208,8 @@
     <string name="weightKg">體重(kg)</string>
     <string name="body_fatpercent">體脂(%)</string>
     <string name="BodyDatatrend">變化趨勢</string>
-    <string name="empty_string" />
+    <string name="empty_string">\"\"</string>
+    <string name="delete_graph">刪除圖片</string>
+    <string name="hello_world">Hello World!!!</string>
+    <string name="save_text_record">儲存文字記錄</string>
 </resources>

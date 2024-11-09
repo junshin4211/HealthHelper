@@ -73,7 +73,6 @@ fun PhotoPreviewScreen(
                                 false
                             )
                         }
-//                        tabViewModel.setTabVisibility(true)
                     }
                 }
             ) {

@@ -56,10 +56,12 @@ fun LoginScreen(
 
     val textFieldColors = TextFieldDefaults.colors(
         errorContainerColor = Color(0xFFFFCDD2),  // 淺紅色代表錯誤
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Color(0xFFD75813),
+        unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
-        focusedContainerColor = Color.White
+        focusedContainerColor = Color.White,
+        focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
+       // unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
 
     Box(
@@ -108,12 +110,12 @@ fun LoginScreen(
                     IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                         Icon(
                             painter = if (uiState.formState.passwordVisible)
-                                painterResource(id = R.drawable.eyeshow)
+                                 painterResource(id = R.drawable.eyeshow)
                             else painterResource(id = R.drawable.eyenoshow),
                             contentDescription = if (uiState.formState.passwordVisible)
                                 "隱藏密碼" else "顯示密碼",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Gray
+                            modifier = Modifier.size(20.dp),
+                           tint = Color.Gray
                         )
                     }
                 },
@@ -150,7 +152,7 @@ fun LoginScreen(
                             context = context,
                             onSuccess = { userId ->
                                 // 登入成功後直接導航到更新頁面
-                                navController.navigate("UpdateInfoScreen")
+                                navController.navigate("Main")
                                 Toast.makeText(context, "登入成功", Toast.LENGTH_SHORT).show()
                             },
                             onError = { error ->

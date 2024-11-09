@@ -11,7 +11,6 @@ fun NutritionInfoText1(
         nutritionInfoVO.sodium,
         nutritionInfoVO.fiber,
         nutritionInfoVO.sugar,
-        nutritionInfoVO.fiber,
         nutritionInfoVO.calories,
     )
 
