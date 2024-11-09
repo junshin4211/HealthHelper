@@ -17,7 +17,7 @@ object DietDiaryUrl {
         get() = "${serverUrl}/dietDiary/diaryDescription/tryToInsert"
 
     val selectDiaryDescriptionUrl : String
-        get() = "${serverUrl}/dietDiary/diaryDescription/tryToInsert"
+        get() = "${serverUrl}/dietDiary/diaryDescription/query"
 
     val updateDiaryInfoUrl: String
         get() = "${serverUrl}/dietDiary/update/updateDietDiary"

@@ -34,7 +34,7 @@ class DiaryDescriptionViewModel: ViewModel(){
         val url = DietDiaryUrl.selectDiaryDescriptionUrl
         return try {
             val result = httpPost(url, gson.toJson(diaryDescriptionVO))
-            val collectionType = object : TypeToken<Int>() {}.type
+            val collectionType = object : TypeToken<List<DiaryDescriptionVO>>() {}.type
             gson.fromJson(result, collectionType) ?: emptyList()
         } catch (e: Exception) {
             Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)

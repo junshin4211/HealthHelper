@@ -73,6 +73,7 @@ import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
 import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
+import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
@@ -98,9 +99,6 @@ fun DietDiaryMealFrame(
 
     val verticalScrollState = rememberScrollState()
 
-    // load diary description from database and try to set it into repo -- DiaryDescriptionRepository if one can.
-    LoadFoodDescription(context)
-
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
@@ -124,6 +122,12 @@ fun DietDiaryMealFrame(
     var isCleanEventTriggered by remember { mutableStateOf(false) }
 
     var shouldShowDescription by remember { mutableStateOf(false) }
+
+    val currentMealCategoryId = getMealCategoryId(context)
+    DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
+
+    // load diary description from database and try to set it into repo -- DiaryDescriptionRepository if one can.
+    LoadFoodDescription(context)
 
     availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
         foodItems.filter {
@@ -294,7 +298,7 @@ fun DietDiaryMealFrame(
                                     onClick = {
                                         dietDiaryDescriptionButtonIsClicked = true
                                         if (isCleanEventTriggeredMeetPrerequisites) {
-                                            descriptionText = ""
+                                            descriptionText = mutableStateOf("")
                                         }
                                     },
                                     buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
@@ -318,10 +322,10 @@ fun DietDiaryMealFrame(
                                     )
                                 }
                                 MyOutLinedTextField(
-                                    value = descriptionText,
+                                    value = descriptionText.value,
                                     onValueChange = {
                                         Log.e(TAG, "it:${it}")
-                                        descriptionText = it
+                                        descriptionText.value = it
                                     },
                                     isVisible = shouldShowDescription,
                                 )
@@ -403,7 +407,7 @@ fun DietDiaryMealFrame(
             navController = navController,
             context = context,
             foodIconUri = selectedImageUri,
-            foodDescription = descriptionText,
+            foodDescription = descriptionText.value,
         )
         saveFoodDescriptionButtonIsClicked = false
     }
@@ -443,4 +447,18 @@ fun MyOutLinedTextField(
             maxLines = 1,
         )
     }
+}
+
+@Composable
+fun getMealCategoryId(
+    context: Context,
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
+): Int {
+    val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()
+    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
+    val index = mealsOptionVOs.indexOf(selectedMealOption)
+    if(index == -1){
+        return 0 + 1
+    }
+    return index + 1
 }
