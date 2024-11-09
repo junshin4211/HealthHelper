@@ -24,15 +24,21 @@ fun LoginMain() {
             SignUpScreen(navController)
         }
 
-        composable("UpdateInfoScreen") {
-            // 從 UserManager 獲取用戶資料
-            val user = UserManager.getUser() ?: User()
-            UpdateInfoScreen(user, navController)
-        }
+//        composable("UpdateInfoScreen") {
+//            // 從 UserManager 獲取用戶資料
+//            val user = UserManager.getUser() ?: User()
+//            UpdateInfoScreen(user, navController)
+//        }
 
         composable("Main") {
             val user = UserManager.getUser() ?: User()
             Main(user,navController)
+        }
+
+
+        composable("UpdateInfoScreen") {
+            val user = UserManager.getUser() ?: User()
+            UpdateInfoScreen(user,navController)
         }
 
 
