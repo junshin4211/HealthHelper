@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.person.model.DateRange
 import com.example.healthhelper.person.model.ErrorMsg
 import com.example.healthhelper.person.model.WeightData
+import com.example.healthhelper.signuplogin.User
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
@@ -17,19 +19,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.pow
 
-class WeightViewModel : ViewModel() {
+class WeightViewModel: ViewModel() {
     private val _weightDataState = MutableStateFlow<List<WeightData>>(emptyList())
     val weightDataState: StateFlow<List<WeightData>> = _weightDataState.asStateFlow()
     private val _dateRangeState = MutableStateFlow(DateRange())
     val dateRangeState: StateFlow<DateRange> = _dateRangeState.asStateFlow()
-
+    val userId = UserManager.getUser().userId
 
     init {
         viewModelScope.launch {
             val defaultDateRange = _dateRangeState.value
             _weightDataState.value = fetchWeightDataList(
                 defaultDateRange.startDate,
-                defaultDateRange.endDate
+                defaultDateRange.endDate,
+                userId
             )
         }
     }
@@ -80,11 +83,11 @@ class WeightViewModel : ViewModel() {
     }
 
 
-    suspend fun insertBodyDataJson(height: Double, weight: Double, bodyFat: Double, recordDate: String, bmi: Double): Boolean {
+    suspend fun insertBodyDataJson(height: Double, weight: Double, bodyFat: Double, recordDate: String, bmi: Double, userId:Int): Boolean {
         val url = "$serverUrl/insertBodyData"
         val gson = Gson()
         val jsonObject = JsonObject().apply {
-            addProperty("userId", 2) // TODO: 需要修改 userId
+            addProperty("userId", userId) // TODO: 需要修改 userId
             addProperty("height", height)
             addProperty("weight", weight)
             addProperty("bodyFat", bodyFat)
@@ -106,7 +109,7 @@ class WeightViewModel : ViewModel() {
     fun setDateRange(startDate: String, endDate: String) {
         _dateRangeState.value = DateRange(startDate, endDate)
         viewModelScope.launch {
-            _weightDataState.value = fetchWeightDataList(startDate, endDate)
+            _weightDataState.value = fetchWeightDataList(startDate, endDate, userId)
         }
     }
 
@@ -114,18 +117,18 @@ class WeightViewModel : ViewModel() {
     fun refreshWeightData() {
         viewModelScope.launch {
             val dateRange = _dateRangeState.value
-            _weightDataState.value = fetchWeightDataList(dateRange.startDate, dateRange.endDate)
+            _weightDataState.value = fetchWeightDataList(dateRange.startDate, dateRange.endDate, userId)
         }
     }
 
     fun filterWeightDataByRecordId(recordId: Int): List<WeightData> {
         return weightDataState.value.filter { it.recordId == recordId }
     }
-    suspend fun fetchWeightDataList(startDate: String, endDate: String): List<WeightData> {
+    suspend fun fetchWeightDataList(startDate: String, endDate: String, userId:Int): List<WeightData> {
         val url = "$serverUrl/selectBodyData"
         val gson = Gson()
         val jsonObject = JsonObject().apply {
-            addProperty("userId", 2)
+            addProperty("userId", userId)
             addProperty("startDate", startDate)
             addProperty("endDate", endDate)
         }

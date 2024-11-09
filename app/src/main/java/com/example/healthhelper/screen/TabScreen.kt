@@ -49,9 +49,10 @@ import com.example.healthhelper.signuplogin.User
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun Main(user:User,navController: NavHostController, tabViewModel: TabViewModel = viewModel()) {
+fun Main(tabViewModel: TabViewModel = viewModel(), onLogout: () -> Unit) {
     val tabVisibility = tabViewModel.tabVisibility.collectAsState()
     var tabIndex by remember { mutableIntStateOf(0) }
+
 
     val tabs = listOf(
         stringResource(id = R.string.management),
@@ -67,8 +68,9 @@ fun Main(user:User,navController: NavHostController, tabViewModel: TabViewModel 
                 .fillMaxSize()
                 .weight(1f)
         ) {
+
             when (tabIndex) {
-                0 -> MainPersonScreen()
+                0 -> MainPersonScreen(onLogout = onLogout)
                 1 -> CmtController()
                 2 -> { DietDiaryMainScreen() }
                 3 -> Plan()

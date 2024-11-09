@@ -275,7 +275,7 @@ fun RestaurantDetailsBottomSheet(
                     isFavor = !isFavor
                     scope.launch{
                         if (isFavor) {
-                            viewModel.insertFavorRestaurant(2, restaurant.rID)
+                            viewModel.insertFavorRestaurant(restaurant.rID)
                         } else {
                             viewModel.deleteFavor(restaurant.rID)
                         }

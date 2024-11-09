@@ -1,5 +1,6 @@
 package com.example.healthhelper.person
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -45,21 +46,24 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.person.personVM.AchievementViewModel
+import com.example.healthhelper.person.personVM.LoginState
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.screen.TabViewModel
+import com.example.healthhelper.signuplogin.getEncryptedPreferences
 import kotlinx.coroutines.launch
 
 @Composable
 fun PersonScreen(
+    onLogout: () -> Unit,
     navController: NavHostController,
     achievementVM: AchievementViewModel,
     userPhotoUploadVM: UserPhotoUploadVM,
-    tabViewModel: TabViewModel
+    tabViewModel: TabViewModel,
 ) {
     val userPhotoUrl by userPhotoUploadVM.userPhotoUrlState.collectAsState()
     val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
-//    var isLoading by remember { mutableStateOf(true) }
+    val isLoading by userPhotoUploadVM.isloading.collectAsState()
     tabViewModel.setTabVisibility(true)
 
     Scaffold(containerColor = colorResource(R.color.backgroundcolor)) { innerPadding ->
@@ -75,22 +79,25 @@ fun PersonScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+
                 Box(
                     modifier = Modifier.size(250.dp)
                 ) {
-//                    if (isLoading) {
-//                        CircularProgressIndicator(
-//                            modifier = Modifier
-//                                .align(Alignment.Center)
-//                                .size(50.dp)
-//                        )
-//                    }
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(50.dp)
+                                .zIndex(1f),
+                        )
+                    }
                     userPhotoUrl.photoUrl?.let { uri ->
                         Image(
                             painter = rememberAsyncImagePainter(uri),
                             contentDescription = stringResource(R.string.choosePicture),
                             modifier = Modifier
-                                .size(250.dp).clip(CircleShape),
+                                .size(250.dp)
+                                .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
                     } ?: Image(
@@ -112,7 +119,11 @@ fun PersonScreen(
                             painter = painterResource(R.drawable.editperson),
                             contentDescription = stringResource(R.string.editPhoto)
                         )
-                        PhotoOptionsMenu(expanded = expanded, onDismiss = { expanded = false }, navController)
+                        PhotoOptionsMenu(
+                            expanded = expanded,
+                            onDismiss = { expanded = false },
+                            navController
+                        )
                     }
                 }
 
@@ -122,7 +133,9 @@ fun PersonScreen(
                         .height(60.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-                    onClick = {}
+                    onClick = {
+                        navController.navigate(PersonScreenEnum.updateInfoScreen.name)
+                    }
                 ) {
                     Text(stringResource(R.string.personData), fontSize = 28.sp)
                 }
@@ -159,7 +172,10 @@ fun PersonScreen(
                         .height(60.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-                    onClick = {}
+                    onClick = {
+//                        LoginState.isLogin=false
+                        onLogout()
+                    }
                 ) {
                     Text(stringResource(R.string.logout), fontSize = 28.sp)
                 }
@@ -203,4 +219,5 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Na
         )
     }
 }
+
 

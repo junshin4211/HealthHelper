@@ -3,10 +3,12 @@
 import android.Manifest
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,6 +22,11 @@ import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.screen.TabViewModel
+import com.example.healthhelper.signuplogin.LoginScreen
+import com.example.healthhelper.signuplogin.LoginVM
+import com.example.healthhelper.signuplogin.UpdateInfoScreen
+import com.example.healthhelper.signuplogin.UpdateInfoVM
+import com.example.healthhelper.signuplogin.UserManager
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -28,14 +35,18 @@ import com.google.accompanist.permissions.rememberPermissionState
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun MainPersonScreen(
+    onLogout: () -> Unit,
     navController: NavHostController = rememberNavController(),
     weightViewModel: WeightViewModel = viewModel(),
+    userPhotoUploadVM: UserPhotoUploadVM = viewModel(),
     achievementVM: AchievementViewModel = viewModel(),
     cloudPhotoUploadVM: CloudPhotoUploadVM = viewModel(),
-    userPhotoUploadVM: UserPhotoUploadVM = viewModel(),
-    tabViewModel: TabViewModel = viewModel()
+    tabViewModel: TabViewModel = viewModel(),
+    loginVM: LoginVM = viewModel(),
+    updateInfoVM: UpdateInfoVM = viewModel()
 ) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var userId by remember { mutableIntStateOf(UserManager.getUser().userId ) }
 
     NavHost(
         navController = navController,
@@ -46,7 +57,8 @@ fun MainPersonScreen(
                 navController = navController,
                 achievementVM = achievementVM,
                 userPhotoUploadVM = userPhotoUploadVM,
-                tabViewModel = tabViewModel
+                tabViewModel = tabViewModel,
+                onLogout = onLogout
             )
         }
         composable(route = PersonScreenEnum.cameraPreviewScreen.name) {
@@ -63,13 +75,24 @@ fun MainPersonScreen(
         }
         composable(route = PersonScreenEnum.photoPreviewScreen.name) {
             PhotoPreviewScreen(
-                navController =navController,
+                navController = navController,
                 imageUri = imageUri,
                 onRejectClick = { navController.popBackStack() },
                 userPhotoUploadVM = userPhotoUploadVM,
                 cloudPhotoUploadVM = cloudPhotoUploadVM,
             )
         }
+        composable(route = PersonScreenEnum.updateInfoScreen.name) {
+//            val viewModel: UpdateInfoVM = viewModel()
+//            val loginVM: LoginVM = viewModel()
+            UpdateInfoScreen(
+//                user: User,
+                navController = navController,
+                viewModel = updateInfoVM,
+                loginVM = loginVM,
+            )
+        }
+
         composable(route = PersonScreenEnum.pickPhotoScreen.name) {
             PickPhotoScreen(
                 navController,
@@ -81,7 +104,7 @@ fun MainPersonScreen(
             WeightScreen(navController, weightViewModel = weightViewModel)
         }
         composable(route = PersonScreenEnum.weightSettingScreen.name) {
-            WeightSettingScreen(navController, weightViewModel = weightViewModel)
+            WeightSettingScreen(userId = userId, navController, weightViewModel = weightViewModel)
         }
         composable(route = "${PersonScreenEnum.weightReviseScreen.name}/{recordId}") { backStackEntry ->
             val recordId = backStackEntry.arguments?.getString("recordId")

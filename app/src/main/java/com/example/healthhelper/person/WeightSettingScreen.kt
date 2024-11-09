@@ -64,6 +64,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeightSettingScreen(
+    userId :Int,
     navController: NavHostController,
     weightViewModel: WeightViewModel,
 ) {
@@ -216,7 +217,7 @@ fun WeightSettingScreen(
                         if (bmi != 0.0) {
                             coroutineScope.launch {
                                 val result = weightViewModel.insertBodyDataJson(
-                                    heightValue, weightValue, fatValue, selectDate, bmi
+                                    heightValue, weightValue, fatValue, selectDate, bmi, userId
                                 )
                                 if (result) navController.navigateUp()
                             }
