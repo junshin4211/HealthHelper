@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 class FoodDiaryViewModel: ViewModel()  {
     private val repository = FoodDiaryRepository
-    val data: StateFlow<MutableList<FoodDiaryVO>> = repository.dataFlow
+    val data: StateFlow<FoodDiaryVO> = repository.dataFlow
 
-    suspend fun sendWebRequest(
+    suspend fun insertDietDiary(
         foodDiaryVO: FoodDiaryVO,
     ):Int{
         val url = DietDiaryUrl.insertDietDiaryUrl
@@ -27,4 +27,19 @@ class FoodDiaryViewModel: ViewModel()  {
             0
         }
     }
+
+    suspend fun selectByUserIdAndCreateDate(
+        foodDiaryVO: FoodDiaryVO,
+    ):List<FoodDiaryVO>{
+        val url = DietDiaryUrl.selectByUserIdAndCreateDateUrl
+        return try {
+            val result = httpPost(url, gson.toJson(foodDiaryVO))
+            val collectionType = object : TypeToken<FoodDiaryVO>() {}.type
+            gson.fromJson(result, collectionType) ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
+            emptyList()
+        }
+    }
+
 }

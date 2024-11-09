@@ -1,18 +1,18 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
 import com.google.gson.annotations.SerializedName
-import java.sql.Time
 import java.sql.Date
+import java.sql.Time
 
 data class FoodDiaryVO(
     @SerializedName("diaryID")
-    val diaryID: Int = -1,
+    var diaryID: Int = -1,
 
     @SerializedName("userID")
-    val userID: Int = -1,
+    var userID: Int = -1,
 
     @SerializedName("createDate")
-    val createDate: Date = Date(0),
+    var createDate: Date = Date(0),
 
     @SerializedName("createTime")
     val createTime: Time = Time(0),

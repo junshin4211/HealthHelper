@@ -95,7 +95,7 @@ fun CustomDatePicker(
 
             // set the date to SelectedDateRepository
             SelectedDateRepository.setDate(date)
-            val diaryVOs = diaryViewModel.fetchDataFromWebRequest(selectedDateVO)
+            val diaryVOs = diaryViewModel.getDiaryIdByUserIdAndDate(selectedDateVO)
             DiaryRepository.setData(diaryVOs)
 
             

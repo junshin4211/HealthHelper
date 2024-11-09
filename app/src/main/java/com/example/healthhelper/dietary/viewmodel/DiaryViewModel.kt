@@ -15,7 +15,7 @@ class DiaryViewModel: ViewModel() {
     private val repository = DiaryRepository
     val data: StateFlow<MutableList<DiaryVO>> = repository.dataFlow
 
-    suspend fun fetchDataFromWebRequest(
+    suspend fun getDiaryIdByUserIdAndDate(
         selectedDateVO: SelectedDateVO,
     ):List<DiaryVO>{
         val url = DietDiaryUrl.queryByDateUrl
