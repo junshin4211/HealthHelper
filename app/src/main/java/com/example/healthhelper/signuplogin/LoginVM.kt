@@ -95,7 +95,7 @@ class LoginVM : ViewModel() {
                         Username: ${user.username}
                         Email: ${user.userEmail}
                         RoleID: ${user.roleID}
-                      photoUrl:${user.photoUrl}
+                        photoUrl:${user.photoUrl}
                     """.trimIndent())
                 LoginState.isLogin.value = true
                 onSuccess(user.userId)

@@ -75,7 +75,7 @@ fun CmtMainScreen(navController: NavHostController, postVM: PostVM = viewModel()
         Column {
             Scaffold(
                 modifier = Modifier.background(colorResource(id = R.color.backgroundcolor)),
-                topBar = { CmtNavbarComponent(navController = navController) }) { innerPadding ->
+                topBar = { CmtNavbarComponent(navController = navController, postVM = postVM) }) { innerPadding ->
                 Column(
                     modifier = Modifier
                         .background(colorResource(R.color.backgroundcolor))

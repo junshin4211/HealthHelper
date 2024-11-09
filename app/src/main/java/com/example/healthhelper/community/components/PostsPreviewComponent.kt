@@ -1,5 +1,7 @@
 package com.example.healthhelper.community.components
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,9 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -44,7 +49,8 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
             color = colorResource(id = R.color.backgroundcolor),
             shape = RoundedCornerShape(15.dp)
         )
-        .clickable { navController.navigate("${CmtScreenEnum.PersonalPostScreen.name}/${post.postId}") }) {
+        .clickable { navController.navigate("${CmtScreenEnum.PersonalPostScreen.name}/${post.postId}") }
+    ) {
 
         Column(
             modifier = Modifier
@@ -87,17 +93,44 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                             color = colorResource(R.color.dark_blue_100),
                             fontWeight = FontWeight.Bold,
                             lineHeight = 10.sp,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
+//                Column(
+//                    modifier = Modifier.padding(8.dp)
+//                ) {
+//                    Spacer(modifier = Modifier.height(10.dp))
+//                    val imagePainter = runCatching { painterResource(id = post.picture) }
+//                        .getOrElse { painterResource(id = R.drawable.postpic) }
+//                    Image(
+//                            painter = imagePainter,
+//                        contentDescription = "貼文圖片",
+//                        modifier = Modifier
+//                            .width(189.dp)
+//                            .height(107.dp)
+//                            .background(colorResource(id = R.color.backgroundcolor))
+//                    )
+//                }
+
+
                 Column(
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Spacer(modifier = Modifier.height(10.dp))
-                    val imagePainter = runCatching { painterResource(id = post.img) }
-                        .getOrElse { painterResource(id = R.drawable.postpic) }
+                    val imagePainter = post.picture?.let {
+                        runCatching {
+                            val decodedImage = Base64.decode(it, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.size)
+                            BitmapPainter(bitmap.asImageBitmap())
+                        }.getOrElse {
+                            painterResource(id = R.drawable.postpic)
+                        }
+                    } ?: painterResource(id = R.drawable.postpic)
+
                     Image(
-                            painter = imagePainter,
+                        painter = imagePainter,
                         contentDescription = "貼文圖片",
                         modifier = Modifier
                             .width(189.dp)

@@ -79,13 +79,13 @@ fun UpdateInfoScreen(
 
 
     val textFieldColors = TextFieldDefaults.colors(
-        errorContainerColor = Color(0xFFFFCDD2),
+       // errorContainerColor = Color(0xFFFFCDD2),
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
         focusedContainerColor = Color.White,
         focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
-       // unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
+        //unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
 
     Box(
