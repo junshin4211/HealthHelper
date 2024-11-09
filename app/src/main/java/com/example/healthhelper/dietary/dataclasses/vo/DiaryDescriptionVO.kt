@@ -4,8 +4,8 @@ import android.net.Uri
 import com.google.gson.annotations.SerializedName
 
 data class DiaryDescriptionVO(
-    @SerializedName("diaryId")
-    var diaryId: Int,
+    @SerializedName("diaryID")
+    var diaryID: Int,
 
     @SerializedName("foodIconUri")
     var uri: Uri? = null,

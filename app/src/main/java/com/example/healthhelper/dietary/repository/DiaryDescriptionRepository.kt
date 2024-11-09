@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 object DiaryDescriptionRepository {
-    private val _dataFlow = MutableStateFlow<DiaryDescriptionVO>(DiaryDescriptionVO(2))
+    private val _dataFlow = MutableStateFlow(DiaryDescriptionVO(2))
     val dataFlow: StateFlow<DiaryDescriptionVO>
         get() = _dataFlow.asStateFlow()
 
@@ -17,7 +17,7 @@ object DiaryDescriptionRepository {
     }
 
     fun setDiaryId(diaryId:Int){
-        _dataFlow.value.diaryId = diaryId
+        _dataFlow.value.diaryID = diaryId
     }
 
     fun setUri(uri:Uri?){

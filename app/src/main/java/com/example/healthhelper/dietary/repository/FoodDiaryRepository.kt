@@ -14,6 +14,7 @@ object FoodDiaryRepository {
 
     fun setData(newData: FoodDiaryVO) {
         _dataFlow.update { newData }
+        DiaryDescriptionRepository.setDiaryId(newData.diaryID)
     }
 
     fun setUserId(userId:Int){

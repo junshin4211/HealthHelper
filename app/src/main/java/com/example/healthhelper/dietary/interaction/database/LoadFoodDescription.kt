@@ -20,8 +20,8 @@ fun LoadFoodDescription(
 ){
     val currentDiaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
     LaunchedEffect(Unit) {
-        val currentDiaryId = currentDiaryDescriptionVO.diaryId
-        val targetDiaryDescriptionVO = DiaryDescriptionVO(diaryId = currentDiaryId)
+        val currentDiaryId = currentDiaryDescriptionVO.diaryID
+        val targetDiaryDescriptionVO = DiaryDescriptionVO(diaryID = currentDiaryId)
         val queriedDiaryDescriptionVOs = diaryDescriptionViewModel.fetchDataFromDatabase(targetDiaryDescriptionVO)
         if(queriedDiaryDescriptionVOs.isEmpty()){ // load data failed as it is empty.
             Toast.makeText(context,context.getString(R.string.load_diary_description_failed), Toast.LENGTH_LONG).show()

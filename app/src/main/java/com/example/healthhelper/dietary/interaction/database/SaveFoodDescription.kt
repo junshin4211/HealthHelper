@@ -2,6 +2,7 @@ package com.example.healthhelper.dietary.interaction.database
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,12 +23,15 @@ fun SaveFoodDescription(
     foodDescription: String,
     diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
 ) {
+    val TAG = "tag_SaveFoodDescription"
+
     DiaryDescriptionRepository.setUri(foodIconUri)
     DiaryDescriptionRepository.setDescription(foodDescription)
 
     val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
 
     LaunchedEffect(Unit) {
+        Log.e(TAG,"LaunchedEffect(Unit) block in SaveFoodDescription function was called. diaryDescriptionVO:${diaryDescriptionVO}")
         // try to insert diaryDescriptionVO to database. (i.e. when there are no record about given diaryDescriptionVO.diaryId, insert it.
         // Otherwise, update it by given diaryDescriptionVO.diaryId.
         val affectedRows = diaryDescriptionViewModel.tryToInsert(diaryDescriptionVO)
