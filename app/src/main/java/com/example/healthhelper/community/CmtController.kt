@@ -24,7 +24,7 @@ fun CmtController(
         composable(
             route = CmtScreenEnum.CreatePostScreen.name
         ) {
-            CreatePostScreen(navController)
+            CreatePostScreen(navController = navController)
         }
         composable(
             route = CmtScreenEnum.EditPostScreen.name

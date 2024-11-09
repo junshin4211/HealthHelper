@@ -28,9 +28,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.community.CmtScreenEnum
+import com.example.healthhelper.community.Post
 
 @Composable
-fun MyPostsPreviewComponent(navController: NavHostController) {
+fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
     Column(modifier = Modifier
         .padding(vertical = 8.dp)
         .shadow(
@@ -97,13 +98,13 @@ fun MyPostsPreviewComponent(navController: NavHostController) {
                     Column(
                     ) {
                         Text(
-                            text = "高蛋白午餐分享!熱量低又美味!",
+                            text = post.title,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(id = R.color.black_200)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "烤雞腿：誰說健康餐一定要吃雞胸肉！先將雞腿汆燙，接著調味後(\n" + "橄欖油、迷迭香 ...",
+                            text = post.content,
                             fontSize = 10.sp,
                             color = colorResource(id = R.color.dark_blue_100),
                             fontWeight = FontWeight.Bold,
@@ -131,37 +132,40 @@ fun MyPostsPreviewComponent(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(top = 8.dp)
             ) {
-                Row {
-                    Icon(
-                        painter = painterResource(id = R.drawable.like_not_fill),
-                        contentDescription = "Like",
-                        tint = colorResource(R.color.primarycolor)
-                    )
-                    Text(
-                        text = " 2",
-                        fontWeight = FontWeight(600),
-                        color = colorResource(id = R.color.primarycolor),
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
+
+                //按讚數
+//                Row {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.like_not_fill),
+//                        contentDescription = "Like",
+//                        tint = colorResource(R.color.primarycolor)
+//                    )
+//                    Text(
+//                        text = " 2",
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(id = R.color.primarycolor),
+//                        modifier = Modifier.padding(start = 4.dp)
+//                    )
+//                }
                 Spacer(modifier = Modifier.width(32.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.comment),
-                        contentDescription = "Comment",
-                        tint = colorResource(R.color.primarycolor)
-                    )
-                    Text(
-                        text = " 3",
-                        fontWeight = FontWeight(600),
-                        color = colorResource(id = R.color.primarycolor),
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
+                    //留言數
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.comment),
+//                        contentDescription = "Comment",
+//                        tint = colorResource(R.color.primarycolor)
+//                    )
+//                    Text(
+//                        text = "3",
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(id = R.color.primarycolor),
+//                        modifier = Modifier.padding(start = 4.dp)
+//                    )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "2小時前",
+                        text = post.postDate,
                         fontSize = 16.sp,
                         fontWeight = FontWeight(600),
                         color = colorResource(id = R.color.primarycolor)
