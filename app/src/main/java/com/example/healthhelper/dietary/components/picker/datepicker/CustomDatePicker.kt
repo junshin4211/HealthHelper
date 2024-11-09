@@ -98,6 +98,8 @@ fun CustomDatePicker(
             FoodDiaryRepository.setCreateDate(selectedDateVO.selectedDate.value)
 
             val queriedDiaryInfoUpdatorVO = diaryInfoUpdatorViewModel.selectDiaryInfoByUserId(diaryInfoUpdatorVO)
+            Log.e(TAG,"In LaunchedEffect(selectedDate) block,queriedDiaryInfoUpdatorVO:${queriedDiaryInfoUpdatorVO}")
+
             if(queriedDiaryInfoUpdatorVO.isEmpty()){ // fetch data failed.
                 Toast.makeText(
                     context, context.getString(R.string.fetch_diary_id_failed),
