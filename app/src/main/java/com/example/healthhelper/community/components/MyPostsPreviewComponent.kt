@@ -1,5 +1,7 @@
 package com.example.healthhelper.community.components
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -27,9 +31,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.community.CmtScreenEnum
 import com.example.healthhelper.community.Post
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
@@ -62,19 +69,28 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.profile),
-                            contentDescription = "Profile Picture",
+                        post.photoUrl?.let {
+                            Image(
+                                painter = rememberAsyncImagePainter(it),
+                                contentDescription = "User profile picture",
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(40.dp)
+                                    .padding(0.dp)
+                            )
+                        } ?: Image(
+                            painter = painterResource(R.drawable.profile),
+                            contentDescription = "User profile picture",
                             modifier = Modifier
-                                .width(25.dp)
-                                .height(25.dp),
-                            colorResource(R.color.primarycolor)
+                                .width(40.dp)
+                                .height(40.dp)
+                                .padding(0.dp)
                         )
 
                         Spacer(modifier = Modifier.width(10.dp))
 
                         Text(
-                            text = stringResource(id = R.string.userName),
+                            text = post.userName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.black_200),
@@ -120,13 +136,23 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
                     modifier = Modifier.padding(8.dp)
                 ) {
                     Spacer(modifier = Modifier.height(10.dp))
+                    val imagePainter = post.picture?.let {
+                        runCatching {
+                            val decodedImage = Base64.decode(it, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.size)
+                            BitmapPainter(bitmap.asImageBitmap())
+                        }.getOrElse {
+                            painterResource(id = R.drawable.postpic)
+                        }
+                    } ?: painterResource(id = R.drawable.postpic)
+
                     Image(
-                        painter = painterResource(id = R.drawable.postpic),
+                        painter = imagePainter,
                         contentDescription = "貼文圖片",
                         modifier = Modifier
                             .width(189.dp)
                             .height(107.dp)
-                            .background(color = colorResource(id = R.color.backgroundcolor))
+                            .background(colorResource(id = R.color.backgroundcolor))
                     )
                 }
             }
@@ -168,11 +194,26 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
 //                        modifier = Modifier.padding(start = 4.dp)
 //                    )
                     Spacer(modifier = Modifier.weight(1f))
+//                    Text(
+//                        text = post.postDate,
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(id = R.color.primarycolor)
+//                    )
+
+                    // 解析和格式化日期
+                    val dateString = runCatching {
+                        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                        val date = LocalDateTime.parse(post.postDate, inputFormatter)
+                        date.format(outputFormatter)
+                    }.getOrElse { post.postDate } // 若解析失敗，使用原始字串
+
                     Text(
-                        text = post.postDate,
+                        text = dateString,
                         fontSize = 16.sp,
                         fontWeight = FontWeight(600),
-                        color = colorResource(id = R.color.primarycolor)
+                        color = colorResource(R.color.primarycolor)
                     )
                 }
             }

@@ -222,4 +222,5 @@
     <string name="no_plantext">尚未有計畫!!</string>
     <string name="no_diarytext">尚未新增任何日記!!</string>
     <string name="isfinish">已達成</string>
+    <string name="updateFailed">更新失敗\n</string>
 </resources>

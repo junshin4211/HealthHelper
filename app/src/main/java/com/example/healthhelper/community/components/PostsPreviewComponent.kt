@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.community.CmtScreenEnum
 import com.example.healthhelper.community.Post
@@ -64,17 +65,26 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                     modifier = Modifier.weight(1f)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            //usericon資料未引入
-                            painter = painterResource(id = R.drawable.profile),
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier.width(25.dp).height(25.dp),
-                            tint = colorResource(R.color.primarycolor)
+                        post.photoUrl?.let {
+                            Image(
+                                painter = rememberAsyncImagePainter(it),
+                                contentDescription = "User profile picture",
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(40.dp)
+                                    .padding(0.dp)
+                            )
+                        } ?: Image(
+                            painter = painterResource(R.drawable.profile),
+                            contentDescription = "User profile picture",
+                            modifier = Modifier
+                                .width(40.dp)
+                                .height(40.dp)
+                                .padding(0.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            //username資料未引入
-                            text ="userName",
+                            text =post.userName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.black_200)
@@ -98,23 +108,6 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                         )
                     }
                 }
-//                Column(
-//                    modifier = Modifier.padding(8.dp)
-//                ) {
-//                    Spacer(modifier = Modifier.height(10.dp))
-//                    val imagePainter = runCatching { painterResource(id = post.picture) }
-//                        .getOrElse { painterResource(id = R.drawable.postpic) }
-//                    Image(
-//                            painter = imagePainter,
-//                        contentDescription = "貼文圖片",
-//                        modifier = Modifier
-//                            .width(189.dp)
-//                            .height(107.dp)
-//                            .background(colorResource(id = R.color.backgroundcolor))
-//                    )
-//                }
-
-
                 Column(
                     modifier = Modifier.padding(8.dp)
                 ) {

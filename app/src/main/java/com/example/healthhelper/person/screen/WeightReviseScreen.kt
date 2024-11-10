@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.DeleteDataDialog
@@ -153,7 +154,7 @@ fun WeightReviseScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text =  stringResource(R.string.body_fat), fontSize = 24.sp)
+                        Text(text = stringResource(R.string.body_fat), fontSize = 24.sp)
                         Spacer(modifier = Modifier.padding(end = 10.dp))
                         OutlinedTextField(
                             value = bodyFat,
@@ -193,24 +194,29 @@ fun WeightReviseScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                 Button(
                     onClick = {
-                        val heightValue = height.toDoubleOrNull()
-                        val weightValue = weight.toDoubleOrNull()
-                        val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
-
-                        if (heightValue != null && weightValue != null && heightValue > 0 && weightValue > 0) {
+                        errMsg = weightViewModel.validateInput(height, weight, bodyFat) ?: ""
+                        if (errMsg.isEmpty()) {
+                            val heightValue = height.toDouble()
+                            val weightValue = weight.toDouble()
+                            val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
                             val bmi = weightViewModel.calculateBMI(heightValue, weightValue)
-                            if (bmi != 0.0) {
-                                coroutineScope.launch {
-                                    if(recordId!=null){
-                                        val result = weightViewModel.updateBodyDataJson(
-                                            recordId.toInt(), heightValue, weightValue, fatValue, recordDate, bmi
-                                        )
-                                        if (result) navController.navigateUp()
+
+                            coroutineScope.launch {
+                                if (recordId != null) {
+                                    val result = weightViewModel.updateBodyDataJson(
+                                        recordId.toInt(),
+                                        heightValue,
+                                        weightValue,
+                                        fatValue,
+                                        bmi
+                                    )
+                                    if (result) {
+                                        navController.navigateUp()
+                                    } else {
+                                        errMsg = context.getString(R.string.updateFailed)
                                     }
                                 }
                             }
-                        } else {
-                            errMsg = context.getString(R.string.failValueHeightWeight)
                         }
                     },
                     modifier = Modifier
@@ -224,11 +230,9 @@ fun WeightReviseScreen(
                         fontSize = 24.sp
                     )
                 }
-
             }
             Spacer(modifier = Modifier.padding(top = 8.dp))
             Text(text = errMsg, color = Color.Red)
-
         }
         Text(text = errMsg, color = Color.Red)
         if (isShowDeleteDialog) {
@@ -241,7 +245,7 @@ fun WeightReviseScreen(
                 onConfirm = {
                     isShowDeleteDialog = false
                     coroutineScope.launch {
-                        val result = weightViewModel.deleteBodyDataJson(recordId?:"")
+                        val result = weightViewModel.deleteBodyDataJson(recordId ?: "")
                         if (result) navController.navigate(PersonScreenEnum.weightScreen.name)
                     }
                 },

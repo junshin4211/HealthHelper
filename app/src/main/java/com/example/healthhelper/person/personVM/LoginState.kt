@@ -4,5 +4,5 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 object LoginState {
-    var isLogin:MutableState<Boolean> = mutableStateOf(false)
+    var isLogin:MutableState<Boolean?> = mutableStateOf(null)
 }

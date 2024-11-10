@@ -120,6 +120,7 @@ class UserPhotoUploadVM : ViewModel() {
     ) {
         withContext(Dispatchers.IO) {
             try {
+                _isloading.value = true
                 val inputStream = contentResolver.openInputStream(contentUri)
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 val byteArrayOutputStream = ByteArrayOutputStream()

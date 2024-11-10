@@ -105,5 +105,9 @@ class PostVM : ViewModel() {
         }
     }
 
+   fun getPostById(postId: Int): Post? {
+        return _postsState.value.find { it.postId == postId }
+    }
+
 }
 

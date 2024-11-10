@@ -49,7 +49,7 @@ fun CmtController(
             route = "${CmtScreenEnum.PersonalPostScreen.name}/{postId}"
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId")
-            PersonalPostScreen(navController, commentVM = commentVM, postId = postId)
+            PersonalPostScreen(navController, postVM = postVM, commentVM = commentVM, postId = postId)
         }
 
     }

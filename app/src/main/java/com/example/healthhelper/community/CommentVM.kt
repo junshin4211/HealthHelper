@@ -51,7 +51,7 @@ class CommentVM : ViewModel() {
         }
     }
 
-    suspend fun insertComment(reply: String, postId: Int, userId: Int): Boolean {
+    suspend fun insertComment(reply: String, postId: Int): Boolean {
         val url = "$serverUrl/insertComment"
         val gson = Gson()
         val jsonObject = JsonObject().apply {

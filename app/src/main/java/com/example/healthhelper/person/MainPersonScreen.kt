@@ -3,7 +3,6 @@
 import android.Manifest
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,8 +20,15 @@ import com.example.healthhelper.person.personVM.AchievementViewModel
 import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.personVM.WeightViewModel
+import com.example.healthhelper.person.screen.AchievementScreen
+import com.example.healthhelper.person.screen.CameraPreviewScreen
+import com.example.healthhelper.person.screen.PersonScreen
+import com.example.healthhelper.person.screen.PhotoPreviewScreen
+import com.example.healthhelper.person.screen.PickPhotoScreen
+import com.example.healthhelper.person.screen.WeightReviseScreen
+import com.example.healthhelper.person.screen.WeightScreen
+import com.example.healthhelper.person.screen.WeightSettingScreen
 import com.example.healthhelper.screen.TabViewModel
-import com.example.healthhelper.signuplogin.LoginScreen
 import com.example.healthhelper.signuplogin.LoginVM
 import com.example.healthhelper.signuplogin.UpdateInfoScreen
 import com.example.healthhelper.signuplogin.UpdateInfoVM

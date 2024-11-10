@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -50,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.person.model.ErrorMsg
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomTopBar
 import com.example.healthhelper.person.widget.SaveButton
@@ -202,18 +200,21 @@ fun WeightSettingScreen(
                         )
                     }
 
+
                 }
             }
-
+            Text(text = errMsg, color = Color.Red)
             Spacer(modifier = Modifier.padding(bottom = 8.dp))
             SaveButton(
                 onClick = {
-                    val heightValue = height.toDoubleOrNull()
-                    val weightValue = weight.toDoubleOrNull()
-                    val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
+                    errMsg = weightViewModel.validateInput(height, weight, bodyFat, selectDate) ?: ""
 
-                    if (heightValue != null && weightValue != null && heightValue > 0 && weightValue > 0) {
+                    if (errMsg.isEmpty()) {
+                        val heightValue = height.toDouble()
+                        val weightValue = weight.toDouble()
+                        val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
                         val bmi = weightViewModel.calculateBMI(heightValue, weightValue)
+
                         if (bmi != 0.0) {
                             coroutineScope.launch {
                                 val result = weightViewModel.insertBodyDataJson(
@@ -222,13 +223,10 @@ fun WeightSettingScreen(
                                 if (result) navController.navigateUp()
                             }
                         }
-                    } else {
-                        errMsg = context.getString(R.string.failValueHeightWeight)
                     }
                 }
             )
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-            Text(text = errMsg, color = Color.Red)
+
         }
 
         if (showDatePickerDialog) {
