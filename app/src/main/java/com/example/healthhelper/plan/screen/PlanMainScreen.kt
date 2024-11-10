@@ -45,6 +45,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.usecase.PlanUCImpl
+import com.example.healthhelper.plan.viewmodel.CheckPlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
@@ -54,6 +55,7 @@ fun PlanMain(context: Context = LocalContext.current,
              navcontroller: NavHostController = rememberNavController(),
              tabVM: TabViewModel = viewModel(),
              planVM: PlanVM,
+             checkPlanVM: CheckPlanVM
 ) {
     val tag = "tag_PlanMain"
     tabVM.setTabVisibility(true)
@@ -111,6 +113,7 @@ fun PlanMain(context: Context = LocalContext.current,
                 .fillMaxWidth()
                 .padding(top = 5.dp)
                 .clickable {
+                    checkPlanVM.setSelectedPlan(myPlan)
                     navcontroller.navigate(PlanPage.CheckPlan.name)
                 },
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -220,6 +223,7 @@ fun PlanMain(context: Context = LocalContext.current,
                 .fillMaxWidth()
                 .padding(top = 5.dp)
                 .clickable {
+                    checkPlanVM.setSelectedPlan(completePlan)
                     navcontroller.navigate(PlanPage.CheckPlan.name)
                 },
             horizontalAlignment = Alignment.CenterHorizontally,

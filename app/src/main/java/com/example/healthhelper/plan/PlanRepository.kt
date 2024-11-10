@@ -1,6 +1,8 @@
 package com.example.healthhelper.plan
 
+import com.example.healthhelper.plan.model.DiaryNutritionModel
 import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.plan.model.PlanSpecificModel
 import com.example.healthhelper.plan.model.PlanWithGoalModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +35,45 @@ object PlanRepository {
         }
     }
 
+    //remove myPlan from list
+    fun removeMyPlan(plan: PlanModel) {
+        _myPlanList.update {
+            val plans = it.toMutableList()
+            plans.remove(plan)
+            plans
+        }
+    }
+
+    //set plan from Plan selection
+    private val _selectedPlan = MutableStateFlow(PlanModel())
+    val selectedPlan: StateFlow<PlanModel> = _selectedPlan.asStateFlow()
+
+    fun setSelectedPlan(plan: PlanModel) {
+        _selectedPlan.updateAndGet {
+            plan
+        }
+    }
+
+    //set plan from CompletePlan selection
+//    private val _selectedCompletePlan = MutableStateFlow(PlanModel())
+//    val selectedCompletePlan: StateFlow<PlanModel> = _selectedCompletePlan.asStateFlow()
+//
+//    fun setSelectedCompletePlan(plan: PlanModel) {
+//        _selectedCompletePlan.updateAndGet {
+//            plan
+//        }
+//    }
+
+    //get plan specific data
+    private val _planSpecificData = MutableStateFlow(PlanSpecificModel())
+    val planSpecificData: StateFlow<PlanSpecificModel> = _planSpecificData.asStateFlow()
+
+    fun setPlanSpecificData(plan: PlanSpecificModel) {
+        _planSpecificData.update {
+            plan
+        }
+    }
+
     //Get List Plan
     private val _myPlanList = MutableStateFlow(emptyList<PlanModel>())
     val myPlanList: StateFlow<List<PlanModel>> = _myPlanList.asStateFlow()
@@ -43,24 +84,13 @@ object PlanRepository {
         }
     }
 
-    //remove mtPlan from list
-    fun removeMyPlan(plan: PlanModel) {
-        _myPlanList.update {
-            val plans = it.toMutableList()
-            plans.remove(plan)
-            plans
-        }
-    }
-
-    //add myPlan to list
-
     private val _completePlanList = MutableStateFlow(emptyList<PlanModel>())
     val completePlanList: StateFlow<List<PlanModel>> = _completePlanList.asStateFlow()
 
     fun setCompletePlanList(list: List<PlanModel>) {
-       _completePlanList.update {
-           list
-       }
+        _completePlanList.update {
+            list
+        }
     }
 
     //remove CompletePlan from list
@@ -72,6 +102,14 @@ object PlanRepository {
         }
     }
 
-    //add CompletePlan to list
+    //get Diary Range List
+    private val _diaryRangeList = MutableStateFlow(emptyList<DiaryNutritionModel>())
+    val diaryRangeList: StateFlow<List<DiaryNutritionModel>> = _diaryRangeList.asStateFlow()
+
+    fun setDiaryRangeList(list: List<DiaryNutritionModel>) {
+        _diaryRangeList.update {
+            list
+        }
+    }
 
 }
