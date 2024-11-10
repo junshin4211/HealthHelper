@@ -50,6 +50,7 @@ import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.himanshoe.charty.common.toChartDataCollection
 import com.himanshoe.charty.pie.model.PieData
@@ -71,6 +72,7 @@ fun EditPlan(
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
     val planUCImpl = remember { PlanUCImpl() }
+    val currentuserId = UserManager.getUser()?.userId ?: 0
 
     val calorieErr = stringResource(R.string.calorieerror)
     val dateErr = stringResource(R.string.dateerror)
@@ -349,7 +351,7 @@ fun EditPlan(
                         return@OnClick
                     }
 
-                    EditPlanVM.updateUserId(2)
+                    EditPlanVM.updateUserId(currentuserId)
                     EditPlanVM.updateFinishState(0)
                     EditPlanVM.updateCaloriesGoal(calorie)
                     scope.launch {

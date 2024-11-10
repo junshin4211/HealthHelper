@@ -84,6 +84,7 @@ fun CheckPlan(
     LaunchedEffect(Unit) {
         runCatching {
             checkVM.getSpecificPlan()
+//            if(checkVM.updatePlan() == )
         }.onFailure {
             Log.d(tag, "CheckPlan: ${it.message}")
         }

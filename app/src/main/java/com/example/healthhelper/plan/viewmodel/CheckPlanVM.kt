@@ -37,11 +37,7 @@ class CheckPlanVM: ViewModel() {
     val selectedPlanState: StateFlow<PlanModel> = repository.selectedPlan
     val planSpecificState: StateFlow<PlanSpecificModel> = repository.planSpecificData
     val diaryRangeListState: StateFlow<List<DiaryNutritionModel>> = repository.diaryRangeList
-
-//    init {
-//        getSpecificPlan()
-//        getDiaryList()
-//    }
+    val currentuserId = UserManager.getUser()?.userId ?: 0
 
     fun getCateGoryName(): String{
         return selectedPlanState.value.categoryName
@@ -106,11 +102,34 @@ class CheckPlanVM: ViewModel() {
         }
     }
 
+    //update finished plan request
+    private suspend fun updatefinishrequest(
+        userId: Int,
+        userDietPlanID: Int,
+    ): Boolean{
+        try {
+            val url = "$serverUrl/Plan/UpdatePlan"
+            val gson = Gson()
+            var jsonObject = JsonObject()
+
+            jsonObject.addProperty("userId", userId)
+            jsonObject.addProperty("userDietPlanId", userDietPlanID)
+
+            val result = httpPost(url, jsonObject.toString())
+            jsonObject = gson.fromJson(result, JsonObject::class.java)
+            Log.d(tag, "updatePlan: $result")
+            return jsonObject.get("result").asBoolean
+        }catch (e:Exception){
+            Log.e(tag, "Error to update plan: ${e.message}")
+            return  false
+        }
+    }
+
     //get specific plan
     fun getSpecificPlan(){
         viewModelScope.launch {
             try {
-                val specificPlan = fetchSpecificPlan(2, selectedPlanState.value)
+                val specificPlan = fetchSpecificPlan(currentuserId, selectedPlanState.value)
                 Log.d(tag, "getspecificPlan: $specificPlan")
                 repository.setPlanSpecificData(specificPlan)
                 Log.d(tag, "Fetched planSpecificState: ${planSpecificState.value}")
@@ -132,6 +151,17 @@ class CheckPlanVM: ViewModel() {
             } catch (e: Exception) {
                 Log.e(tag, "Error fetching diaryRangeListState: ${e.message}")
             }
+        }
+    }
+
+    //update plan
+    suspend fun updatePlan(): Boolean{
+        try {
+                val result = updatefinishrequest(currentuserId, selectedPlanState.value.userDietPlanId)
+                return result
+        }catch (e: Exception) {
+                Log.e(tag, "Error update plan state: ${e.message}")
+                return false
         }
     }
 

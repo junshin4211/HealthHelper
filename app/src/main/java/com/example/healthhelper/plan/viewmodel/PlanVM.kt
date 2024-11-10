@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.GsonBuilder
@@ -24,6 +25,7 @@ class PlanVM : ViewModel() {
 
     var panneelname: String = PlanPage.MyPlan.name
     var showdelete: Boolean = false
+    val currentuserId = UserManager.getUser()?.userId ?: 0
 
     init {
         getPlan()
@@ -56,7 +58,7 @@ class PlanVM : ViewModel() {
     fun getPlan(){
         viewModelScope.launch {
             try {
-                val myPlan = fetchPlanData(2, 0)
+                val myPlan = fetchPlanData(currentuserId, 0)
                 repository.setMyPlan(myPlan)
                 Log.d(tag, "Fetched myPlanState: ${myPlanState.value}")
             } catch (e: Exception) {
@@ -68,7 +70,7 @@ class PlanVM : ViewModel() {
     fun getCompletePlan(){
         viewModelScope.launch {
             try {
-                val completePlan = fetchPlanData(2, 1)
+                val completePlan = fetchPlanData(currentuserId, 1)
                 repository.setCompletePlan(completePlan)
                 Log.d(tag, "Fetched completePlanState: ${completePlanState.value}")
             } catch (e: Exception) {
