@@ -30,7 +30,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,32 +42,29 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.community.components.CmtNavbarComponent
-import com.example.healthhelper.ui.theme.HealthHelperTheme
 import kotlinx.coroutines.launch
 
+@JvmOverloads
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PersonalPostScreen(
     navController: NavHostController,
     commentVM: CommentVM,
-//                       postVM: PostVM,
+    postVM: PostVM,
     postId: String?,
 ) {
-//    val comments = fetchComments()
     var reply by remember { mutableStateOf("") }
-//    val posts by postVM.postsState.collectAsState()
     var isRefreshing by remember { mutableStateOf(false) }
     var comments by remember { mutableStateOf<List<Comment>>(emptyList()) }
     val scope = rememberCoroutineScope()
+    val postIdInt = postId?.toIntOrNull() // 確保是 Int，避免 null
+    val post = remember { postIdInt?.let { postVM.getPostById(it) } }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
@@ -82,6 +78,7 @@ fun PersonalPostScreen(
         }
     )
 
+
     LaunchedEffect(postId) {
         postId?.toInt()?.let {
             comments = commentVM.filterComment(it)
@@ -93,10 +90,11 @@ fun PersonalPostScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(colorResource(id = R.color.backgroundcolor))
+                .padding(bottom = 72.dp)
         ) {
             // Navbar 元件
             item {
-//                CmtNavbarComponent(navController = navController, postVM = postVM)
+                CmtNavbarComponent(navController = navController, postVM = postVM)
             }
 
             // Profile row
@@ -107,17 +105,24 @@ fun PersonalPostScreen(
                         .fillMaxWidth()
                         .padding(start = 8.dp, top = 16.dp)
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.profile),
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier.size(48.dp),
-                        tint = colorResource(R.color.primarycolor)
+                    post?.photoUrl?.let {
+                        Image(
+                            painter = rememberAsyncImagePainter(it),
+                            contentDescription = "User profile picture",
+                            modifier = Modifier
+                                .size(48.dp)
+                        )
+                    } ?: Image(
+                        painter = painterResource(R.drawable.profile),
+                        contentDescription = "User profile picture",
+                        modifier = Modifier
+                            .size(48.dp)
                     )
 
                     Spacer(modifier = Modifier.width(10.dp))
 
                     Text(
-                        text = stringResource(id = R.string.userName),
+                        text = post?.userName ?: stringResource(id = R.string.userName),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(R.color.black_200)
@@ -129,17 +134,14 @@ fun PersonalPostScreen(
             // Post title row
             item {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        10.dp,
-                        Alignment.CenterHorizontally
-                    ),
+                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.post_title_text),
+                        text = post?.title ?: stringResource(id = R.string.post_title_text),
                         fontSize = 24.sp,
                         fontWeight = FontWeight(800),
                         color = colorResource(R.color.black_200)
@@ -147,26 +149,26 @@ fun PersonalPostScreen(
                 }
                 Spacer(modifier = Modifier.height(25.dp))
             }
-
-            // Post image
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.post_img_example),
-                        contentDescription = "image description",
-                        contentScale = ContentScale.FillBounds,
+            post?.picture?.let { imageUrl ->
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .width(365.90417.dp)
-                            .height(192.89487.dp)
-                            .padding(8.dp)
-                    )
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUrl),
+                            contentDescription = "Post Image",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .width(365.dp)
+                                .height(192.dp)
+                                .padding(8.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
-                Spacer(modifier = Modifier.height(20.dp))
             }
 
             // Post content text
@@ -178,7 +180,7 @@ fun PersonalPostScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.post_content_text),
+                        text = post?.content ?: stringResource(id = R.string.post_content_text),
                         color = colorResource(id = R.color.dark_blue_100)
                     )
                 }
@@ -193,7 +195,7 @@ fun PersonalPostScreen(
                         .padding(start = 16.dp)
                 ) {
                     Text(
-                        text = "2024-08-19 08:30",
+                        text = post?.postDate ?: "2024-08-19 08:30",
                         fontSize = 14.sp,
                         lineHeight = 22.4.sp,
                         fontWeight = FontWeight(400),
@@ -287,54 +289,51 @@ fun PersonalPostScreen(
 
                 HorizontalDivider(color = colorResource(id = R.color.white_100))
             }
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = reply,
+                onValueChange = { reply = it },
+                placeholder = { Text("留言…") },
+                modifier = Modifier
+                    .weight(1f)
+                    .background(colorResource(id = R.color.white))
+                    .border(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.gray_300),
+                        shape = RoundedCornerShape(size = 4.dp)
+                    )
+                    .background(
+                        color = colorResource(id = R.color.white),
+                        shape = RoundedCornerShape(size = 4.dp)
+                    ),
 
-            // 留言輸入框
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = reply,
-                        onValueChange = { reply = it },
-                        placeholder = { Text("留言…") },
-                        modifier = Modifier
-                            .weight(1f)
-                            .background(colorResource(id = R.color.white))
-                            .border(
-                                width = 1.dp,
-                                color = colorResource(id = R.color.gray_300),
-                                shape = RoundedCornerShape(size = 4.dp)
-                            )
-                            .background(
-                                color = colorResource(id = R.color.white),
-                                shape = RoundedCornerShape(size = 4.dp)
-                            ),
-
-                        )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = {
-                        if (postId != null) {
-                            scope.launch {
-                                val result = commentVM.insertComment(reply, postId.toInt())
-                                if (result) {
-                                    reply = ""
-                                    postId.toIntOrNull()?.let {
-                                        comments = commentVM.filterComment(it)
-                                    }
-                                }
+                )
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(onClick = {
+                if (postId != null) {
+                    scope.launch {
+                        val result = commentVM.insertComment(reply, postId.toInt())
+                        if (result) {
+                            reply = ""
+                            postId.toIntOrNull()?.let {
+                                comments = commentVM.filterComment(it)
                             }
                         }
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.send),
-                            contentDescription = "Send Comment",
-                            tint = colorResource(id = R.color.primarycolor)
-                        )
                     }
                 }
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.send),
+                    contentDescription = "Send Comment",
+                    tint = colorResource(id = R.color.primarycolor)
+                )
             }
         }
         PullRefreshIndicator(
@@ -342,54 +341,5 @@ fun PersonalPostScreen(
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
-    }
-}
-
-
-/**
- * 載入測試需要資料
- * @return 多留言資訊
- */
-//fun fetchComments(): List<Comment> {
-//    return listOf(
-//        Comment(
-//            R.drawable.profile,
-//            "Marry",
-//            "看起來美味又營養",
-//            1,
-//            "2024-06-07 04:30"
-//        ),
-//        Comment(
-//            R.drawable.profile,
-//            "Max",
-//            "看起來營養又好吃",
-//            2,
-//            "2024-06-07 13:34"
-//        ),
-//        Comment(
-//            R.drawable.profile,
-//            "Betty",
-//            "讚!繼續保持",
-//            3,
-//            "2024-06-07 23:30"
-//        ),
-//        Comment(
-//            R.drawable.profile,
-//            "Martin",
-//            "會瘦會瘦",
-//            4,
-//            "2024-06-07 23:44"
-//        )
-//
-//    )
-//}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PersonalPostScreenPreview() {
-    HealthHelperTheme {
-        val commentVM: CommentVM = viewModel()
-        PersonalPostScreen(rememberNavController(), commentVM = commentVM, postId = "2")
     }
 }
