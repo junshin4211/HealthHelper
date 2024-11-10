@@ -25,7 +25,7 @@ class PlanVM : ViewModel() {
 
     var panneelname: String = PlanPage.MyPlan.name
     var showdelete: Boolean = false
-    val currentuserId = UserManager.getUser()?.userId ?: 0
+    val currentuserId = UserManager.getUser().userId
 
     init {
         getPlan()
@@ -58,6 +58,7 @@ class PlanVM : ViewModel() {
     fun getPlan(){
         viewModelScope.launch {
             try {
+                Log.d(tag,"$currentuserId")
                 val myPlan = fetchPlanData(currentuserId, 0)
                 repository.setMyPlan(myPlan)
                 Log.d(tag, "Fetched myPlanState: ${myPlanState.value}")
