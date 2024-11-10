@@ -5,6 +5,7 @@ import com.example.healthhelper.plan.CateGoryId
 import com.example.healthhelper.plan.NutritionGoals
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.model.DiaryNutritionModel
+import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import java.sql.Timestamp
@@ -181,21 +182,20 @@ class PlanUCImpl : PlanUC {
         return formattedPercentage
     }
 
-    override fun isTimeAfterToday(timeStamp: Long): Boolean {
+    override fun isTimeAfterToday(timeStamp: Timestamp): Boolean {
         // 使用台北時區
         val taipeiZoneId = ZoneId.of("Asia/Taipei")
 
-        // 取得台北當前時間的日期
-        val currentDateInTaipei = LocalDate.now(taipeiZoneId)
+        // 取得台北當前的當地時間
+        val currentDateTimeInTaipei = LocalDateTime.now(taipeiZoneId)
 
-        // 取得TimeStamp在台北時區的日期
-        val dateInTaipei = Instant.ofEpochMilli(timeStamp)
+        // 將 Timestamp 轉換為 LocalDateTime
+        val timestampDateTime = timeStamp.toInstant()
             .atZone(taipeiZoneId)
-            .toLocalDate()
+            .toLocalDateTime()
 
-        // 當 dateInTaipei 大於 currentDateInTaipei 時回傳 true
-        return dateInTaipei.isAfter(currentDateInTaipei)
+        // 比較當地時間是否大於傳進來的 Timestamp
+        return currentDateTimeInTaipei.isAfter(timestampDateTime)
     }
-
 
 }

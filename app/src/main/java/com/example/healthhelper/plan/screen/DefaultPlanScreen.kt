@@ -72,7 +72,7 @@ fun EditPlan(
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
     val planUCImpl = remember { PlanUCImpl() }
-    val currentuserId = UserManager.getUser()?.userId ?: 0
+    val currentuserId = UserManager.getUser().userId
 
     val calorieErr = stringResource(R.string.calorieerror)
     val dateErr = stringResource(R.string.dateerror)

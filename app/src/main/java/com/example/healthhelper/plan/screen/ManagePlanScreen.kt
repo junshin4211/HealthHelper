@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.model.PlanModel
@@ -30,6 +31,7 @@ import com.example.healthhelper.plan.ui.CustomIcon
 import com.example.healthhelper.plan.ui.CustomList
 import com.example.healthhelper.plan.ui.CustomSnackBar
 import com.example.healthhelper.plan.usecase.PlanUCImpl
+import com.example.healthhelper.plan.viewmodel.CheckPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
@@ -45,6 +47,8 @@ fun ManagePlan(
     tabVM: TabViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    checkPlanVM: CheckPlanVM,
+    navcontroller: NavHostController
 ) {
     tabVM.setTabVisibility(false)
     val context = LocalContext.current
@@ -87,7 +91,8 @@ fun ManagePlan(
                 CustomList().ItemList(
                     inputList = myPlanList,
                     onItemClick = {
-                        //TODO 導入到計畫詳細頁面
+                        checkPlanVM.setSelectedPlan(it)
+                        navcontroller.navigate(PlanPage.CheckPlan.name)
                     },
                     leadingIcon = {
                         Image(
@@ -139,7 +144,8 @@ fun ManagePlan(
                 CustomList().ItemList(
                     inputList = completePlanList,
                     onItemClick = {
-                        //TODO 導入到計畫詳細頁面
+                        checkPlanVM.setSelectedPlan(it)
+                        navcontroller.navigate(PlanPage.CheckPlan.name)
                     },
                     leadingIcon = {
                         Image(
@@ -180,7 +186,6 @@ fun ManagePlan(
                     scope.launch {
                         val isSuccess = managePlanVM.deletePlan(
                             plan = selectedPlan,
-                            userId = 2, //TODO 換成給定的userid
                             userDietPlanID = selectedPlan.userDietPlanId,
                             finishState = 0
                         )

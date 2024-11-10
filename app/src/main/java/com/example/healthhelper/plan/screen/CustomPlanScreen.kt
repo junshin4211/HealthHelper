@@ -73,7 +73,7 @@ fun CustomEditPlan(
     tabVM.setTabVisibility(false)
     val context = LocalContext.current
     val df = DecimalFormat("#.#")
-    val currentuserId = UserManager.getUser()?.userId ?: 0
+    val currentuserId = UserManager.getUser().userId
 
     val calorieErr = stringResource(R.string.calorieerror)
     val dateErr = stringResource(R.string.dateerror)

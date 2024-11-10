@@ -37,7 +37,7 @@ class CheckPlanVM: ViewModel() {
     val selectedPlanState: StateFlow<PlanModel> = repository.selectedPlan
     val planSpecificState: StateFlow<PlanSpecificModel> = repository.planSpecificData
     val diaryRangeListState: StateFlow<List<DiaryNutritionModel>> = repository.diaryRangeList
-    val currentuserId = UserManager.getUser()?.userId ?: 0
+    val currentuserId = UserManager.getUser().userId
 
     fun getCateGoryName(): String{
         return selectedPlanState.value.categoryName
@@ -46,6 +46,12 @@ class CheckPlanVM: ViewModel() {
     //set selected plan
     fun setSelectedPlan(plan: PlanModel) {
         repository.setSelectedPlan(plan)
+    }
+
+    fun clear(){
+        setSelectedPlan(PlanModel())
+        repository.setPlanSpecificData(PlanSpecificModel())
+        repository.setDiaryRangeList(emptyList())
     }
 
     //get specific plan request
@@ -106,6 +112,7 @@ class CheckPlanVM: ViewModel() {
     private suspend fun updatefinishrequest(
         userId: Int,
         userDietPlanID: Int,
+        finishstate: Int
     ): Boolean{
         try {
             val url = "$serverUrl/Plan/UpdatePlan"
@@ -114,6 +121,7 @@ class CheckPlanVM: ViewModel() {
 
             jsonObject.addProperty("userId", userId)
             jsonObject.addProperty("userDietPlanId", userDietPlanID)
+            jsonObject.addProperty("finishstate", finishstate)
 
             val result = httpPost(url, jsonObject.toString())
             jsonObject = gson.fromJson(result, JsonObject::class.java)
@@ -155,13 +163,13 @@ class CheckPlanVM: ViewModel() {
     }
 
     //update plan
-    suspend fun updatePlan(): Boolean{
+    suspend fun updatePlan(userDietPlanID: Int,finishstate: Int): Boolean{
         try {
-                val result = updatefinishrequest(currentuserId, selectedPlanState.value.userDietPlanId)
-                return result
+            val result = updatefinishrequest(currentuserId, userDietPlanID, finishstate)
+            return result
         }catch (e: Exception) {
-                Log.e(tag, "Error update plan state: ${e.message}")
-                return false
+            Log.e(tag, "Error update plan state: ${e.message}")
+            return false
         }
     }
 
