@@ -26,7 +26,6 @@ const val serverName = "HealthyHelperServer"
 // server url
 const val serverUrl = "${serverProtocol}://${serverIPv4}:${serverPort}/${serverName}"
 
-
 private const val myTag = "tag_Common"
 
 suspend fun sendHttpRequest(
@@ -36,6 +35,7 @@ suspend fun sendHttpRequest(
 ): String {
     val TAG = "tag_sendHttpRequest"
 
+    Log.e(TAG,"-".repeat(50))
     Log.e(TAG,"sendHttpRequest function was called.")
 
     var dataIn = ""
@@ -63,6 +63,7 @@ suspend fun sendHttpRequest(
         }
     }
     Log.e(TAG,"sendHttpRequest function was finished called.")
+    Log.e(TAG,"-".repeat(50))
     return dataIn
 }
 

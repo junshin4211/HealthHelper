@@ -123,7 +123,6 @@ fun DietDiaryMealFrame(
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
     var checkedFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-
     LaunchedEffect(availableFoodItems) {
         checkedFoodItems = availableFoodItems.filter { it.isCheckedWhenSelection.value }
     }
@@ -339,7 +338,7 @@ fun DietDiaryMealFrame(
                                     onClick = {
                                         dietDiaryDescriptionButtonIsClicked = true
                                         if (isCleanEventTriggeredMeetPrerequisites) {
-                                            descriptionText = mutableStateOf("")
+                                            descriptionText = ""
                                         }
                                     },
                                     buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
@@ -363,8 +362,8 @@ fun DietDiaryMealFrame(
                                     )
                                 }
                                 MyOutLinedTextField(
-                                    value = descriptionText.value,
-                                    onValueChange = { descriptionText.value = it },
+                                    value = descriptionText,
+                                    onValueChange = { descriptionText = it },
                                     isVisible = shouldShowDescription,
                                 )
                                 isCleanEventTriggered = false
@@ -453,7 +452,7 @@ fun DietDiaryMealFrame(
             navController = navController,
             context = context,
             foodIconUri = selectedImageUri,
-            foodDescription = descriptionText.value,
+            foodDescription = descriptionText,
         )
         saveFoodDescriptionButtonIsClicked = false
     }

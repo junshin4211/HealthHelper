@@ -37,7 +37,7 @@ class FoodViewModel : ViewModel() {
         if(foodVOs.isEmpty()){
             return 1000
         }
-        return foodVOs[0].foodId
+        return foodVOs[0].foodID
     }
 
     suspend fun selectByFoodId(

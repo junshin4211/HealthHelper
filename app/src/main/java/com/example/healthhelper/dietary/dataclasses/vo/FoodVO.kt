@@ -3,8 +3,8 @@ package com.example.healthhelper.dietary.dataclasses.vo
 import com.google.gson.annotations.SerializedName
 
 data class FoodVO(
-    @SerializedName("foodId")
-    var foodId : Int = -1,
+    @SerializedName("foodID")
+    var foodID : Int = -1,
 
     @SerializedName("foodName")
     var foodName: String = "",

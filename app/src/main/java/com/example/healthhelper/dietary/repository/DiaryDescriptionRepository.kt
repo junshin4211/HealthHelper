@@ -25,15 +25,15 @@ object DiaryDescriptionRepository {
     }
 
     fun setUri(uri:Uri?){
-        _dataFlow.value.uri.value = uri
+        _dataFlow.value.uri = uri
     }
 
     fun setDescription(description:String){
-        _dataFlow.value.description.value = description
+        _dataFlow.value.description = description
     }
 
     fun clearData(){
-        _dataFlow.value.uri.value = null
-        _dataFlow.value.description.value = ""
+        _dataFlow.value.uri = null
+        _dataFlow.value.description = ""
     }
 }

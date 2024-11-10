@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
-import com.example.healthhelper.dietary.interaction.database.LoadFoodItem
 import com.example.healthhelper.dietary.repository.DiaryRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedDateRepository
@@ -91,6 +90,7 @@ fun CustomDatePicker(
 
     LaunchedEffect(selectedDate) {
         if(selectedDate!=context.getString(R.string.noChoose)){
+            Log.e(TAG,"-".repeat(50))
             Log.e(TAG,"LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
 
             // get date by formatting the given String.
@@ -103,8 +103,9 @@ fun CustomDatePicker(
             DiaryRepository.setCreateDate(selectedDateVO.selectedDate.value)
 
             var queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
-            Log.e(TAG,"In LaunchedEffect(selectedDate) block,queriedDiaryVOs:${queriedDiaryVOs}")
 
+            Log.e(TAG,"In LaunchedEffect(selectedDate) block,queriedDiaryVOs:${queriedDiaryVOs}")
+            Log.e(TAG,"-".repeat(50))
             if(queriedDiaryVOs.isEmpty()){
                 val toastMessage = context.getString(R.string.load_diary_info_failed) +
                         context.getString(R.string.insert_diary_id_tip_message)
@@ -130,14 +131,6 @@ fun CustomDatePicker(
             DiaryRepository.setData(queriedDiaryVOs[0])
 
             FoodItemRepository.setSelectedDiaryId(queriedDiaryVOs[0].diaryID)
-
-            Log.e(TAG,"In CustomDatePicker function, LaunchedEffect(selectedDate) was called. selectedFoodItemVO:${selectedFoodItemVO}")
-
-            LoadFoodItem(
-                context = context,
-                selectedFoodItemVO = selectedFoodItemVO,
-                foodItemViewModel = foodItemViewModel,
-            )
         }
     }
 

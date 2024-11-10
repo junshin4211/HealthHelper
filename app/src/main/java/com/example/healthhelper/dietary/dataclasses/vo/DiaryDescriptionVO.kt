@@ -1,8 +1,6 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
 import android.net.Uri
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import com.google.gson.annotations.SerializedName
 
 data class DiaryDescriptionVO(
@@ -13,8 +11,8 @@ data class DiaryDescriptionVO(
     var mealCategoryID: Int,
 
     @SerializedName("foodIconUri")
-    var uri: MutableState<Uri?> = mutableStateOf(null),
+    var uri: Uri? = null,
 
     @SerializedName("foodDescription")
-    var description: MutableState<String> = mutableStateOf(""),
+    var description: String = "",
 )

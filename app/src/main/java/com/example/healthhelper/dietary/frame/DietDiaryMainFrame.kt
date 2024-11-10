@@ -47,7 +47,6 @@ import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
 import com.example.healthhelper.dietary.dataclasses.vo.FoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
-import com.example.healthhelper.dietary.interaction.dataclass.UpdateSelectedFoodItemVOs
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
 import com.example.healthhelper.dietary.repository.NutritionInfoRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -84,6 +83,7 @@ fun DietDiaryMainFrame(
     val verticalScrollState2 = rememberScrollState()
 
     LaunchedEffect(diaryVO) {
+        Log.e(TAG,"-".repeat(50))
         Log.e(TAG, "LaunchedEffect(diaryVO) blocked was called,diaryVO:${diaryVO}")
         NutritionInfoRepository.setNutritionInfo(diaryVO)
         val newFoodItemVO = FoodItemVO(
@@ -92,20 +92,14 @@ fun DietDiaryMainFrame(
             grams = -1.0,
         )
         val queriedFoodItems = foodItemViewModel.selectFoodItemByDiaryId(newFoodItemVO)
-        if(queriedFoodItems.isEmpty()){
+        if(queriedFoodItems.isEmpty()){ // fetch data failed.
             Toast.makeText(context,context.getString(R.string.fetch_food_item_failed),Toast.LENGTH_LONG).show()
             return@LaunchedEffect
         }
-        Toast.makeText(context,context.getString(R.string.fetch_food_item_successfully),Toast.LENGTH_LONG).show()
-    }
 
-    LaunchedEffect(diaryVO) {
-        Log.e(TAG,"LaunchedEffect(foodItemVOs) block was called.foodItemVOs:${foodItemVOs}")
-        UpdateSelectedFoodItemVOs(
-            context = context,
-            foodItemVOs = foodItemVOs,
-            foodViewModel = foodViewModel,
-        )
+        // fetch data successfully
+        Toast.makeText(context,context.getString(R.string.fetch_food_item_successfully),Toast.LENGTH_LONG).show()
+        Log.e(TAG,"-".repeat(50))
     }
 
     Scaffold(

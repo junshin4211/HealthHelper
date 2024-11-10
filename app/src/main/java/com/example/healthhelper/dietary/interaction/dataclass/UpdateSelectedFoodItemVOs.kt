@@ -25,7 +25,7 @@ fun UpdateSelectedFoodItemVOs(
     foodViewModel.viewModelScope.launch {
         foodItemVOs.forEach { foodItemVO ->
             val targetFoodVO = FoodVO()
-            targetFoodVO.foodId = foodItemVO.foodID
+            targetFoodVO.foodID = foodItemVO.foodID
             val foodName = foodViewModel.selectFoodNameByFoodId(targetFoodVO)
             if(!foodNames.contains(foodName)) {
                 foodNames.add(foodName)
