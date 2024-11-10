@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.healthhelper.web.serverUrl
+import com.example.healthhelper.web.httpPost
 
 class UpdateInfoVM : ViewModel() {
 
@@ -24,22 +26,29 @@ class UpdateInfoVM : ViewModel() {
     private val gson = Gson()
 
     init {
-        // 在 ViewModel 初始化時就讀取用戶資料
-        UserManager.getUser()?.let { user ->
+        try {
+            // 在 ViewModel 初始化時就讀取用戶資料
+            val user = UserManager.getUser()
             Log.d("TEST_UpdateInfo", """
                 UpdateInfoVM - 初始化時讀取資料:
-                Account: ${user.account}
-                Username: ${user.username}
-                Email: ${user.userEmail}
-                Phone: ${user.phoneno}
-                Gender: ${user.gender}
-                Birthday: ${user.birthday}
-                roleID: ${user.roleID}
+                User is null? ${user == null}
+                Account: ${user?.account}
+                Username: ${user?.username}
+                Email: ${user?.userEmail}
+                Phone: ${user?.phoneno}
+                Gender: ${user?.gender}
+                Birthday: ${user?.birthday}
+                roleID: ${user?.roleID}
             """.trimIndent())
 
-            setUserData(user)
+            if (user != null) {
+                setUserData(user)
+            }
+        } catch (e: Exception) {
+            Log.e("TEST_UpdateInfo", "Error in init: ${e.message}")
         }
     }
+
 
     fun setUserData(user: User) {
         // 從 UserManager 取得資料來測試
@@ -72,7 +81,7 @@ class UpdateInfoVM : ViewModel() {
                     formState = currentState.formState.copy(
                         account = user.account,
                         username = user.username,
-                        email = user.userEmail,
+                        email = user.userEmail ?: "",
                         phone = user.phoneno ?: "",
                         gender = when (user.gender) {
                             0 -> "男"
@@ -96,7 +105,6 @@ class UpdateInfoVM : ViewModel() {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
-
         val currentUser = _uiState.value.currentUser
         if (currentUser == null) {
             Log.e("UpdateInfoVM", "currentUser is null")
@@ -104,14 +112,12 @@ class UpdateInfoVM : ViewModel() {
             return
         }
 
-
         Log.d("UpdateInfoVM", "Submitting form with account: ${_uiState.value.formState.account}")
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _isLoading.value = true
 
-                // 構建 gender 值並準備 JSON 資料
                 val genderValue = when (_uiState.value.formState.gender) {
                     "男" -> 0
                     "女" -> 1
@@ -125,7 +131,6 @@ class UpdateInfoVM : ViewModel() {
                     addProperty("phoneno", _uiState.value.formState.phone)
                     addProperty("gender", genderValue)
                     addProperty("birthday", _uiState.value.formState.birthDate)
-
                 }
 
                 Log.d("UpdateInfoVM", "Prepared JSON Data (with account): ${jsonObject.toString()}")
@@ -142,6 +147,26 @@ class UpdateInfoVM : ViewModel() {
                     val jsonResponse = gson.fromJson(response, JsonObject::class.java)
                     if (jsonResponse.get("success")?.asBoolean == true) {
                         Log.d("UpdateInfoVM", "Update successful")
+
+                        val updatedUser = currentUser.copy(
+                            username = _uiState.value.formState.username,
+                            userEmail = _uiState.value.formState.email,
+                            phoneno = _uiState.value.formState.phone,
+                            gender = genderValue,
+                            birthday = _uiState.value.formState.birthDate
+                            // 根據需要更新其他欄位
+                        )
+
+                        // 即時更新到 UserManager
+                        UserManager.setUser(updatedUser)
+
+                        // 更新 UI state
+                        _uiState.update { currentState ->
+                            currentState.copy(currentUser = updatedUser)
+                        }
+
+                        Log.d("UpdateInfoVM", "User data updated in UserManager: $updatedUser")
+
                         onSuccess()
                     } else {
                         val errorMessage = jsonResponse.get("message")?.asString ?: "更新失敗"

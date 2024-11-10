@@ -1,39 +1,49 @@
 package com.example.healthhelper.dietary.repository
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 object MealsOptionRepository {
-    private val _dataFlow: MutableStateFlow<MutableList<MealsOptionVO>>
-        @Composable
-        get() = MutableStateFlow(fetchMealsOption().toMutableList())
-    val dataFlow: StateFlow<MutableList<MealsOptionVO>>
-        @Composable
+
+    val TAG = "tag_MealsOptionRepository"
+
+    private val _dataFlow: MutableStateFlow<List<MealsOptionVO>> = MutableStateFlow(fetchData())
+    val dataFlow: StateFlow<List<MealsOptionVO>>
         get() = _dataFlow.asStateFlow()
 
-    @Composable
-    fun fetchMealsOption(): List<MealsOptionVO> {
+    private val _selectedDataFlow: MutableStateFlow<MealsOptionVO> = MutableStateFlow(fetchData()[0])
+    val selectedDataFlow: StateFlow<MealsOptionVO>
+        get() = _selectedDataFlow.asStateFlow()
+
+    fun setSelectedData(newData:MealsOptionVO){
+        _selectedDataFlow.update { newData }
+    }
+
+    fun fetchData(): List<MealsOptionVO> {
         return listOf(
             MealsOptionVO(
                 R.drawable.breakfast_leading_icon,
-                stringResource(R.string.breakfast),
+                R.string.breakfast,
+                R.string.breakfast_name,
             ),
             MealsOptionVO(
                 R.drawable.lunch_leading_icon,
-                stringResource(R.string.lunch),
+                R.string.lunch,
+                R.string.lunch_name,
             ),
             MealsOptionVO(
                 R.drawable.dinner_leading_icon,
-                stringResource(R.string.dinner),
+                R.string.dinner,
+                R.string.dinner_name,
             ),
             MealsOptionVO(
                 R.drawable.supper_leading_icon,
-                stringResource(R.string.supper),
+                R.string.supper,
+                R.string.supper_name,
             ),
         )
     }

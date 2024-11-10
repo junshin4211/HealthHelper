@@ -1,6 +1,5 @@
 package com.example.healthhelper.dietary.components.picker.datepicker
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +15,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,12 +24,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
+import com.example.healthhelper.dietary.repository.DiaryRepository
+import com.example.healthhelper.dietary.repository.SelectedDateRepository
+import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
+import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
+import java.sql.Date
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -36,8 +45,14 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun CustomDatePicker() {
+fun CustomDatePicker(
+    diaryViewModel: DiaryViewModel = viewModel(),
+    selectedDateViewModel: SelectedDateViewModel = viewModel(),
+) {
     val TAG = "tag_CustomDatePicker"
+    val context = LocalContext.current
+
+    val selectedDateVO by selectedDateViewModel.selectedDate.collectAsState()
 
     val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
@@ -56,11 +71,19 @@ fun CustomDatePicker() {
         Instant.ofEpochMilli(it)
             .atZone(ZoneId.of("UTC"))
             .toLocalDate()
-            .format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+            .format(DateTimeFormatter.ofPattern(DateFormatterPattern.pattern))
     } ?: stringResource(R.string.noChoose)
 
     val scrollState = rememberScrollState()
 
+    LaunchedEffect(selectedDate) {
+        if(selectedDate!=context.getString(R.string.noChoose)){
+            val date = Date.valueOf(selectedDate)
+            SelectedDateRepository.setDate(date)
+            val diaryVOs = diaryViewModel.fetchDataFromWebRequest(selectedDateVO)
+            DiaryRepository.setData(diaryVOs)
+        }
+    }
     Surface(
         modifier = Modifier
             .fillMaxWidth()

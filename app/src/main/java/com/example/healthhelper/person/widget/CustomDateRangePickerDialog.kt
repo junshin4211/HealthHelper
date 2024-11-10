@@ -32,7 +32,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDateRangePickerDialog(
@@ -79,17 +78,17 @@ fun CustomDateRangePickerDialog(
                 onClick = {
                     onConfirm(startDate, endDate)
                 },
-                colors = ButtonDefaults.buttonColors(colorResource(R.color.backgroundcolor))
+                colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor))
             ) {
-                Text(text = stringResource(R.string.confirm), color = colorResource(R.color.primarycolor))
+                Text(text = stringResource(R.string.confirm), color = colorResource(R.color.backgroundcolor))
             }
         },
         dismissButton = {
             Button(
                 onClick = onDismissRequest,
-                colors = ButtonDefaults.buttonColors(colorResource(R.color.backgroundcolor))
+                colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor))
             ) {
-                Text(text = stringResource(R.string.cancel), color = colorResource(R.color.primarycolor))
+                Text(text = stringResource(R.string.cancel), color = colorResource(R.color.backgroundcolor))
             }
         },
         text = {
@@ -107,29 +106,18 @@ fun CustomDateRangePickerDialog(
                     ) {
                         Text(
                             text = "$startDate ~ $endDate",
-                            color = Color.White,
+                            color = Color.DarkGray,
                             fontSize = 18.sp
                         )
                     }
                 },
                 colors = DatePickerDefaults.colors(
-                    containerColor = colorResource(R.color.primarycolor),
-                    weekdayContentColor = Color.White,
-                    subheadContentColor = Color.White,
-                    yearContentColor = Color.White,
-                    currentYearContentColor = Color.White,
-                    selectedYearContainerColor = Color.White.copy(alpha = 0.3f),
-                    selectedYearContentColor = Color.White,
-                    dayContentColor = Color.White,
-                    selectedDayContainerColor = Color.White.copy(alpha = 0.3f),
-                    selectedDayContentColor = Color.White,
-                    todayContentColor = Color.White,
-                    todayDateBorderColor = Color.White
+                    containerColor = colorResource(R.color.backgroundcolor),
                 )
             )
         },
         shape = RoundedCornerShape(15.dp),
-        containerColor = colorResource(R.color.primarycolor),
+        containerColor = colorResource(R.color.backgroundcolor),
         modifier = Modifier.width(400.dp)
     )
 }

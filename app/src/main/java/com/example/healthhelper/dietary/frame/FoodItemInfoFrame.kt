@@ -1,7 +1,9 @@
 package com.example.healthhelper.dietary.frame
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,45 +40,47 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.attr.color.defaultcolor.DefaultColorViewModel
+import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.FoodItemTopAppBar
 import com.example.healthhelper.dietary.components.button.DeleteButton
 import com.example.healthhelper.dietary.components.button.SaveButton
 import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
+import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.repository.EnterStatusRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
-import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemViewModel
-import com.example.healthhelper.dietary.viewmodel.SelectedMealOptionViewModel
+import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodItemInfoFrame(
     navController: NavHostController,
-    selectedMealOptionViewModel: SelectedMealOptionViewModel = viewModel(),
-    selectedFoodItemViewModel: SelectedFoodItemViewModel = viewModel(),
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
+    selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
 ) {
 
     val TAG = "tag_FoodItemInfoFrame"
 
     val context = LocalContext.current
 
-    val selectedMealOption by selectedMealOptionViewModel.data.collectAsState()
-    val selectedFoodItem by selectedFoodItemViewModel.data.collectAsState()
+    val mealOptions by mealOptionViewModel.data.collectAsState()
 
-    val mealOption by mealOptionViewModel.data.collectAsState()
-
-    val mutableStateString = remember { mutableStateOf(selectedMealOption.name) }
-    val options by remember { mutableStateOf(mutableListOf("")) }
+    val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
 
     var deleteButtonIsClicked by remember { mutableStateOf(false) }
     var saveButtonIsClicked by remember { mutableStateOf(false) }
+    val mealOptionNames by remember { mutableStateOf(mutableListOf<String>()) }
 
     LaunchedEffect(Unit) {
-        mealOption.forEach {
-            options.add(it.mealsOptionText)
+        Log.e(TAG,"At LaunchedEffect was called in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
+        mealOptions.forEach {
+            mealOptionNames.add(context.getString(it.nameResId))
         }
+    }
+
+    LaunchedEffect(Unit) {
+        EnterStatusRepository.setIsFirstEnter(false)
     }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -83,7 +88,7 @@ fun FoodItemInfoFrame(
             FoodItemTopAppBar(
                 navController = navController,
                 title = {
-                    Text(selectedFoodItem.name)
+                    Text(selectedFoodItem.meal.value)
                 }
             )
         },
@@ -91,7 +96,8 @@ fun FoodItemInfoFrame(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding),
+                    .padding(innerPadding)
+                    .background(color = colorResource(R.color.backgroundcolor)),
             ) {
                 Column(
 
@@ -109,7 +115,6 @@ fun FoodItemInfoFrame(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         OutlinedTextField(
-                            //value = gramsText,
                             value = selectedFoodItem.grams.value.toInt().toString(),
                             onValueChange = {
                                 if (it.isNotBlank() && it.isDigitsOnly()) {
@@ -143,13 +148,15 @@ fun FoodItemInfoFrame(
                     ) {
                         MyExposedDropDownMenu(
                             navController = navController,
-                            mutableStateValue = mutableStateString,
+                            mutableStateValue = selectedFoodItem.meal,
                             label = {},
                             modifier = Modifier.width(200.dp),
-                            onValueChangedEvent = { mutableStateString.value = it },
-                            options = options,
+                            onValueChangedEvent = {
+                                selectedFoodItem.meal.value = it
+                            },
+                            options = mealOptionNames,
                             outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
-                            readOnly = false,
+                            readOnly = true,
                         )
                         Image(
                             painter = painterResource(R.drawable.meal_icon),
@@ -172,6 +179,7 @@ fun FoodItemInfoFrame(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     DeleteButton(
+                        buttonModifier = Modifier.size(100.dp,40.dp),
                         onClick = {
                             deleteButtonIsClicked = true
                             saveButtonIsClicked = false
@@ -180,6 +188,7 @@ fun FoodItemInfoFrame(
                     )
                     Spacer(modifier = Modifier.width(20.dp))
                     SaveButton(
+                        buttonModifier = Modifier.size(100.dp,40.dp),
                         onClick = {
                             saveButtonIsClicked = true
                             deleteButtonIsClicked = false
@@ -234,19 +243,22 @@ fun FoodItemInfoFrame(
 
     if (deleteButtonIsClicked) {
         SelectedFoodItemsRepository.remove(selectedFoodItem)
-        deleteButtonIsClicked = false
+
         Toast.makeText(
             context,
             stringResource(R.string.delete_data_successfully),
             Toast.LENGTH_LONG
         ).show()
+        deleteButtonIsClicked = false
         navController.navigateUp()
     } else if (saveButtonIsClicked) {
-        //TODO
-        SelectedFoodItemsRepository.updateData(selectedFoodItem, selectedFoodItem)
-        saveButtonIsClicked = false
+
+        Log.e(TAG,"When saveButtonIsClicked is true in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
+
         Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
             .show()
-        navController.navigateUp()
+        saveButtonIsClicked = false
+        navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
+
     }
 }

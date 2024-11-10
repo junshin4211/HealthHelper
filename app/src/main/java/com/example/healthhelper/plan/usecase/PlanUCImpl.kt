@@ -181,7 +181,7 @@ class PlanUCImpl : PlanUC {
         return formattedPercentage
     }
 
-    override fun isTodayInTaipeiTime(timeStamp: Long): Boolean {
+    override fun isTimeAfterToday(timeStamp: Long): Boolean {
         // 使用台北時區
         val taipeiZoneId = ZoneId.of("Asia/Taipei")
 
@@ -193,8 +193,9 @@ class PlanUCImpl : PlanUC {
             .atZone(taipeiZoneId)
             .toLocalDate()
 
-        // 比較兩個日期是否相同
-        return dateInTaipei.isEqual(currentDateInTaipei)
+        // 當 dateInTaipei 大於 currentDateInTaipei 時回傳 true
+        return dateInTaipei.isAfter(currentDateInTaipei)
     }
+
 
 }

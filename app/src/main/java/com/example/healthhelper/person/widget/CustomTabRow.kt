@@ -2,9 +2,11 @@ package com.example.healthhelper.person.widget
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -35,30 +37,22 @@ fun CustomTabRow(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         Button(
             onClick = { onTabSelected(0) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (selectedTab == 0) colorResource(R.color.primarycolor) else Color.Transparent
             ),
-            modifier = Modifier.padding(vertical = 12.dp),
-            shape = RoundedCornerShape(15.dp, 0.dp, 0.dp, 15.dp),
-            border = BorderStroke(1.dp, colorResource(R.color.primarycolor))
+            modifier = Modifier.padding(vertical = 6.dp).size(90.dp, 40.dp),
+            shape = RoundedCornerShape(15.dp),
+            border = BorderStroke(1.dp, colorResource(R.color.primarycolor)),
+            contentPadding = PaddingValues(6.dp)
         ) {
-
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .graphicsLayer(alpha = if (selectedTab == 0) 1f else 0f)
-            )
-
             Text(
                 labels[0],
                 color = if (selectedTab == 0) selectedTextColor else textColor,
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         }
 
@@ -67,22 +61,16 @@ fun CustomTabRow(
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (selectedTab == 1) colorResource(R.color.primarycolor) else Color.Transparent
             ),
-            modifier = Modifier.padding(vertical = 12.dp),
-            shape = RoundedCornerShape(0.dp),
-            border = BorderStroke(1.dp, colorResource(R.color.primarycolor))
+            modifier = Modifier.padding(vertical = 6.dp).size(90.dp, 40.dp),
+            shape = RoundedCornerShape(15.dp),
+            border = BorderStroke(1.dp, colorResource(R.color.primarycolor)),
+            contentPadding = PaddingValues(6.dp)
         ) {
-
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
-                        .graphicsLayer(alpha = if (selectedTab == 1) 1f else 0f)
-                )
 
             Text(
                 labels[1],
                 color = if (selectedTab == 1) selectedTextColor else textColor,
-                fontSize = 18.sp
+                fontSize = 16.sp
             )
         }
 
@@ -91,22 +79,17 @@ fun CustomTabRow(
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (selectedTab == 2) colorResource(R.color.primarycolor) else Color.Transparent
             ),
-            modifier = Modifier.padding(vertical = 12.dp),
-            shape = RoundedCornerShape(0.dp, 15.dp, 15.dp, 0.dp),
-            border = BorderStroke(1.dp, colorResource(R.color.primarycolor))
+            modifier = Modifier.padding(vertical = 6.dp).size(90.dp, 40.dp),
+            shape = RoundedCornerShape(15.dp),
+            border = BorderStroke(1.dp, colorResource(R.color.primarycolor)),
+            contentPadding = PaddingValues(6.dp)
         ) {
 
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp)
-                        .graphicsLayer(alpha = if (selectedTab == 2) 1f else 0f)
-                )
 
             Text(
                 labels[2],
                 color = if (selectedTab == 2) selectedTextColor else textColor,
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         }
     }

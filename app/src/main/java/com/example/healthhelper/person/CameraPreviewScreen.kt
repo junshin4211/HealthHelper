@@ -11,11 +11,12 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -26,26 +27,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.screen.TabViewModel
 
 @Composable
-fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Unit) {
+fun CameraPreviewScreen(
+    onPictureTaken: (Uri?) -> Unit,
+    navController: NavHostController,
+    tabViewModel: TabViewModel,
+) {
     val tag = "tag_CameraPreviewScreen"
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    tabViewModel.setTabVisibility(false)
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -58,21 +67,10 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
             },
             modifier = Modifier.fillMaxSize()
         )
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val circleDiameter = 350.dp.toPx()
-            val circleRadius = circleDiameter / 2
-            val centerX = size.width / 2
-            val centerY = size.height / 2
 
-            drawCircle(
-                color = Color.Black.copy(alpha = 0.5f),
-                radius = circleRadius,
-                center = Offset(centerX, centerY),
-                style = Stroke(width = 5.dp.toPx())
-            )
-        }
         Row(modifier = Modifier.align(Alignment.BottomCenter)) {
             Button(modifier = Modifier
+                .height(70.dp)
                 .weight(1f)
                 .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
@@ -97,10 +95,14 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                         ContextCompat.getMainExecutor(context),
                         object : ImageCapture.OnImageSavedCallback {
                             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                imageUri = outputFileResults.savedUri
-                                Log.d(tag, "imageUri: $imageUri")
-                                onPictureTaken(imageUri)
+                                val savedUri = outputFileResults.savedUri
+                                if (savedUri != null) {
+                                    imageUri = outputFileResults.savedUri
+                                    Log.d(tag, "imageUri: $imageUri")
+                                    onPictureTaken(imageUri)
+                                }
                             }
+
                             override fun onError(exception: ImageCaptureException) {
                                 val msg = "Picture capture failed: ${exception.message}"
                                 Log.e(tag, msg, exception)
@@ -109,16 +111,28 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
                     )
                 }
             ) {
-                Text(stringResource(id = R.string.takePicture), color = colorResource(R.color.backgroundcolor))
+                Text(
+                    stringResource(id = R.string.takePicture),
+                    color = colorResource(R.color.backgroundcolor),
+                    fontSize = 28.sp
+                )
             }
             Button(
                 modifier = Modifier
+                    .height(70.dp)
                     .weight(1f)
                     .padding(8.dp),
                 colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
-                onClick = onCancelClick
+                onClick = {
+                    imageUri = null
+                    navController.popBackStack(PersonScreenEnum.personScreen.name, false)
+                }
             ) {
-                Text(text = stringResource(id = R.string.cancel), color = colorResource(R.color.backgroundcolor))
+                Text(
+                    text = stringResource(id = R.string.cancel),
+                    color = colorResource(R.color.backgroundcolor),
+                    fontSize = 28.sp
+                )
             }
         }
     }
@@ -127,7 +141,7 @@ fun CameraPreviewScreen(onPictureTaken: (Uri?) -> Unit, onCancelClick: () -> Uni
 private fun startCamera(
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    previewView: PreviewView
+    previewView: PreviewView,
 ): ImageCapture {
     // 單例模式取得物件，用來連結相機生命週期
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -142,8 +156,6 @@ private fun startCamera(
                 // 取得Preview.SurfaceProvider，並用以顯示預覽資料
                 it.surfaceProvider = previewView.surfaceProvider
             }
-
-        // 選擇前鏡頭
         val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
         try {
@@ -163,3 +175,4 @@ private fun startCamera(
 
     return imageCapture
 }
+

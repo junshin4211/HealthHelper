@@ -1,7 +1,9 @@
 package com.example.healthhelper.person.widget
 
 import android.icu.text.CaseMap.Title
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,11 +39,16 @@ fun CustomTopBar(
 ) {
     TopAppBar(
         title = {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+            }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = colorResource(R.color.backgroundcolor)

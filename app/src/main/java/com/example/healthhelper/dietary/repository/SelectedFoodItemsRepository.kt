@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.repository
 
+import androidx.compose.runtime.mutableStateOf
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,15 +11,20 @@ object SelectedFoodItemsRepository {
 
     val TAG = "tag_SelectedFoodItemsRepository"
 
-    private val _dataFlow = MutableStateFlow<MutableList<SelectedFoodItemVO>>(fetchData())
-    val dataFlow: StateFlow<List<SelectedFoodItemVO>> = _dataFlow.asStateFlow()
+    private val _dataFlow = MutableStateFlow(fetchData())
+    val dataFlow: StateFlow<List<SelectedFoodItemVO>>
+        get() = _dataFlow.asStateFlow()
+
+    private val _selectedDataFlow = MutableStateFlow(fetchData()[0])
+    val selectedDataFlow: StateFlow<SelectedFoodItemVO>
+        get() = _selectedDataFlow.asStateFlow()
 
     private fun fetchData():MutableList<SelectedFoodItemVO> {
         val foodItems = mutableListOf(
-            SelectedFoodItemVO(name = "Apple"),
-            SelectedFoodItemVO(name = "Banana"),
-            SelectedFoodItemVO(name = "Grape"),
-            SelectedFoodItemVO(name = "Orange"),
+            SelectedFoodItemVO(name = mutableStateOf("Apple")),
+            SelectedFoodItemVO(name = mutableStateOf("Banana")),
+            SelectedFoodItemVO(name = mutableStateOf("Grape")),
+            SelectedFoodItemVO(name = mutableStateOf("Orange")),
         )
         return foodItems
     }
@@ -27,11 +33,13 @@ object SelectedFoodItemsRepository {
         _dataFlow.update { newData }
     }
 
-    fun updateData(selectedFoodItemVO: SelectedFoodItemVO,newSelectedFoodItemVO: SelectedFoodItemVO){
-       val elemIndex =  _dataFlow.value.indexOf(selectedFoodItemVO)
-       if(elemIndex!=-1){
-           _dataFlow.value[elemIndex] = newSelectedFoodItemVO
-       }
+    fun setSelectedData(newData: SelectedFoodItemVO){
+        _selectedDataFlow.update { newData }
+    }
+
+    // set meal of selected item.
+    fun setSelectedDataMealValue(meal: String){
+        _selectedDataFlow.value.meal.value = meal
     }
 
     fun setCheckedWhenQueryState(selectedFoodItemVO: SelectedFoodItemVO,state:Boolean){
@@ -64,6 +72,10 @@ object SelectedFoodItemsRepository {
 
     fun setAllCheckingWhenSelectionState(state:Boolean){
         _dataFlow.value.forEach{ it.isCheckingWhenSelection.value = state}
+    }
+
+    fun setMealValue(selectedFoodItemVO:SelectedFoodItemVO, meal: String){
+        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.meal.value = meal}
     }
 
     fun remove(selectedFoodItemVO: SelectedFoodItemVO){

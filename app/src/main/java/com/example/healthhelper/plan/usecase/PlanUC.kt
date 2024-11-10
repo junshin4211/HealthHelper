@@ -21,5 +21,5 @@ interface PlanUC {
     fun formatToOneF(value: Float): String
     fun calculateTotalNutrition(nutritionList: List<DiaryNutritionModel>): DiaryNutritionModel
     fun averageNutrition(size:Int, goal:Float, totalcurrent:Float): String
-    fun isTodayInTaipeiTime(timeStamp: Long): Boolean
+    fun isTimeAfterToday(timeStamp: Long): Boolean
 }

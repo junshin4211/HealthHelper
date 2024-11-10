@@ -6,6 +6,8 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Looper
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,7 +49,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
+import com.example.healthhelper.healthyMap.mapVM.FavorListViewModel
 import com.example.healthhelper.healthyMap.mapVM.RestaurantViewModel
+import com.example.healthhelper.healthyMap.model.RestaurantInfo
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -62,14 +66,12 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MainMapSearchScreen(
+    restaurantViewModel: RestaurantViewModel = viewModel(),
+    favorListViewModel: FavorListViewModel = viewModel(),
     navController: NavHostController = rememberNavController(),
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentScreen = MapScreenEnum.valueOf(
-        backStackEntry?.destination?.route?.split("/")?.first() ?: MapScreenEnum.MapSearchScreen.name
-    )
     val destination = navController.currentBackStackEntryAsState().value?.destination
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val viewModel: RestaurantViewModel = viewModel()
     val restaurants by viewModel.restaurantsByDistrict.collectAsState()
 
@@ -82,6 +84,7 @@ fun MainMapSearchScreen(
     val permissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+
     LaunchedEffect(userLat) {
         if (!permissionState.status.isGranted) {
             permissionState.launchPermissionRequest()
@@ -93,17 +96,21 @@ fun MainMapSearchScreen(
         }
     }
 
+    val restaurantsByDistrict by restaurantViewModel.restaurantsByDistrict.collectAsState()
+    val allRestaurants by restaurantViewModel.allRestaurants.collectAsState()
+    LaunchedEffect(userCity) {
+        restaurantViewModel.fetchAndStoreRestaurantsByCity(userCity)
+    }
+
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if (!isShowTopBar(destination)) {
                 userCity = ReverseGeocode(context, userLat, userLng)
                 MapSearchAppBar(
-                    //                currentScreen = currentScreen,
                     canNavigateBack = navController.previousBackStackEntry != null,
                     navigateUp = { navController.navigateUp() },
-                    scrollBehavior = scrollBehavior,
-                    isFavorite = false,
                     navController = navController,
                     userCity = if (userCity == "") stringResource(R.string.LocationNone) else userCity
                 )
@@ -120,9 +127,11 @@ fun MainMapSearchScreen(
         ) {
             composable(route = MapScreenEnum.MapSearchScreen.name) {
                 MapSearchScreen(
+                    restaurantsByDistrict = restaurantsByDistrict,
+                    allRestaurants = allRestaurants,
                     navController = navController,
                     userLat = userLat,
-                    userLng = userLng
+                    userLng = userLng,
                 )
             }
             composable(
@@ -130,6 +139,7 @@ fun MainMapSearchScreen(
             ) { backStackEntry ->
                 val restaurantId = backStackEntry.arguments?.getString("restaurantId")
                 GoogleMapScreen(
+                    favorListViewModel = favorListViewModel,
                     restaurantId = restaurantId,
                     restaurants = restaurants.values.flatten(),
                     navController = navController,
@@ -141,7 +151,9 @@ fun MainMapSearchScreen(
                 route = "${MapScreenEnum.FavoriteListScreen.name}"
             ) {
                 FavoriteListScreen(
-                    isFavorite = true
+                    favorListViewModel = favorListViewModel,
+                    isFavorite = true,
+                    navController = navController
                 )
             }
         }
@@ -151,23 +163,26 @@ fun MainMapSearchScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapSearchAppBar(
-//    currentScreen: Screen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    scrollBehavior: TopAppBarScrollBehavior,
-    isFavorite: Boolean,
+//    scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
     userCity: String,
 ) {
+    var isFavorite by remember { mutableStateOf(false) }
+    val favoriteColor = animateColorAsState(
+        targetValue = if (isFavorite) colorResource(R.color.primarycolor) else colorResource(R.color.footer),
+        animationSpec = tween(durationMillis = 300)
+    )
     TopAppBar(
         title = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = stringResource(id = R.string.currentSite), fontSize = 14.sp)
-                Text(text = userCity, fontSize = 14.sp)
+                Text(text = stringResource(id = R.string.currentSite), fontSize = 16.sp)
+                Text(text = userCity, fontSize = 16.sp)
             }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -176,7 +191,10 @@ fun MapSearchAppBar(
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
+                IconButton(onClick = {
+                    navigateUp()
+                    isFavorite = false
+                }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         tint = colorResource(R.color.primarycolor),
@@ -187,17 +205,22 @@ fun MapSearchAppBar(
         },
         actions = {
             IconButton(onClick = {
-                navController.navigate(MapScreenEnum.FavoriteListScreen.name)
+                isFavorite = !isFavorite
+                val currentDestination = navController.currentDestination?.route
+                if (currentDestination == MapScreenEnum.FavoriteListScreen.name) {
+                    navController.popBackStack()
+                } else {
+                    navController.navigate(MapScreenEnum.FavoriteListScreen.name)
+                }
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_favorite_24),
                     contentDescription = stringResource(id = R.string.favoriteList),
-                    tint = if (isFavorite) colorResource(R.color.primarycolor) else colorResource(R.color.footer),
+                    tint = favoriteColor.value,
                     modifier = Modifier.size(48.dp)
                 )
             }
         },
-        scrollBehavior = scrollBehavior,
     )
 }
 

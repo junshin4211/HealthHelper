@@ -1,9 +1,7 @@
 package com.example.healthhelper.signuplogin
 
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -52,13 +50,13 @@ import com.example.healthhelper.R
 import java.time.Instant
 import java.time.ZoneId
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun UpdateInfoScreen(
-    user: User,
+//    user: User,
     navController: NavHostController = rememberNavController(),
-    viewModel: UpdateInfoVM = androidx.lifecycle.viewmodel.compose.viewModel(),
-    loginVM: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: UpdateInfoVM ,
+    loginVM: LoginVM
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val loginState by loginVM.uiState.collectAsState()
@@ -81,11 +79,13 @@ fun UpdateInfoScreen(
 
 
     val textFieldColors = TextFieldDefaults.colors(
-        errorContainerColor = Color(0xFFFFCDD2),
+       // errorContainerColor = Color(0xFFFFCDD2),
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
-        focusedContainerColor = Color.White
+        focusedContainerColor = Color.White,
+        focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
+        //unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
 
     Box(
@@ -123,7 +123,7 @@ fun UpdateInfoScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White),
                     colors = textFieldColors
@@ -137,7 +137,7 @@ fun UpdateInfoScreen(
                         .weight(1f)
                         .height(56.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .background(Color.White)
                         .clickable { viewModel.toggleGenderDropdown() }
                         .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -189,19 +189,19 @@ fun UpdateInfoScreen(
                 isError = uiState.formState.phoneErrorMessage.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
             )
 
-            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
-                Text(
-                    text = uiState.formState.phoneErrorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 1.dp)
-                )
-            }
+//            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
+//                Text(
+//                    text = uiState.formState.phoneErrorMessage,
+//                    color = Color.Red,
+//                    modifier = Modifier.padding(top = 1.dp)
+//                )
+//            }
 
             // Email
             TextField(
@@ -210,7 +210,7 @@ fun UpdateInfoScreen(
                 label = { Text("信箱") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -234,17 +234,19 @@ fun UpdateInfoScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.calender),
                             contentDescription = "選擇日期",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
+                            tint=Color.Gray
                         )
                     }
                 },
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
-                colors = textFieldColors
+                colors = textFieldColors,
+
             )
 
             // 日期選擇器
@@ -262,6 +264,27 @@ fun UpdateInfoScreen(
                 )
             }
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()  // 讓 Row 佔滿寬度
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                // 取消按鈕
+                Button(
+                    onClick = {
+                        navController.navigateUp() // 返回上一頁
+                    },
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFAEAD1))
+                ) {
+                    Text(text = "取消", fontSize = 18.sp, color = Color(0xFFD75813))
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
             Button(
                 onClick = {
                     viewModel.submitForm(
@@ -269,7 +292,7 @@ fun UpdateInfoScreen(
                         onSuccess = {
                             Toast.makeText(context, "更新成功", Toast.LENGTH_SHORT).show()
                             navController.navigate("LoginScreen") {
-                                popUpTo("LoginScreen") { inclusive = true }
+
                             }
                         },
                         onError = { error ->
@@ -279,8 +302,8 @@ fun UpdateInfoScreen(
                 },
                 modifier = Modifier
                     .width(150.dp)
-                    .padding(vertical = 16.dp)
-                    .height(48.dp),
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(14.dp)),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD75813)),
                 enabled = !isLoading
             ) {
@@ -291,6 +314,8 @@ fun UpdateInfoScreen(
                     )
                 } else {
                     Text(text = "修改", fontSize = 16.sp, color = Color.White)
+
+                     }
                 }
             }
         }
