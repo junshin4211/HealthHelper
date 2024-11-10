@@ -16,12 +16,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CommentVM : ViewModel() {
+    val userId = UserManager.getUser().userId
     private val _commentState = MutableStateFlow<List<Comment>>(emptyList())
     val commentState: StateFlow<List<Comment>> = _commentState.asStateFlow()
     val userId = UserManager.getUser()?.userId ?: 0
     init {
         viewModelScope.launch {
-            _commentState.value = fetchComment(2)
+            _commentState.value = fetchComment()
         }
     }
 
@@ -30,11 +31,11 @@ class CommentVM : ViewModel() {
     }
     fun refreshComment(){
         viewModelScope.launch {
-            _commentState.value = fetchComment(2)
+            _commentState.value = fetchComment()
         }
     }
 
-    suspend fun fetchComment(postId: Int): List<Comment> {
+    suspend fun fetchComment(): List<Comment> {
         val url = "$serverUrl/selectComment"
         val gson = Gson()
 

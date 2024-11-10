@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.model.WeightData
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomDateRangePickerDialog
@@ -65,8 +66,9 @@ import java.util.Locale
 @Composable
 fun WeightScreen(
     navController: NavHostController,
-    weightViewModel: WeightViewModel,
+    weightViewModel: WeightViewModel
 ) {
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var showDatePickerRangeDialog by remember { mutableStateOf(false) }
 
@@ -269,7 +271,6 @@ fun HeaderRow() {
             modifier = Modifier.weight(0.5f),
             fontSize = 18.sp
         )
-//        Spacer(modifier = Modifier.weight(0.2f))
     }
 }
 
@@ -301,13 +302,6 @@ fun WeightDataRow(data: WeightData, navController: NavHostController) {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
-//        Icon(
-//            modifier = Modifier.weight(0.2f),
-//            painter = painterResource(R.drawable.baseline_mode_edit_24),
-////            imageVector = Icons.Default.PlayArrow,
-//            contentDescription = "edit"
-//
-//        )
     }
 }
 

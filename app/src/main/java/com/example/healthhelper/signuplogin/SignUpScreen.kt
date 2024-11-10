@@ -34,9 +34,9 @@ import android.widget.Toast
 import androidx.compose.ui.tooling.preview.Preview
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUpScreen(
+    onRegisterSuccess: () -> Unit, onBackToLogin: () -> Unit,
     navController: NavHostController = rememberNavController(),
     viewModel: SignUpViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -405,9 +405,10 @@ fun SignUpScreen(
                 // 取消按鈕
                 Button(
                     onClick = {
-                        navController.navigate("LoginScreen") {
+                        onBackToLogin()
+//                        navController.navigate("LoginScreen") {
                          //   popUpTo("LoginScreen") { inclusive = true }
-                        }
+//                        }
                     },
                     modifier = Modifier
                         .width(150.dp)
@@ -431,7 +432,8 @@ fun SignUpScreen(
                             context = context,
                             onSuccess = {
                                 Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
-                                navController.navigate("LoginScreen")
+                                onRegisterSuccess()
+//                                navController.navigate("LoginScreen")
                             },
                             onError = { errorMessage ->
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
@@ -459,8 +461,8 @@ fun SignUpScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewSignUp() {
-    SignUpScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewSignUp() {
+//    SignUpScreen()
+//}

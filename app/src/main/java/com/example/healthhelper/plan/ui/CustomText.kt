@@ -17,9 +17,9 @@ class CustomText {
 
     @Composable
     fun TextWithDiffColor(
-        @ColorRes setcolor:Int = R.color.black,
+        @ColorRes setcolor:Int = R.color.black_300,
         text:String = "",
-        setsize:TextUnit = 12.sp
+        setsize:TextUnit = 12.sp,
     ){
         Text(
             text = text,
@@ -30,12 +30,34 @@ class CustomText {
                 color = colorResource(id = setcolor),
                 textAlign = TextAlign.Start,
                 letterSpacing = 0.2.sp
-            )
+            ),
         )
     }
+
+    @Composable
+    fun TextWithDiffColor(
+        @ColorRes setcolor:Int = R.color.black_300,
+        text:String = "",
+        setsize:TextUnit = 12.sp,
+        maxline:Int = 1,
+    ){
+        Text(
+            text = text,
+            style = TextStyle(
+                fontSize = setsize,
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight(600),
+                color = colorResource(id = setcolor),
+                textAlign = TextAlign.Start,
+                letterSpacing = 0.2.sp
+            ),
+            maxLines = maxline,
+        )
+    }
+
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun TextPreview(){
     CustomText().TextWithDiffColor(R.color.primarycolor,"測試")

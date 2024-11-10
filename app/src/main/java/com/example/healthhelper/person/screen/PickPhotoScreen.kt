@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import android.content.Context
 import android.graphics.Bitmap

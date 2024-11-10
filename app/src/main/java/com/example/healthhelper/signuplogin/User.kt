@@ -25,4 +25,15 @@ data class User(
     override fun hashCode(): Int {
         return userId.hashCode()
     }
+    fun clear() {
+        userId = 0
+        account = ""
+        username = ""
+        userEmail = ""
+        phoneno = null
+        gender = null
+        birthday = null
+        roleID = null
+        photoUrl = null
+    }
 }

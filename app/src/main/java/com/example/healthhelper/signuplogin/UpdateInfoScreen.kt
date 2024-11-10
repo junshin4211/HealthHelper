@@ -1,9 +1,7 @@
 package com.example.healthhelper.signuplogin
 
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -52,13 +50,13 @@ import com.example.healthhelper.R
 import java.time.Instant
 import java.time.ZoneId
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun UpdateInfoScreen(
-    user: User,
+//    user: User,
     navController: NavHostController = rememberNavController(),
-    viewModel: UpdateInfoVM = androidx.lifecycle.viewmodel.compose.viewModel(),
-    loginVM: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: UpdateInfoVM ,
+    loginVM: LoginVM
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val loginState by loginVM.uiState.collectAsState()
