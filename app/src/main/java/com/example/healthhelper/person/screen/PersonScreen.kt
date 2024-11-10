@@ -1,6 +1,5 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,15 +39,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.personVM.AchievementViewModel
-import com.example.healthhelper.person.personVM.LoginState
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.screen.TabViewModel
-import com.example.healthhelper.signuplogin.getEncryptedPreferences
 import kotlinx.coroutines.launch
 
 @Composable

@@ -211,7 +211,7 @@ fun PersonalPostScreen(
                         .padding(start = 16.dp, end = 16.dp)
                 ) {
                     Text(
-                        text = "共${comments?.size}則留言",
+                        text = "共${comments.size}則留言",
                         fontSize = 20.sp,
                         fontWeight = FontWeight(600),
                         color = colorResource(id = R.color.gray_500)

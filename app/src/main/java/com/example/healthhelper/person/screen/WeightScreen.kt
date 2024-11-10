@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -47,11 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.model.WeightData
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomDateRangePickerDialog

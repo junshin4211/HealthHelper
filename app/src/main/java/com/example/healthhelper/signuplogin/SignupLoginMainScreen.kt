@@ -5,13 +5,22 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -28,6 +37,7 @@ fun LoginMain() {
     var isLogin by remember { LoginState.isLogin }
     val encryptedPreferences = getEncryptedPreferences(context)
     val loginVM: LoginVM = viewModel()
+    var isLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         val savedAccount = encryptedPreferences.getString("account", "") ?: ""
@@ -41,12 +51,30 @@ fun LoginMain() {
                     LoginState.isLogin.value = true
                 },
                 onError = { errorMessage ->
-                    Log.d("Auto-login failed::","$errorMessage")
+                    Log.d("Auto-login failed::", "$errorMessage")
                 }
             )
+        } else {
+            isLogin = false
         }
     }
-    if (isLogin) {
+    if (isLogin == null) {
+        isLoading = true
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .zIndex(1f),
+                )
+            }
+        }
+    } else if (isLogin == true) {
+        isLoading = false
         Main(
             onLogout = {
                 UserManager.clearUser()
@@ -71,6 +99,7 @@ fun LoginMain() {
         }
     }
 }
+
 fun getEncryptedPreferences(context: Context): SharedPreferences {
     val masterKeyAlias = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
@@ -84,6 +113,7 @@ fun getEncryptedPreferences(context: Context): SharedPreferences {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 }
+
 private fun clearPreferences(context: Context) {
     val sharedPreferences = getEncryptedPreferences(context)
     sharedPreferences.edit()

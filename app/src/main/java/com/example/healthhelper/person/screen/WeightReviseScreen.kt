@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,24 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -50,37 +39,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
-import com.example.healthhelper.person.model.ErrorMsg
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomTopBar
-import com.example.healthhelper.person.widget.SaveButton
+import com.example.healthhelper.person.widget.DeleteDataDialog
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeightSettingScreen(
-    userId :Int,
+fun WeightReviseScreen(
     navController: NavHostController,
     weightViewModel: WeightViewModel,
+    recordId: String?,
 ) {
     val context = LocalContext.current
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var showDatePickerDialog by remember { mutableStateOf(false) }
-    val dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-    var selectDate by remember { mutableStateOf(LocalDate.now().format(dateFormatter)) }
-    val weightData by weightViewModel.weightDataState.collectAsState()
-    val latestWeightData = weightData.maxByOrNull { it.recordDate }
-    var height by remember { mutableStateOf(latestWeightData?.height?.toString() ?: "") }
-    var weight by remember { mutableStateOf(latestWeightData?.weight?.toString() ?: "") }
-    var bodyFat by remember { mutableStateOf(latestWeightData?.bodyFat?.toString() ?: "") }
-    var errMsg by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
+    val weightData = recordId?.toInt()
+        ?.let { weightViewModel.filterWeightDataByRecordId(it).firstOrNull() }
+    var recordDate = weightData?.recordDate ?: ""
+    var height by remember { mutableStateOf(weightData?.height?.toString() ?: "") }
+    var weight by remember { mutableStateOf(weightData?.weight?.toString() ?: "") }
+    var bodyFat by remember { mutableStateOf(weightData?.bodyFat?.toString() ?: "") }
 
+    var errMsg by remember { mutableStateOf("") }
+    var isShowDeleteDialog by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -99,20 +82,8 @@ fun WeightSettingScreen(
                 .background(colorResource(R.color.backgroundcolor)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(selectDate, fontSize = 24.sp)
-                IconButton(onClick = { showDatePickerDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = stringResource(R.string.calendar)
-                    )
-                }
-            }
 
+            Text(recordDate, fontSize = 24.sp)
             Box(
                 modifier = Modifier
                     .height(270.dp)
@@ -125,7 +96,6 @@ fun WeightSettingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(stringResource(R.string.lastWeightRecord), color = colorResource(R.color.primarycolor))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -184,7 +154,7 @@ fun WeightSettingScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = stringResource(R.string.body_fat), fontSize = 24.sp)
+                        Text(text =  stringResource(R.string.body_fat), fontSize = 24.sp)
                         Spacer(modifier = Modifier.padding(end = 10.dp))
                         OutlinedTextField(
                             value = bodyFat,
@@ -201,108 +171,93 @@ fun WeightSettingScreen(
                             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                         )
                     }
-
                 }
             }
-
-            Spacer(modifier = Modifier.padding(bottom = 8.dp))
-            SaveButton(
-                onClick = {
-                    val heightValue = height.toDoubleOrNull()
-                    val weightValue = weight.toDoubleOrNull()
-                    val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
-
-                    if (heightValue != null && weightValue != null && heightValue > 0 && weightValue > 0) {
-                        val bmi = weightViewModel.calculateBMI(heightValue, weightValue)
-                        if (bmi != 0.0) {
-                            coroutineScope.launch {
-                                val result = weightViewModel.insertBodyDataJson(
-                                    heightValue, weightValue, fatValue, selectDate, bmi, userId
-                                )
-                                if (result) navController.navigateUp()
-                            }
-                        }
-                    } else {
-                        errMsg = context.getString(R.string.failValueHeightWeight)
-                    }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = { isShowDeleteDialog = true },
+                    modifier = Modifier
+                        .width(100.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primarycolor)),
+                ) {
+                    Text(
+                        stringResource(R.string.delete),
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
                 }
-            )
+                Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                Button(
+                    onClick = {
+                        val heightValue = height.toDoubleOrNull()
+                        val weightValue = weight.toDoubleOrNull()
+                        val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
+
+                        if (heightValue != null && weightValue != null && heightValue > 0 && weightValue > 0) {
+                            val bmi = weightViewModel.calculateBMI(heightValue, weightValue)
+                            if (bmi != 0.0) {
+                                coroutineScope.launch {
+                                    if(recordId!=null){
+                                        val result = weightViewModel.updateBodyDataJson(
+                                            recordId.toInt(), heightValue, weightValue, fatValue, recordDate, bmi
+                                        )
+                                        if (result) navController.navigateUp()
+                                    }
+                                }
+                            }
+                        } else {
+                            errMsg = context.getString(R.string.failValueHeightWeight)
+                        }
+                    },
+                    modifier = Modifier
+                        .width(100.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primarycolor)),
+                ) {
+                    Text(
+                        stringResource(R.string.save),
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+                }
+
+            }
             Spacer(modifier = Modifier.padding(top = 8.dp))
             Text(text = errMsg, color = Color.Red)
-        }
 
-        if (showDatePickerDialog) {
-            CustomDatePickerDialog(
-                onDismissRequest = { showDatePickerDialog = false },
-                onConfirm = { utcTimeMillis ->
-                    selectDate = utcTimeMillis?.let {
-                        Instant.ofEpochMilli(it).atZone(ZoneId.of("UTC"))
-                            .toLocalDate().format(dateFormatter)
-                    } ?: context.getString(R.string.noChoose)
-                    showDatePickerDialog = false
+        }
+        Text(text = errMsg, color = Color.Red)
+        if (isShowDeleteDialog) {
+            DeleteDataDialog(
+                title = stringResource(R.string.deleteData),
+                text = stringResource(R.string.deleteContent),
+                onDismissRequest = {
+                    isShowDeleteDialog = false
                 },
-                onDismiss = { showDatePickerDialog = false }
+                onConfirm = {
+                    isShowDeleteDialog = false
+                    coroutineScope.launch {
+                        val result = weightViewModel.deleteBodyDataJson(recordId?:"")
+                        if (result) navController.navigate(PersonScreenEnum.weightScreen.name)
+                    }
+                },
+                onDismiss = {
+                    isShowDeleteDialog = false
+                }
             )
         }
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomDatePickerDialog(
-    onDismissRequest: () -> Unit,
-    onConfirm: (Long?) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val today = LocalDate.now()
-    val datePickerState = rememberDatePickerState(
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                val selectedDate = Instant.ofEpochMilli(utcTimeMillis)
-                    .atZone(ZoneId.of("UTC"))
-                    .toLocalDate()
-                return !selectedDate.isAfter(today)
-            }
-        }
-    )
-    DatePickerDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            Button(
-                onClick = {
-                    onConfirm(datePickerState.selectedDateMillis)
-                },
-                colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor))
-            ) {
-                Text(stringResource(R.string.confirm), color = Color.White)
-            }
-        },
-        dismissButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor))
-            ) {
-                Text(stringResource(R.string.cancel), color = Color.White)
-            }
-        },
-        colors = DatePickerDefaults.colors(
-            containerColor = colorResource(R.color.backgroundcolor)
-        )
-    ) {
-        DatePicker(
-            state = datePickerState,
-            showModeToggle = false,
-            colors = DatePickerDefaults.colors(
-                containerColor = colorResource(R.color.backgroundcolor),
-                titleContentColor = colorResource(R.color.backgroundcolor),
-            )
-        )
-    }
 }
 
 
 //@Preview(showBackground = true)
 //@Composable
-//fun WeightSettingPreview() {
-//    WeightSettingScreen(rememberNavController())
+//fun WeightRevisePreview() {
+//    WeightReviseScreen(rememberNavController())
 //}

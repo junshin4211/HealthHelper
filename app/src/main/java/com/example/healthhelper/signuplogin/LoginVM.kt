@@ -4,7 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.healthhelper.person.personVM.LoginState
+import com.example.healthhelper.web.httpPost
+import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.example.healthhelper.web.serverUrl
-import com.example.healthhelper.web.httpPost
 
 
 class LoginVM : ViewModel() {
@@ -74,7 +73,6 @@ class LoginVM : ViewModel() {
 
                 val response = gson.fromJson(result, JsonObject::class.java)
                 if (response.get("success")?.asBoolean != true) {
-                    LoginState.isLogin.value = false
                     throw Exception(response.get("message")?.asString ?: "登入失敗")
                 }
 
@@ -97,7 +95,6 @@ class LoginVM : ViewModel() {
                         RoleID: ${user.roleID}
                         photoUrl:${user.photoUrl}
                     """.trimIndent())
-                LoginState.isLogin.value = true
                 onSuccess(user.userId)
             } catch (e: Exception) {
                 println("Debug - Network error: ${e.message}")

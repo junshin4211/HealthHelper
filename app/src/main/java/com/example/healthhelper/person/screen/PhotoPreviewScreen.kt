@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import android.net.Uri
 import android.util.Log
@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
-import com.example.healthhelper.screen.TabViewModel
 import kotlinx.coroutines.launch
 
 @Composable
