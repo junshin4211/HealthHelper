@@ -38,7 +38,6 @@ import com.example.healthhelper.dietary.repository.FoodDiaryRepository
 import com.example.healthhelper.dietary.repository.SelectedDateRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
 import com.example.healthhelper.dietary.viewmodel.DiaryInfoUpdatorViewModel
-import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodDiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
 import java.sql.Date
@@ -50,7 +49,6 @@ import java.time.format.DateTimeFormatter
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun CustomDatePicker(
-    diaryViewModel: DiaryViewModel = viewModel(),
     foodDiaryViewModel: FoodDiaryViewModel = viewModel(),
     selectedDateViewModel: SelectedDateViewModel = viewModel(),
     diaryInfoUpdatorViewModel: DiaryInfoUpdatorViewModel = viewModel(),
