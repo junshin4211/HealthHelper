@@ -19,7 +19,7 @@ class CommentVM : ViewModel() {
     val userId = UserManager.getUser().userId
     private val _commentState = MutableStateFlow<List<Comment>>(emptyList())
     val commentState: StateFlow<List<Comment>> = _commentState.asStateFlow()
-    val userId = UserManager.getUser()?.userId ?: 0
+
     init {
         viewModelScope.launch {
             _commentState.value = fetchComment()
