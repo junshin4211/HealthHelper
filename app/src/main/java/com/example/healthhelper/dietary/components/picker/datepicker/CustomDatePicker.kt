@@ -74,6 +74,11 @@ fun CustomDatePicker(
         }
     )
 
+    LaunchedEffect(Unit) {
+        val currentTimeMillis = System.currentTimeMillis()
+        Log.e(TAG,"currentTimeMillis:${currentTimeMillis}")
+        datePickerState.selectedDateMillis = currentTimeMillis
+    }
     var selectedDateMillis by remember { mutableStateOf(datePickerState.selectedDateMillis) }
     val selectedDate = selectedDateMillis?.let {
         Instant.ofEpochMilli(it)
