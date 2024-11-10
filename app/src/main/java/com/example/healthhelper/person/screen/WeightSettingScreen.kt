@@ -200,18 +200,21 @@ fun WeightSettingScreen(
                         )
                     }
 
+
                 }
             }
-
+            Text(text = errMsg, color = Color.Red)
             Spacer(modifier = Modifier.padding(bottom = 8.dp))
             SaveButton(
                 onClick = {
-                    val heightValue = height.toDoubleOrNull()
-                    val weightValue = weight.toDoubleOrNull()
-                    val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
+                    errMsg = weightViewModel.validateInput(height, weight, bodyFat, selectDate) ?: ""
 
-                    if (heightValue != null && weightValue != null && heightValue > 0 && weightValue > 0) {
+                    if (errMsg.isEmpty()) {
+                        val heightValue = height.toDouble()
+                        val weightValue = weight.toDouble()
+                        val fatValue = bodyFat.toDoubleOrNull() ?: 0.0
                         val bmi = weightViewModel.calculateBMI(heightValue, weightValue)
+
                         if (bmi != 0.0) {
                             coroutineScope.launch {
                                 val result = weightViewModel.insertBodyDataJson(
@@ -220,13 +223,10 @@ fun WeightSettingScreen(
                                 if (result) navController.navigateUp()
                             }
                         }
-                    } else {
-                        errMsg = context.getString(R.string.failValueHeightWeight)
                     }
                 }
             )
-            Spacer(modifier = Modifier.padding(top = 8.dp))
-            Text(text = errMsg, color = Color.Red)
+
         }
 
         if (showDatePickerDialog) {

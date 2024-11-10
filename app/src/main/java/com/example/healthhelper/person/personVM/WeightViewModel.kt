@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.pow
 
-class WeightViewModel: ViewModel() {
+class WeightViewModel : ViewModel() {
     private val _weightDataState = MutableStateFlow<List<WeightData>>(emptyList())
     val weightDataState: StateFlow<List<WeightData>> = _weightDataState.asStateFlow()
     private val _dateRangeState = MutableStateFlow(DateRange())
@@ -37,12 +37,38 @@ class WeightViewModel: ViewModel() {
         }
     }
 
+    fun validateInput(height: String, weight: String, bodyFatValue: String, selectDate: String = ""): String? {
+        val heightValue = height.toDoubleOrNull()
+        val weightValue = weight.toDoubleOrNull()
+        val bodyFatValue = bodyFatValue.toDoubleOrNull()
+
+        if (heightValue == null || heightValue <= 0) {
+            return "身高必須大於 0"
+        }
+        if (weightValue == null || weightValue <= 0) {
+            return "體重必須大於 0"
+        }
+        if (bodyFatValue == null || bodyFatValue < 0) {
+            return "體脂數值非負數"
+        }
+        if (weightDataState.value.any { it.recordDate == selectDate }) {
+            return "該日期的體重數據已存在，請選擇其他日期"
+        }
+        return null
+    }
+
 
     fun calculateBMI(height: Double, weight: Double): Double {
         return String.format("%.1f", weight / (height / 100).pow(2)).toDouble()
     }
 
-    suspend fun updateBodyDataJson(recordId: Int, height: Double, weight: Double, bodyFat: Double, recordDate: String, bmi: Double): Boolean {
+    suspend fun updateBodyDataJson(
+        recordId: Int,
+        height: Double,
+        weight: Double,
+        bodyFat: Double,
+        bmi: Double,
+    ): Boolean {
         val url = "$serverUrl/updateBodyData"
         val gson = Gson()
         val jsonObject = JsonObject().apply {
@@ -50,7 +76,6 @@ class WeightViewModel: ViewModel() {
             addProperty("height", height)
             addProperty("weight", weight)
             addProperty("bodyFat", bodyFat)
-            addProperty("recordDate", recordDate)
             addProperty("bmi", bmi)
         }
 
@@ -83,7 +108,14 @@ class WeightViewModel: ViewModel() {
     }
 
 
-    suspend fun insertBodyDataJson(height: Double, weight: Double, bodyFat: Double, recordDate: String, bmi: Double, userId:Int): Boolean {
+    suspend fun insertBodyDataJson(
+        height: Double,
+        weight: Double,
+        bodyFat: Double,
+        recordDate: String,
+        bmi: Double,
+        userId: Int,
+    ): Boolean {
         val url = "$serverUrl/insertBodyData"
         val gson = Gson()
         val jsonObject = JsonObject().apply {
@@ -117,14 +149,20 @@ class WeightViewModel: ViewModel() {
     fun refreshWeightData() {
         viewModelScope.launch {
             val dateRange = _dateRangeState.value
-            _weightDataState.value = fetchWeightDataList(dateRange.startDate, dateRange.endDate, userId)
+            _weightDataState.value =
+                fetchWeightDataList(dateRange.startDate, dateRange.endDate, userId)
         }
     }
 
     fun filterWeightDataByRecordId(recordId: Int): List<WeightData> {
         return weightDataState.value.filter { it.recordId == recordId }
     }
-    suspend fun fetchWeightDataList(startDate: String, endDate: String, userId:Int): List<WeightData> {
+
+    suspend fun fetchWeightDataList(
+        startDate: String,
+        endDate: String,
+        userId: Int,
+    ): List<WeightData> {
         val url = "$serverUrl/selectBodyData"
         val gson = Gson()
         val jsonObject = JsonObject().apply {

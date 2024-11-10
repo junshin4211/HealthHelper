@@ -167,9 +167,9 @@ fun PickPhotoScreen(
                     val croppedUri = selectedImageUri?.let { uri ->
                         generateCroppedBitmap(context, uri, scale, offset, 350)
                     }
-                    croppedUri?.let { uri ->
+                    croppedUri?.let {
                         scope.launch {
-                            userPhotoUploadVM.uploadImageToCloudinary(cloudinary, uri)
+                            userPhotoUploadVM.uploadImageToCloudinary(cloudinary, it)
                             navController.navigateUp()
                         }
                     }

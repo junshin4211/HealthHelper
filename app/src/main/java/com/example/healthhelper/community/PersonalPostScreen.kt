@@ -318,7 +318,7 @@ fun PersonalPostScreen(
                     IconButton(onClick = {
                         if (postId != null) {
                             scope.launch {
-                                val result = commentVM.insertComment(reply, postId.toInt(), 2)
+                                val result = commentVM.insertComment(reply, postId.toInt())
                                 if (result) {
                                     reply = ""
                                     postId.toIntOrNull()?.let {
