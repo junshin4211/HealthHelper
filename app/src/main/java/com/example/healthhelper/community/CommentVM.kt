@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.person.model.ErrorMsg
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 class CommentVM : ViewModel() {
     private val _commentState = MutableStateFlow<List<Comment>>(emptyList())
     val commentState: StateFlow<List<Comment>> = _commentState.asStateFlow()
-
+    val userId = UserManager.getUser()?.userId ?: 0
     init {
         viewModelScope.launch {
             _commentState.value = fetchComment(2)
@@ -49,11 +50,11 @@ class CommentVM : ViewModel() {
         }
     }
 
-    suspend fun insertComment(reply: String, postId: Int, userId: Int): Boolean {
+    suspend fun insertComment(reply: String, postId: Int): Boolean {
         val url = "$serverUrl/insertComment"
         val gson = Gson()
         val jsonObject = JsonObject().apply {
-            addProperty("userId", 2) // TODO: 需要修改 userId
+            addProperty("userId", userId)
             addProperty("postId", postId)
             addProperty("reply", reply)
         }

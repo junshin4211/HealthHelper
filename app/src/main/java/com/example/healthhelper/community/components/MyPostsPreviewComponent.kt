@@ -31,9 +31,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.community.CmtScreenEnum
 import com.example.healthhelper.community.Post
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
@@ -66,13 +69,22 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.profile),
-                            contentDescription = "Profile Picture",
+                        post.photoUrl?.let {
+                            Image(
+                                painter = rememberAsyncImagePainter(it),
+                                contentDescription = "User profile picture",
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(40.dp)
+                                    .padding(0.dp)
+                            )
+                        } ?: Image(
+                            painter = painterResource(R.drawable.profile),
+                            contentDescription = "User profile picture",
                             modifier = Modifier
-                                .width(25.dp)
-                                .height(25.dp),
-                            colorResource(R.color.primarycolor)
+                                .width(40.dp)
+                                .height(40.dp)
+                                .padding(0.dp)
                         )
 
                         Spacer(modifier = Modifier.width(10.dp))
@@ -182,11 +194,26 @@ fun MyPostsPreviewComponent(navController: NavHostController, post: Post) {
 //                        modifier = Modifier.padding(start = 4.dp)
 //                    )
                     Spacer(modifier = Modifier.weight(1f))
+//                    Text(
+//                        text = post.postDate,
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(id = R.color.primarycolor)
+//                    )
+
+                    // 解析和格式化日期
+                    val dateString = runCatching {
+                        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                        val date = LocalDateTime.parse(post.postDate, inputFormatter)
+                        date.format(outputFormatter)
+                    }.getOrElse { post.postDate } // 若解析失敗，使用原始字串
+
                     Text(
-                        text = post.postDate,
+                        text = dateString,
                         fontSize = 16.sp,
                         fontWeight = FontWeight(600),
-                        color = colorResource(id = R.color.primarycolor)
+                        color = colorResource(R.color.primarycolor)
                     )
                 }
             }
