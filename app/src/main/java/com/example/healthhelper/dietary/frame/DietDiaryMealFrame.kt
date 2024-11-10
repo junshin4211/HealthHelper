@@ -27,7 +27,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -73,7 +73,7 @@ import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
-import com.example.healthhelper.dietary.interaction.database.LoadFoodItem
+import com.example.healthhelper.dietary.interaction.database.LoadFoodItemInfo
 import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
 import com.example.healthhelper.dietary.interaction.database.SaveFoodItem
 import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
@@ -81,6 +81,7 @@ import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.FoodRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
+import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodViewModel
@@ -99,8 +100,9 @@ fun DietDiaryMealFrame(
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     enterStatusViewModel: EnterStatusViewModel = viewModel(),
     diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
-    foodItemViewModel: FoodItemViewModel = viewModel(),
     foodViewModel: FoodViewModel = viewModel(),
+    diaryViewModel: DiaryViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
@@ -115,10 +117,18 @@ fun DietDiaryMealFrame(
     val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
     val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
     val foodVO by foodViewModel.data.collectAsState()
+    val diaryVO by diaryViewModel.data.collectAsState()
+    val foodItemVOs by foodItemViewModel.data.collectAsState()
 
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
+    var checkedFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
-    var clickedFoodItemVO by remember { mutableStateOf(SelectedFoodItemVO(name = mutableStateOf("") )) }
+
+    LaunchedEffect(availableFoodItems) {
+        checkedFoodItems = availableFoodItems.filter { it.isCheckedWhenSelection.value }
+    }
+
+    var clickedFoodItemVO by remember { mutableStateOf(SelectedFoodItemVO(name = mutableStateOf(""))) }
     var descriptionText by remember { mutableStateOf(diaryDescriptionVO.description) }
 
     var dietDiaryImageButtonText by remember { mutableStateOf(context.getString(R.string.add_graph)) }
@@ -146,28 +156,33 @@ fun DietDiaryMealFrame(
     // set the data in repo so that its corresponding view model can access it.
     FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
     // load food items about this diaryId from database and try to set it into repo -- FoodItemRepository if one can.
-    LoadFoodItem(context)
+    LoadFoodItemInfo(context)
 
-    availableFoodItems = if (enterStatusVO.isFirstEnter.value) {
-        foodItems.filter {
-            it.meal.value in listOf(
-                stringResource(selectedMealOption.nameResId),
-                stringResource(MealCategoryEnum.EMPTY_STRING.title)
-            )
+    availableFoodItems =
+        if (enterStatusVO.isFirstEnter.value) {
+            foodItems.filter {
+                it.meal.value in listOf(
+                    stringResource(selectedMealOption.nameResId),
+                    stringResource(MealCategoryEnum.EMPTY_STRING.title)
+                )
+            }
+        } else {
+            foodItems.filter {
+                it.meal.value in listOf(
+                    stringResource(selectedMealOption.nameResId),
+                )
+            }
         }
-    } else {
-        foodItems.filter {
-            it.meal.value in listOf(
-                stringResource(selectedMealOption.nameResId),
-            )
-        }
-    }
 
     DisposableEffect(Unit) {
         onDispose {
+            val currentUserId = diaryVO.userID
+            val currentDiaryId = diaryVO.diaryID
             SaveFoodItem(
                 context = context,
-                foodItemViewModel = foodItemViewModel,
+                currentUserId = currentUserId,
+                currentDiaryId = currentDiaryId,
+                checkedFoodItems = checkedFoodItems,
             )
         }
     }
@@ -215,91 +230,90 @@ fun DietDiaryMealFrame(
                         modifier = Modifier
                             .weight(0.7f),
                     ) {
-                        availableFoodItems.filter { it.isCheckedWhenSelection.value }
-                            .forEach { foodItem ->
-                                Box(
+                        checkedFoodItems.forEach { foodItem ->
+                            Box(
+                                modifier = Modifier
+                                    .requiredWidth(width = 360.dp)
+                                    .requiredHeight(height = 41.dp),
+                            ) {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier
                                         .requiredWidth(width = 360.dp)
-                                        .requiredHeight(height = 41.dp),
+                                        .padding(horizontal = 16.dp)
                                 ) {
-                                    Column(
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(
+                                            16.dp, Alignment.CenterHorizontally
+                                        ),
+                                        verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier
-                                            .requiredWidth(width = 360.dp)
-                                            .padding(horizontal = 16.dp)
+                                            .fillMaxWidth()
+                                            .requiredHeight(height = 40.dp)
                                     ) {
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(
-                                                16.dp, Alignment.CenterHorizontally
-                                            ),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .requiredHeight(height = 40.dp)
-                                        ) {
-                                            Column(
-                                                verticalArrangement = Arrangement.Center,
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .weight(weight = 1f),
-                                            ) {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                ) {
-                                                    MyCheckBox(
-                                                        context = context,
-                                                        foodItem = foodItem,
-                                                        mealsOptionVO = selectedMealOption,
-                                                    )
-
-                                                    Text(
-                                                        text = foodItem.name.value,
-                                                        color = colorResource(R.color.primarycolor),
-                                                        lineHeight = 1.27.em,
-                                                        style = MaterialTheme.typography.titleLarge,
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .wrapContentHeight(
-                                                                align =
-                                                                Alignment.CenterVertically
-                                                            )
-                                                    )
-                                                }
-                                            }
-                                            Row(
-                                                horizontalArrangement = Arrangement.spacedBy(
-                                                    10.dp, Alignment.Start
-                                                )
-                                            ) {
-                                                IconButton(onClick = {
-                                                    SelectedFoodItemsRepository.setSelectedData(foodItem)
-                                                    clickedFoodItemVO = foodItem
-                                                    iconButtonIsClicked = true
-                                                }) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.KeyboardArrowRight,
-                                                        contentDescription = "arrow_right",
-                                                        tint = colorResource(R.color.primarycolor)
-                                                    )
-                                                }
-                                            }
-                                        }
                                         Column(
                                             verticalArrangement = Arrangement.Center,
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .weight(weight = 1f),
                                         ) {
-                                            HorizontalDivider(
-                                                color = colorResource(R.color.primarycolor),
-                                                modifier = Modifier.fillMaxWidth()
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                            ) {
+                                                MyCheckBox(
+                                                    context = context,
+                                                    foodItem = foodItem,
+                                                    mealsOptionVO = selectedMealOption,
+                                                )
+
+                                                Text(
+                                                    text = foodItem.name.value,
+                                                    color = colorResource(R.color.primarycolor),
+                                                    lineHeight = 1.27.em,
+                                                    style = MaterialTheme.typography.titleLarge,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .wrapContentHeight(
+                                                            align =
+                                                            Alignment.CenterVertically
+                                                        )
+                                                )
+                                            }
+                                        }
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(
+                                                10.dp, Alignment.Start
                                             )
+                                        ) {
+                                            IconButton(onClick = {
+                                                SelectedFoodItemsRepository.setSelectedData(foodItem)
+                                                clickedFoodItemVO = foodItem
+                                                iconButtonIsClicked = true
+                                            }) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                                    contentDescription = "arrow_right",
+                                                    tint = colorResource(R.color.primarycolor)
+                                                )
+                                            }
                                         }
                                     }
-                                    Box(
-                                        modifier = Modifier.fillMaxSize()
-                                    )
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        HorizontalDivider(
+                                            color = colorResource(R.color.primarycolor),
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
                                 }
+                                Box(
+                                    modifier = Modifier.fillMaxSize()
+                                )
                             }
+                        }
                         Column(
                             modifier = Modifier
                                 .weight(0.3f),
@@ -397,7 +411,7 @@ fun DietDiaryMealFrame(
         FoodRepository.setFoodName(clickedFoodItemVO.name.value)
         LaunchedEffect(Unit) {
             val currentFoodId = foodViewModel.selectFoodIdByFoodName(foodVO)
-            Log.e(TAG,"LaunchedEffect(Unit) was called. currentFoodId:${currentFoodId}")
+            Log.e(TAG, "LaunchedEffect(Unit) was called. currentFoodId:${currentFoodId}")
             FoodItemRepository.setSelectedFoodId(currentFoodId)
         }
 
@@ -488,7 +502,7 @@ fun getMealCategoryId(
     val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()
     val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
     val index = mealsOptionVOs.indexOf(selectedMealOption)
-    if(index == -1){
+    if (index == -1) {
         return 0 + 1
     }
     return index + 1

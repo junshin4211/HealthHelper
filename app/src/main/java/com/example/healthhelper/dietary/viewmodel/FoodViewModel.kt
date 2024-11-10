@@ -39,4 +39,29 @@ class FoodViewModel : ViewModel() {
         }
         return foodVOs[0].foodId
     }
+
+    suspend fun selectByFoodId(
+        foodVO: FoodVO,
+    ):List<FoodVO>{
+        val url = DietDiaryUrl.selectFoodNameByFoodIdUrl
+        return try {
+            val dataOut = gson.toJson(foodVO)
+            val result = httpPost(url, dataOut)
+            val collectionType = object : TypeToken<List<FoodVO>>() {}.type
+            gson.fromJson(result, collectionType) ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    suspend fun selectFoodNameByFoodId(
+        foodVO: FoodVO,
+    ):String{
+        val foodVOs = selectByFoodId(foodVO)
+        if(foodVOs.isEmpty()){
+            return "大麥仁"
+        }
+        return foodVOs[0].foodName
+    }
 }

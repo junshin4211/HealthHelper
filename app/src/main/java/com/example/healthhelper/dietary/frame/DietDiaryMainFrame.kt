@@ -2,6 +2,7 @@ package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,10 +45,14 @@ import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTop
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
+import com.example.healthhelper.dietary.dataclasses.vo.FoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.interaction.dataclass.UpdateSelectedFoodItemVOs
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
 import com.example.healthhelper.dietary.repository.NutritionInfoRepository
-import com.example.healthhelper.dietary.viewmodel.FoodDiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
@@ -58,7 +63,9 @@ fun DietDiaryMainFrame(
     navController: NavHostController,
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
-    foodDiaryViewModel: FoodDiaryViewModel = viewModel(),
+    diaryViewModel: DiaryViewModel = viewModel(),
+    foodViewModel: FoodViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMainFrame"
 
@@ -67,7 +74,8 @@ fun DietDiaryMainFrame(
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
     val selectedMealsOption by mealsOptionViewModel.selectedData.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
-    val foodDiaryVO by foodDiaryViewModel.data.collectAsState()
+    val diaryVO by diaryViewModel.data.collectAsState()
+    val foodItemVOs by foodItemViewModel.data.collectAsState()
 
     var currentMealOption by remember { mutableStateOf(mealsOptions[0]) }
 
@@ -75,9 +83,29 @@ fun DietDiaryMainFrame(
 
     val verticalScrollState2 = rememberScrollState()
 
-    LaunchedEffect(foodDiaryVO) {
-        Log.e(TAG,"LaunchedEffect(foodDiaryVO) blocked was called,foodDiaryVO:${foodDiaryVO}")
-        NutritionInfoRepository.setNutritionInfo(foodDiaryVO)
+    LaunchedEffect(diaryVO) {
+        Log.e(TAG, "LaunchedEffect(diaryVO) blocked was called,diaryVO:${diaryVO}")
+        NutritionInfoRepository.setNutritionInfo(diaryVO)
+        val newFoodItemVO = FoodItemVO(
+            diaryID = diaryVO.diaryID,
+            foodID = -1,
+            grams = -1.0,
+        )
+        val queriedFoodItems = foodItemViewModel.selectFoodItemByDiaryId(newFoodItemVO)
+        if(queriedFoodItems.isEmpty()){
+            Toast.makeText(context,context.getString(R.string.fetch_food_item_failed),Toast.LENGTH_LONG).show()
+            return@LaunchedEffect
+        }
+        Toast.makeText(context,context.getString(R.string.fetch_food_item_successfully),Toast.LENGTH_LONG).show()
+    }
+
+    LaunchedEffect(diaryVO) {
+        Log.e(TAG,"LaunchedEffect(foodItemVOs) block was called.foodItemVOs:${foodItemVOs}")
+        UpdateSelectedFoodItemVOs(
+            context = context,
+            foodItemVOs = foodItemVOs,
+            foodViewModel = foodViewModel,
+        )
     }
 
     Scaffold(
@@ -177,7 +205,6 @@ fun DietDiaryMainFrame(
 
     if (mealsButtonIsClicked) {
         MealsOptionRepository.setSelectedData(currentMealOption)
-        Log.e(TAG,"At mealsButtonIsClicked is true in TAG:${TAG}, selectedMealsOption:${selectedMealsOption}")
         navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
         mealsButtonIsClicked = false
     }

@@ -15,26 +15,26 @@ data class DiaryVO(
     var createDate: Date = Date(0),
 
     @SerializedName("createTime")
-    val createTime: Time = Time(0),
+    var createTime: Time = Time(0),
 
     @SerializedName("totalFat")
-    val totalFat: Double = -1.0,
+    var totalFat: Double = -1.0,
 
     @SerializedName("totalCarbon")
-    val totalCarbon: Double = -1.0,
+    var totalCarbon: Double = -1.0,
 
     @SerializedName("totalFiber")
-    val totalFiber: Double = -1.0,
+    var totalFiber: Double = -1.0,
 
     @SerializedName("totalSugar")
-    val totalSugar: Double = -1.0,
+    var totalSugar: Double = -1.0,
 
     @SerializedName("totalSodium")
-    val totalSodium: Double = -1.0,
+    var totalSodium: Double = -1.0,
 
     @SerializedName("totalProtein")
-    val totalProtein: Double = -1.0,
+    var totalProtein: Double = -1.0,
 
     @SerializedName("totalCalories")
-    val totalCalories: Double = -1.0,
+    var totalCalories: Double = -1.0,
 )

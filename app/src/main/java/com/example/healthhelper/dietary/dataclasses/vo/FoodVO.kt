@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class FoodVO(
     @SerializedName("foodId")
-    val foodId : Int = -1,
+    var foodId : Int = -1,
 
     @SerializedName("foodName")
     var foodName: String = "",

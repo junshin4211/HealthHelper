@@ -2,8 +2,7 @@ package com.example.healthhelper
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.example.healthhelper.dietary.repository.DiaryInfoUpdatorRepository
-import com.example.healthhelper.dietary.repository.FoodDiaryRepository
+import com.example.healthhelper.dietary.repository.DiaryRepository
 
 @Composable
 fun EmulateInitializeRepository(){
@@ -15,7 +14,5 @@ fun EmulateInitializeRepository(){
 }
 
 suspend fun setUserId(userId:Int){
-    DiaryInfoUpdatorRepository.setUserId(userId)
-    DiaryInfoUpdatorRepository.setUserId(userId)
-    FoodDiaryRepository.setUserId(userId)
+    DiaryRepository.setUserId(userId)
 }

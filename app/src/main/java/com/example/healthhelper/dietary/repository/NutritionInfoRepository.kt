@@ -3,7 +3,7 @@ package com.example.healthhelper.dietary.repository
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import com.example.healthhelper.R
-import com.example.healthhelper.dietary.dataclasses.vo.FoodDiaryVO
+import com.example.healthhelper.dietary.dataclasses.vo.DiaryVO
 import com.example.healthhelper.dietary.dataclasses.vo.NutritionInfoPairVO
 import com.example.healthhelper.dietary.dataclasses.vo.NutritionInfoVO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +56,7 @@ object NutritionInfoRepository {
     }
 
     fun setNutritionInfo(
-        foodDiaryVO: FoodDiaryVO,
+        foodDiaryVO: DiaryVO,
     ){
         _dataFlow.value.fat.value.amount.value = foodDiaryVO.totalFat
         _dataFlow.value.carbon.value.amount.value = foodDiaryVO.totalCarbon

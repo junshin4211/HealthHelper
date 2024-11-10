@@ -229,4 +229,12 @@
     <string name="fetch_diary_id_successfully">存取日記編號成功</string>
     <string name="save_food_item_failed">儲存食物項目失敗</string>
     <string name="save_food_item_successfully">儲存食物項目成功</string>
+    <string name="load_diary_info_failed">載入日記的相關資訊失敗</string>
+    <string name="insert_diary_id_tip_message">在使用者在日記頁面中選完食物項目後將會新增一筆日記編號</string>
+    <string name="insert_diary_failed">插入日記資料失敗</string>
+    <string name="load_food_item_info_failed">載入食物項目的相關資訊失敗</string>
+    <string name="load_food_item_info_successfully">載入食物項目的相關資訊成功</string>
+    <string name="update_status_of_food_items_successfully">更新食物項目狀態成功</string>
+    <string name="fetch_food_item_failed">存取食物項目失敗</string>
+    <string name="fetch_food_item_successfully">存取食物項目成功</string>
 </resources>

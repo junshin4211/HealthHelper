@@ -50,7 +50,21 @@ class FoodItemViewModel:ViewModel() {
         val url = DietDiaryUrl.selectFoodItemByDiaryIdAndMealCategoryIdUrl
         return try {
             val result = httpPost(url, gson.toJson(foodItemVO))
-            val collectionType = object : TypeToken<FoodItemVO>() {}.type
+            val collectionType = object : TypeToken<List<FoodItemVO>>() {}.type
+            gson.fromJson(result, collectionType) ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+    suspend fun selectFoodItemByDiaryId(
+        foodItemVO: FoodItemVO,
+    ):List<FoodItemVO>{
+        val url = DietDiaryUrl.selectFoodItemByDiaryIdUrl
+        return try {
+            val result = httpPost(url, gson.toJson(foodItemVO))
+            val collectionType = object : TypeToken<List<FoodItemVO>>() {}.type
             gson.fromJson(result, collectionType) ?: emptyList()
         } catch (e: Exception) {
             Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)

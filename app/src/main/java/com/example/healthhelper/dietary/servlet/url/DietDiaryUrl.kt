@@ -4,19 +4,16 @@ import com.example.healthhelper.web.serverUrl
 
 object DietDiaryUrl {
 
-    val listAvailableFoodNameUrl : String
+    val listAvailableFoodNameUrl: String
         get() = "${serverUrl}/dietDiary/food/listAvailableFoodsName"
 
-    val queryByDateUrl : String
-        get() = "${serverUrl}/dietDiary/query/byDate"
-
-    val insertDietDiaryUrl : String
+    val insertDietDiaryUrl: String
         get() = "${serverUrl}/dietDiary/insert/insertDietDiary"
 
-    val tryToInsertDiaryDescriptionUrl : String
+    val tryToInsertDiaryDescriptionUrl: String
         get() = "${serverUrl}/dietDiary/diaryDescription/tryToInsert"
 
-    val selectDiaryDescriptionUrl : String
+    val selectDiaryDescriptionUrl: String
         get() = "${serverUrl}/dietDiary/diaryDescription/query"
 
     val updateDiaryInfoUrl: String
@@ -28,12 +25,18 @@ object DietDiaryUrl {
     val tryToInsertFoodItemUrl: String
         get() = "${serverUrl}/dietDiary/foodItem/tryToInsert"
 
-    val selectFoodIdByFoodNameUrl:String
+    val selectFoodIdByFoodNameUrl: String
         get() = "${serverUrl}/dietDiary/food/select/selectFoodIdByFoodName"
 
-    val selectByUserIdAndCreateDateUrl:String
-        get() = "${serverUrl}/dietDiary/query/byDate"
+    val selectFoodNameByFoodIdUrl: String
+        get() = "${serverUrl}/dietDiary/foodName/selectFoodNameByFoodId"
 
     val selectFoodItemByDiaryIdAndMealCategoryIdUrl: String
         get() = "${serverUrl}/dietDiary/foodItem/selectFoodItemByDiaryIdAndMealCategoryId"
+
+    val selectDiaryByUserIdAndDateUrl: String
+        get() = "${serverUrl}/dietDiary/diary/selectByUserIdAndDate"
+
+    val selectFoodItemByDiaryIdUrl: String
+        get() = "${serverUrl}/dietDiary/foodItem/selectFoodItemByDiaryId"
 }
