@@ -78,10 +78,12 @@ import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
 import com.example.healthhelper.dietary.interaction.database.SaveFoodItem
 import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
+import com.example.healthhelper.dietary.repository.FoodRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
@@ -98,6 +100,7 @@ fun DietDiaryMealFrame(
     enterStatusViewModel: EnterStatusViewModel = viewModel(),
     diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
     foodItemViewModel: FoodItemViewModel = viewModel(),
+    foodViewModel: FoodViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMealFrame"
 
@@ -111,13 +114,16 @@ fun DietDiaryMealFrame(
     val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
     val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
     val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
+    val foodVO by foodViewModel.data.collectAsState()
 
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
 
+    var clickedFoodItemVO by remember { mutableStateOf(SelectedFoodItemVO(name = mutableStateOf("") )) }
     var descriptionText by remember { mutableStateOf(diaryDescriptionVO.description) }
 
     var dietDiaryImageButtonText by remember { mutableStateOf(context.getString(R.string.add_graph)) }
     var dietDiaryDescriptionButtonText by remember { mutableStateOf(context.getString(R.string.add_description)) }
+
 
     var iconButtonIsClicked by remember { mutableStateOf(false) }
     var dietDiaryImageButtonIsClicked by remember { mutableStateOf(false) }
@@ -130,7 +136,7 @@ fun DietDiaryMealFrame(
     var shouldShowDescription by remember { mutableStateOf(false) }
 
     // get id of meal category that indicates the meal.
-    val currentMealCategoryId = getMealCategoryId(context)
+    val currentMealCategoryId = getMealCategoryId()
 
     // set the data in repo so that its corresponding view model can access it.
     DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
@@ -158,10 +164,12 @@ fun DietDiaryMealFrame(
     }
 
     DisposableEffect(Unit) {
-        SaveFoodItem(
-            context = context,
-            foodItemViewModel = foodItemViewModel,
-        )
+        onDispose {
+            SaveFoodItem(
+                context = context,
+                foodItemViewModel = foodItemViewModel,
+            )
+        }
     }
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -265,9 +273,8 @@ fun DietDiaryMealFrame(
                                                 )
                                             ) {
                                                 IconButton(onClick = {
-                                                    SelectedFoodItemsRepository.setSelectedData(
-                                                        foodItem
-                                                    )
+                                                    SelectedFoodItemsRepository.setSelectedData(foodItem)
+                                                    clickedFoodItemVO = foodItem
                                                     iconButtonIsClicked = true
                                                 }) {
                                                     Icon(
@@ -343,10 +350,7 @@ fun DietDiaryMealFrame(
                                 }
                                 MyOutLinedTextField(
                                     value = descriptionText.value,
-                                    onValueChange = {
-                                        Log.e(TAG, "it:${it}")
-                                        descriptionText.value = it
-                                    },
+                                    onValueChange = { descriptionText.value = it },
                                     isVisible = shouldShowDescription,
                                 )
                                 isCleanEventTriggered = false
@@ -390,6 +394,14 @@ fun DietDiaryMealFrame(
     if (iconButtonIsClicked) {
         SelectedFoodItemsRepository.setSelectedDataMealValue(stringResource(selectedMealOption.nameResId))
         SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItem, true)
+        FoodRepository.setFoodName(clickedFoodItemVO.name.value)
+        LaunchedEffect(Unit) {
+            val currentFoodId = foodViewModel.selectFoodIdByFoodName(foodVO)
+            Log.e(TAG,"LaunchedEffect(Unit) was called. currentFoodId:${currentFoodId}")
+            FoodItemRepository.setSelectedFoodId(currentFoodId)
+        }
+
+        FoodItemRepository.setSelectedGrams(clickedFoodItemVO.grams.value)
         Log.e(TAG, "At IconButton onClick event triggers,selectedFoodItem:${selectedFoodItem}")
         navController.navigate(
             DietDiaryScreenEnum.FoodItemInfoFrame.name
@@ -471,7 +483,6 @@ fun MyOutLinedTextField(
 
 @Composable
 fun getMealCategoryId(
-    context: Context,
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ): Int {
     val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()

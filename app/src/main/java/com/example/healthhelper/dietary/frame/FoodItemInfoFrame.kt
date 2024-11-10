@@ -48,7 +48,9 @@ import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDr
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.EnterStatusRepository
+import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
+import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 
@@ -58,6 +60,7 @@ fun FoodItemInfoFrame(
     navController: NavHostController,
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
 
     val TAG = "tag_FoodItemInfoFrame"
@@ -65,6 +68,7 @@ fun FoodItemInfoFrame(
     val context = LocalContext.current
 
     val mealOptions by mealOptionViewModel.data.collectAsState()
+    val foodItemVO by foodItemViewModel.selectedData.collectAsState()
 
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
 
@@ -73,10 +77,6 @@ fun FoodItemInfoFrame(
     val mealOptionNames by remember { mutableStateOf(mutableListOf<String>()) }
 
     LaunchedEffect(Unit) {
-        Log.e(
-            TAG,
-            "At LaunchedEffect was called in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}"
-        )
         mealOptions.forEach {
             mealOptionNames.add(context.getString(it.nameResId))
         }
@@ -102,9 +102,7 @@ fun FoodItemInfoFrame(
                     .padding(innerPadding)
                     .background(color = colorResource(R.color.backgroundcolor)),
             ) {
-                Column(
-
-                ) {
+                Column() {
                     Spacer(
                         modifier = Modifier
                             .height(10.dp)
@@ -249,7 +247,6 @@ fun FoodItemInfoFrame(
 
     if (deleteButtonIsClicked) {
         SelectedFoodItemsRepository.remove(selectedFoodItem)
-
         Toast.makeText(
             context,
             stringResource(R.string.delete_data_successfully),
@@ -258,16 +255,32 @@ fun FoodItemInfoFrame(
         deleteButtonIsClicked = false
         navController.navigateUp()
     } else if (saveButtonIsClicked) {
-
-        Log.e(
-            TAG,
-            "When saveButtonIsClicked is true in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}"
-        )
-
+        val mealCategoryId = getMealCategoryIdByName(selectedFoodItem.meal.value)
+        FoodItemRepository.setSelectedGrams(selectedFoodItem.grams.value)
+        FoodItemRepository.setSelectedMealCategoryId(mealCategoryId)
+        LaunchedEffect(Unit) {
+            Log.e(TAG,"-".repeat(50))
+            Log.e(TAG,"foodItemVO:${foodItemVO}")
+            val affectedRows = foodItemViewModel.updateMealCategoryID(foodItemVO)
+            Log.e(TAG,"affectedRows of foodItemViewModel.updateMealCategoryID(foodItemVO):${affectedRows}")
+        }
         Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
             .show()
         saveButtonIsClicked = false
         navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
-
     }
+}
+
+@Composable
+fun getMealCategoryIdByName(
+    targetMealName:String,
+    mealOptionViewModel: MealsOptionViewModel = viewModel(),
+):Int{
+    val mealsOptionVOs by mealOptionViewModel.data.collectAsState()
+    val mealNames = mealsOptionVOs.map { stringResource(it.nameResId) }
+    val mealCategoryId = mealNames.indexOf(targetMealName)
+    if(mealCategoryId == -1){
+        return 0
+    }
+    return mealCategoryId + 1
 }
