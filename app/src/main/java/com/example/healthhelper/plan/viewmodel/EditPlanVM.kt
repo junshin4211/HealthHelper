@@ -21,7 +21,7 @@ class EditPlanVM:ViewModel() {
     private val repository = PlanRepository
     //get the insert plan value from here
     val planSetState: StateFlow<PlanWithGoalModel> = repository.setPlanState
-//    val currentuserId = UserManager.getUser()?.userId ?: 0
+//    val currentuserId = UserManager.getUser().userId
 
     //update plan value by function
     fun updateCategoryId(categoryId: Int) {

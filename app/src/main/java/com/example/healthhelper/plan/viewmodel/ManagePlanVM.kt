@@ -21,7 +21,7 @@ class ManagePlanVM : ViewModel() {
     private val repository = PlanRepository
     val myPlanListState: StateFlow<List<PlanModel>> = repository.myPlanList
     val completePlanListState: StateFlow<List<PlanModel>> = repository.completePlanList
-    val currentuserId = UserManager.getUser()?.userId ?: 0
+    val currentuserId = UserManager.getUser().userId
 
     init {
         getPlanList()
@@ -79,7 +79,6 @@ class ManagePlanVM : ViewModel() {
 
     suspend fun deletePlan(
         plan: PlanModel,
-        userId: Int,
         userDietPlanID: Int,
         finishState: Int,
     ):Boolean {

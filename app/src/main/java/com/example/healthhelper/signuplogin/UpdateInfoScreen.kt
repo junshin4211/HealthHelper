@@ -281,7 +281,7 @@ fun UpdateInfoScreen(
                         .clip(RoundedCornerShape(14.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFAEAD1))
                 ) {
-                    Text(text = "取消", fontSize = 18.sp, color = Color(0xFFD75813))
+                    Text(text = "返回", fontSize = 18.sp, color = Color(0xFFD75813))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -291,9 +291,8 @@ fun UpdateInfoScreen(
                         context = context,
                         onSuccess = {
                             Toast.makeText(context, "更新成功", Toast.LENGTH_SHORT).show()
-                            navController.navigate("LoginScreen") {
-
-                            }
+//                            navController.navigate("Main") {
+//                            }
                         },
                         onError = { error ->
                             Toast.makeText(context, error, Toast.LENGTH_SHORT).show()

@@ -75,7 +75,7 @@ fun Plan(
                 onShowDelete = {
                     showdeleteicon = planVM.showdelete
                 },
-                planViewModel = planVM,
+                PlanVM = planVM,
                 checkPlanVM = checkPlanVM
             )
         },
@@ -93,7 +93,8 @@ fun Plan(
                     navcontroller = navController,
                     tabVM = tabViewModel,
                     planVM = planVM,
-                    checkPlanVM = checkPlanVM
+                    checkPlanVM = checkPlanVM,
+                    managePlanVM = managePlanVM
                 )
             }
             composable(route = PlanPage.HighProtein.name) {
@@ -153,7 +154,9 @@ fun Plan(
                     showdelete = showdeleteicon,
                     tabVM = tabViewModel,
                     scope = scope,
-                    snackbarHostState = snackbarHostState
+                    snackbarHostState = snackbarHostState,
+                    checkPlanVM = checkPlanVM,
+                    navcontroller = navController
                 )
             }
             composable(route = PlanPage.CheckPlan.name)
@@ -178,7 +181,7 @@ fun PlanAppBar(
     onShowDelete: () -> Unit,
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
-    planViewModel: PlanVM,
+    PlanVM: PlanVM,
     checkPlanVM: CheckPlanVM
 ) {
     CenterAlignedTopAppBar(
@@ -211,7 +214,10 @@ fun PlanAppBar(
         navigationIcon = {
             if (cannavigateback) {
                 IconButton(
-                    onClick = { navController.popBackStack() }
+                    onClick = {
+                        navController.popBackStack()
+                        checkPlanVM.clear()
+                    }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.arrow),
@@ -228,7 +234,7 @@ fun PlanAppBar(
             if (currentScreen == PlanPage.ManagePlan) {
                 IconButton(
                     onClick = {
-                        planViewModel.showdelete = !planViewModel.showdelete
+                        PlanVM.showdelete = !PlanVM.showdelete
                         onShowDelete()
                     }
                 ) {
