@@ -430,7 +430,7 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-//            CustomText().TextWithDiffColor(text = descriptiontitle, setsize = 14.sp)
+            CustomText().TextWithDiffColor(text = stringResource(descriptiontitle), setsize = 14.sp)
         }
 
         Row(
@@ -443,7 +443,7 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-//            CustomText().TextWithDiffColor(text = description, setsize = 14.sp)
+            CustomText().TextWithDiffColor(text = stringResource(description), setsize = 14.sp)
         }
     }
 }
@@ -466,7 +466,8 @@ fun setdescription(
             onsetdescription(R.string.carbdescription)
         }
         PlanPage.HighProtein -> {
-
+            onsettitle(R.string.proteindescripttitle)
+            onsetdescription(R.string.proteindescription)
         }
         PlanPage.Ketone -> TODO()
         PlanPage.Mediterra -> TODO()

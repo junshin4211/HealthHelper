@@ -95,6 +95,13 @@ fun AchievementScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(R.color.primarycolor), thickness = 2.dp
+            )
+
+            Spacer(modifier = Modifier.padding(top = 8.dp))
+
             CustomAchievTabRow(
                 selectedTabIndex = selectedTab,
                 onTabSelected = { selectedTab = it },
