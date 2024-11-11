@@ -19,9 +19,6 @@ class AlarmViewModel : ViewModel() {
 
     private val _alarms = MutableStateFlow<List<Calendar>>(emptyList())
     val alarms: StateFlow<List<Calendar>> = _alarms.asStateFlow()
-    val userId = UserManager.getUser().userId
-
-
 
     fun addAlarm(context: Context, alarmTime: Calendar) {
         _alarms.value += alarmTime
@@ -103,42 +100,4 @@ class AlarmViewModel : ViewModel() {
         }
     }
 
-//    suspend fun fetchAlarmByUserID(): List<AlarmManager> {
-//            val url = "$serverUrl/selectBodyData"
-//            val gson = Gson()
-//            val jsonObject = JsonObject().apply {
-//                addProperty("userId", userId)
-//            }
-//            return try {
-//                val result = httpPost(url, jsonObject.toString())
-//                val rootJsonObject = gson.fromJson(result, JsonObject::class.java)
-//                val dataJsonArray = rootJsonObject.getAsJsonArray("data")
-//                val collectionType = object : TypeToken<List<AlarmManager>>() {}.type
-//                gson.fromJson(dataJsonArray, collectionType) ?: emptyList()
-//            } catch (e: Exception) {
-//                Log.e("Fetch Error", "Error fetching WeightData from $url: ${e.message}", e)
-//                emptyList()
-//            }
-//    }
-//    fun refreshAlarmanager() {
-//        viewModelScope.launch {
-//            _alarms.value = fetchAlarmByUserID()
-//        }
-//    }
-//    suspend fun insertAlarmByUserID(alarmTime: String):Boolean {
-//        val url = "$serverUrl/insertAlarm"
-//        val gson = Gson()
-//        val jsonObject = JsonObject().apply {
-//            addProperty("userId", userId)
-//            addProperty("alarmTime", alarmTime)
-//        }
-//        val result = httpPost(url, jsonObject.toString())
-//        val response = gson.fromJson(result, JsonObject::class.java)
-//        Log.d("dataout", response.get("errMsg").toString())
-//        if (response.get("result").asBoolean) {
-//            refreshAlarmanager()
-//        }
-//        ErrorMsg.errMsg = response.get("errMsg").toString()
-//        return response.get("result").asBoolean
-//    }
 }
