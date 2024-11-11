@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -19,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -84,7 +87,7 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text =post.userName,
+                            text = post.userName,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorResource(R.color.black_200)
@@ -115,7 +118,8 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                     val imagePainter = post.picture?.let {
                         runCatching {
                             val decodedImage = Base64.decode(it, Base64.DEFAULT)
-                            val bitmap = BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.size)
+                            val bitmap =
+                                BitmapFactory.decodeByteArray(decodedImage, 0, decodedImage.size)
                             BitmapPainter(bitmap.asImageBitmap())
                         }.getOrElse {
                             painterResource(id = R.drawable.postpic)
@@ -126,9 +130,10 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                         painter = imagePainter,
                         contentDescription = "貼文圖片",
                         modifier = Modifier
-                            .width(189.dp)
-                            .height(107.dp)
-                            .background(colorResource(id = R.color.backgroundcolor))
+                            .size(189.dp, 107.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(colorResource(id = R.color.backgroundcolor)),
+                        contentScale = ContentScale.Crop
                     )
                 }
             }
