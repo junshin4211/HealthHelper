@@ -1,6 +1,7 @@
 ﻿package com.example.healthhelper.person
 
 import android.Manifest
+import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -11,16 +12,19 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.person.personVM.AchievementViewModel
+import com.example.healthhelper.person.personVM.AlarmViewModel
 import com.example.healthhelper.person.personVM.CloudPhotoUploadVM
 import com.example.healthhelper.person.personVM.UserPhotoUploadVM
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.screen.AchievementScreen
+import com.example.healthhelper.person.screen.AlarmManagerScreen
 import com.example.healthhelper.person.screen.CameraPreviewScreen
 import com.example.healthhelper.person.screen.PersonScreen
 import com.example.healthhelper.person.screen.PhotoPreviewScreen
@@ -49,8 +53,10 @@ fun MainPersonScreen(
     cloudPhotoUploadVM: CloudPhotoUploadVM = viewModel(),
     tabViewModel: TabViewModel = viewModel(),
     loginVM: LoginVM = viewModel(),
-    updateInfoVM: UpdateInfoVM = viewModel()
+    updateInfoVM: UpdateInfoVM = viewModel(),
+    alarmViewModel: AlarmViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var userId by remember { mutableIntStateOf(UserManager.getUser().userId ) }
 
@@ -96,6 +102,11 @@ fun MainPersonScreen(
                 navController = navController,
                 viewModel = updateInfoVM,
                 loginVM = loginVM,
+            )
+        }
+        composable(route = PersonScreenEnum.alarmManagerScreen.name) {
+            AlarmManagerScreen(
+                navController = navController, context = context, alarmViewModel = alarmViewModel
             )
         }
 

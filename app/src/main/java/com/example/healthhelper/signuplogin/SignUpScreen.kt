@@ -433,7 +433,7 @@ fun SignUpScreen(
                             onSuccess = {
                                 Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
                                 onRegisterSuccess()
-//                                navController.navigate("LoginScreen")
+
                             },
                             onError = { errorMessage ->
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()

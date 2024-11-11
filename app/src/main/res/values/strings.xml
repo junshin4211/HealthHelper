@@ -224,4 +224,7 @@
     <string name="isfinish">已達成</string>
     <string name="updateFailed">更新失敗\n</string>
     <string name="finishrate">達成度:</string>
+    <string name="dayNotification">每日提醒</string>
+    <string name="addTime">添加</string>
+    <string name="cancelAlarm">刪除鬧鐘</string>
 </resources>
