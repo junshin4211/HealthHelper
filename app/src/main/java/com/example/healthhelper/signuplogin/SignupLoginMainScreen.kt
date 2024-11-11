@@ -87,8 +87,8 @@ fun LoginMain() {
     } else {
         if (showRegister) {
             SignUpScreen(
-                onRegisterSuccess = { isLogin = true },
-                onBackToLogin = { showRegister = false },
+                onRegisterSuccess = { showRegister = false },
+                onBackToLogin = {  },
             )
         } else {
             LoginScreen(

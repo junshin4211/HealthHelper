@@ -432,8 +432,8 @@ fun SignUpScreen(
                             context = context,
                             onSuccess = {
                                 Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
-                               // onRegisterSuccess()
-                                onBackToLogin()
+                                onRegisterSuccess()
+
                             },
                             onError = { errorMessage ->
                                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
