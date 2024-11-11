@@ -2,6 +2,7 @@ package com.example.healthhelper.plan.usecase
 
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.model.DiaryNutritionModel
+import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import java.sql.Timestamp
@@ -21,5 +22,5 @@ interface PlanUC {
     fun formatToOneF(value: Float): String
     fun calculateTotalNutrition(nutritionList: List<DiaryNutritionModel>): DiaryNutritionModel
     fun averageNutrition(size:Int, goal:Float, totalcurrent:Float): String
-    fun isTimeAfterToday(timeStamp: Long): Boolean
+    fun isTimeAfterToday(timeStamp: Timestamp): Boolean
 }

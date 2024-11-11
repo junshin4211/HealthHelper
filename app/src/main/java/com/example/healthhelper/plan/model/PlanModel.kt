@@ -16,4 +16,5 @@ data class PlanModel(
     override fun hashCode(): Int {
         return userDietPlanId.hashCode()
     }
+
 }

@@ -2,6 +2,7 @@ package com.example.healthhelper.community
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +38,6 @@ fun MyPostsScreen(navController: NavHostController, postVM: PostVM) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(30.dp))
@@ -46,7 +47,7 @@ fun MyPostsScreen(navController: NavHostController, postVM: PostVM) {
                 lineHeight = 24.sp,
                 fontWeight = FontWeight(600),
                 color = colorResource(id = R.color.primarycolor),
-                modifier = Modifier.padding(bottom = 30.dp)
+                modifier = Modifier.padding(start = 8.dp, bottom = 30.dp)
             )
             MyPostLists(posts = posts, navController = navController)
         }
@@ -61,10 +62,21 @@ fun MyPostLists(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.backgroundcolor))
+            .background(colorResource(id = R.color.backgroundcolor)),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        posts.forEach { post ->
-            MyPostsPreviewComponent(navController = navController, post = post)
+        if (posts.isEmpty()) {
+            Text(
+                text = "尚無貼文",
+                fontSize = 20.sp,
+                color = colorResource(id = R.color.gray_600)
+            )
+        } else {
+            posts.forEach { post ->
+                MyPostsPreviewComponent(navController = navController, post = post)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 }

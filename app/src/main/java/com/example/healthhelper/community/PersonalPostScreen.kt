@@ -1,6 +1,8 @@
 package com.example.healthhelper.community
 
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,6 +39,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -149,8 +153,33 @@ fun PersonalPostScreen(
                 }
                 Spacer(modifier = Modifier.height(25.dp))
             }
-            post?.picture?.let { imageUrl ->
+//            post?.picture?.let { imageUrl ->
+//                item {
+//                    Row(
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                    ) {
+//                        Image(
+//                            painter = rememberAsyncImagePainter(imageUrl),
+//                            contentDescription = "Post Image",
+//                            contentScale = ContentScale.FillBounds,
+//                            modifier = Modifier
+//                                .width(365.dp)
+//                                .height(192.dp)
+//                                .padding(8.dp)
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.height(20.dp))
+//                }
+//            }
+            post?.picture?.let { base64Image ->
                 item {
+                    // 將 Base64 編碼的圖片字串解碼為 ByteArray
+                    val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
+                    val imageBitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -158,18 +187,19 @@ fun PersonalPostScreen(
                             .padding(16.dp)
                     ) {
                         Image(
-                            painter = rememberAsyncImagePainter(imageUrl),
+                            bitmap = imageBitmap.asImageBitmap(),
                             contentDescription = "Post Image",
-                            contentScale = ContentScale.FillBounds,
                             modifier = Modifier
-                                .width(365.dp)
-                                .height(192.dp)
                                 .padding(8.dp)
+                                .clip(RoundedCornerShape(10.dp))
                         )
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
+
+
+
 
             // Post content text
             item {
