@@ -1,9 +1,9 @@
 package com.example.healthhelper.plan.screen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,13 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.NutritionType
-import com.example.healthhelper.plan.model.DiaryNutritionModel
 import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.plan.model.PlanSpecificModel
 import com.example.healthhelper.plan.ui.CreateAnimationBar
@@ -51,6 +51,7 @@ import com.example.healthhelper.plan.ui.CreateDropDownMenu
 import com.example.healthhelper.plan.ui.CreatePieChart
 import com.example.healthhelper.plan.ui.CreateToggleButton
 import com.example.healthhelper.plan.ui.CustomText
+import com.example.healthhelper.plan.ui.GaugeChart
 import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.CheckPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
@@ -58,8 +59,11 @@ import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.himanshoe.charty.common.toChartDataCollection
 import com.himanshoe.charty.pie.model.PieData
-import java.time.LocalDate
+import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.TimeZone
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CheckPlan(
@@ -67,13 +71,17 @@ fun CheckPlan(
     planVM: PlanVM,
     managePlanVM: ManagePlanVM,
     checkVM: CheckPlanVM,
-){
+) {
     tabVM.setTabVisibility(false)
     val planUCImpl = PlanUCImpl()
     val formatter = PlanUCImpl()::dateTimeFormat;
     var showdatepick by remember { mutableStateOf(false) }
+    var showfinish by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableIntStateOf(-1) }
+    var isdiary by remember { mutableStateOf(false) }
+    var finishpercent by remember { mutableFloatStateOf(0f) }
     val scrollstate = rememberScrollState()
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val tag = "tag_CheckPlan"
 
@@ -91,8 +99,91 @@ fun CheckPlan(
         }
     }
     checkVM.getDiaryList()
+
     val size = diaryRangeList.size
     val totalNutrition = planUCImpl.calculateTotalNutrition(diaryRangeList)
+
+    if (diaryRangeList.isNotEmpty()) {
+        isdiary = true
+
+
+        if (planSpecific.finishState == 0) {
+            var count = 0
+            diaryRangeList.forEach { diary ->
+                Log.d(tag, "finishState 0 : ${totalNutrition.totalCarbon / size}")
+                Log.d(tag, "finishState 0 : ${diary.totalCarbon}")
+                if (totalNutrition.totalCarbon / size >= diary.totalCarbon
+                    || totalNutrition.totalProtein / size >= diary.totalProtein
+                    || totalNutrition.totalFat / size >= diary.totalFat
+                ) {
+                    count++
+                }
+            }
+            finishpercent = (count.toFloat() / size) * 100f
+            Log.d(tag, "finishState 0 : $finishpercent")
+        } else if (planSpecific.finishState == 1) {
+            var count = 0
+            diaryRangeList.forEach { diary ->
+                if (totalNutrition.totalCarbon / size >= diary.totalCarbon
+                    && totalNutrition.totalProtein / size >= diary.totalProtein
+                    && totalNutrition.totalFat / size >= diary.totalFat
+                ) {
+                    count++
+                }
+            }
+            finishpercent = (count.toFloat() / size)
+            // 檢查條件
+            if (finishpercent >= 0.60f) {
+                showfinish = true
+                scope.launch {
+                    checkVM.updatePlan(planSpecific.userDietPlanId, 2)
+                }
+
+            }
+            Log.d(tag, "finishState 1 : $finishpercent")
+        } else if (planSpecific.finishState == 2) {
+            var days: Long = 0
+
+            // 檢查 startTimestamp 和 endTimestamp 是否為 null
+            if (planSpecific.startDateTime == null || planSpecific.endDateTime == null) {
+                days = 0
+            } else {
+                // 提取毫秒數
+                val startMillis = planSpecific.startDateTime?.time
+                val endMillis = planSpecific.endDateTime?.time
+
+                // 設定台北時區
+                val timeZone = TimeZone.getTimeZone("Asia/Taipei")
+                val calendarStart = Calendar.getInstance(timeZone)
+                val calendarEnd = Calendar.getInstance(timeZone)
+
+                // 設定開始與結束時間
+                calendarStart.timeInMillis = startMillis ?: 0L
+                calendarEnd.timeInMillis = endMillis ?: 0L
+
+                // 計算區間天數
+                val diffInMillis = calendarEnd.timeInMillis - calendarStart.timeInMillis
+                days = (diffInMillis / (1000 * 60 * 60 * 24) + 1)
+            }
+
+            var count = 0
+            diaryRangeList.forEach { diary ->
+                if (totalNutrition.totalCarbon / days >= diary.totalCarbon
+                    && totalNutrition.totalProtein / days >= diary.totalProtein
+                    && totalNutrition.totalFat / days >= diary.totalFat
+                ) {
+                    count++
+                }
+            }
+            finishpercent = (count.toFloat() / days)
+            // 檢查條件
+            if (finishpercent >= 0.60f) {
+                showfinish = true
+            }
+            Log.d(tag, "finishState 2 : $finishpercent")
+        }
+    }
+
     var carbgoal = 0.0f
     var proteingoal = 0.0f
     var fatgoal = 0.0f
@@ -111,54 +202,58 @@ fun CheckPlan(
     var rangepercentprotein by remember { mutableStateOf("") }
     var rangepercentfat by remember { mutableStateOf("") }
 
-    planUCImpl.percentToGram("carb",planSpecific.Caloriesgoal,planSpecific.carbongoal)
+    planUCImpl.percentToGram("carb", planSpecific.Caloriesgoal, planSpecific.carbongoal)
     {
         carbgoal = it
     }
-    planUCImpl.percentToGram("protein",planSpecific.Caloriesgoal,planSpecific.proteingoal)
+    planUCImpl.percentToGram("protein", planSpecific.Caloriesgoal, planSpecific.proteingoal)
     {
         proteingoal = it
     }
-    planUCImpl.percentToGram("fat",planSpecific.Caloriesgoal,planSpecific.fatgoal)
+    planUCImpl.percentToGram("fat", planSpecific.Caloriesgoal, planSpecific.fatgoal)
     {
         fatgoal = it
     }
-    if (!showdatepick)
-    {
-        totalthree = totalNutrition.totalCarbon + totalNutrition.totalProtein + totalNutrition.totalFat
-        averagecalories = totalNutrition.totalCalories/size
-        averagecarb = totalNutrition.totalCarbon/size
-        averageprotein = totalNutrition.totalProtein/size
-        averagefat = totalNutrition.totalFat/size
-        carbpercent = (totalNutrition.totalCarbon/totalthree)*100
-        proteinpercent = (totalNutrition.totalProtein/totalthree)*100
-        fatpercent = (totalNutrition.totalFat/totalthree)*100
-        rangepercentcarb = planUCImpl.averageNutrition(size = size,carbgoal,totalNutrition.totalCarbon)
-        rangepercentprotein = planUCImpl.averageNutrition(size = size,proteingoal,totalNutrition.totalProtein)
-        rangepercentfat = planUCImpl.averageNutrition(size = size,fatgoal,totalNutrition.totalFat)
-        averagefiber = totalNutrition.totalFiber/size
-        averagesugar = totalNutrition.totalSugar/size
-        averagesodium = (totalNutrition.totalSodium/size)*0.001f
-    }else{
-        if (selectedIndex != -1)
-        {
+    if (!showdatepick) {
+        totalthree =
+            totalNutrition.totalCarbon + totalNutrition.totalProtein + totalNutrition.totalFat
+        averagecalories = totalNutrition.totalCalories / size
+        averagecarb = totalNutrition.totalCarbon / size
+        averageprotein = totalNutrition.totalProtein / size
+        averagefat = totalNutrition.totalFat / size
+        carbpercent = (totalNutrition.totalCarbon / totalthree) * 100
+        proteinpercent = (totalNutrition.totalProtein / totalthree) * 100
+        fatpercent = (totalNutrition.totalFat / totalthree) * 100
+        rangepercentcarb =
+            planUCImpl.averageNutrition(size = size, carbgoal, totalNutrition.totalCarbon)
+        rangepercentprotein =
+            planUCImpl.averageNutrition(size = size, proteingoal, totalNutrition.totalProtein)
+        rangepercentfat = planUCImpl.averageNutrition(size = size, fatgoal, totalNutrition.totalFat)
+        averagefiber = totalNutrition.totalFiber / size
+        averagesugar = totalNutrition.totalSugar / size
+        averagesodium = (totalNutrition.totalSodium / size) * 0.001f
+    } else {
+        if (selectedIndex != -1) {
             val element = diaryRangeList[selectedIndex]
             totalthree = element.totalCarbon + element.totalProtein + element.totalFat
             averagecalories = element.totalCalories
             averagecarb = element.totalCarbon
             averageprotein = element.totalProtein
             averagefat = element.totalFat
-            carbpercent = (element.totalCarbon/totalthree)*100
-            proteinpercent = (element.totalProtein/totalthree)*100
-            fatpercent = (element.totalFat/totalthree)*100
-            rangepercentcarb = planUCImpl.averageNutrition(size = size,carbgoal,element.totalCarbon)
-            rangepercentprotein = planUCImpl.averageNutrition(size = size,proteingoal,element.totalProtein)
-            rangepercentfat = planUCImpl.averageNutrition(size = size,fatgoal,element.totalFat)
+            carbpercent = (element.totalCarbon / totalthree) * 100
+            proteinpercent = (element.totalProtein / totalthree) * 100
+            fatpercent = (element.totalFat / totalthree) * 100
+            rangepercentcarb =
+                planUCImpl.averageNutrition(size = size, carbgoal, element.totalCarbon)
+            rangepercentprotein =
+                planUCImpl.averageNutrition(size = size, proteingoal, element.totalProtein)
+            rangepercentfat = planUCImpl.averageNutrition(size = size, fatgoal, element.totalFat)
             averagefiber = element.totalFiber
             averagesugar = element.totalSugar
-            averagesodium = (element.totalSodium)*0.001f
+            averagesodium = (element.totalSodium) * 0.001f
         }
     }
+
 
     Column(
         modifier = Modifier
@@ -168,241 +263,273 @@ fun CheckPlan(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-
-        //時間範圍
-        Row (
-            modifier = Modifier
-                .padding(top = 10.dp),
-        ){
-            CustomText().TextWithDiffColor(
-                text = "${formatter(selectedPlan.startDateTime)}~${formatter(selectedPlan.endDateTime)}",
-                setsize = 18.sp
-            )
-        }
-        //TODO 達成度圖
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.myplanimg),
-                contentDescription = "達成度圖",
+        if (isdiary) {
+            //時間範圍
+            Row(
                 modifier = Modifier
-            )
-        }
-        //達成度文字
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Start)
-                .padding(start = 30.dp),
-        ){
-            CustomText().TextWithDiffColor(
-                text = stringResource(R.string.finishratecontent)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier
-                .width(370.dp),
-            color = colorResource(R.color.darkgray), thickness = 2.dp
-        )
-
-        //時間toglebutton
-        //顯示日期選擇
-        when(showdatepick)
-        {
-            true ->{
-                CreateToggleButton(
-                    onLeftClick = {
-                        selectedIndex = -1
-                        showdatepick = false},
-                    onRightClick = {},
-                    leftButtonColor = R.color.light_gray,
-                    rightButtonColor = R.color.primarycolor,
-                    leftTextColor = R.color.darkgray,
-                    rightTextColor = R.color.white,
-                    leftText = stringResource(R.string.alltime),
-                    rightText = stringResource(R.string.date),
+                    .padding(top = 10.dp),
+            ) {
+                CustomText().TextWithDiffColor(
+                    text = "${formatter(selectedPlan.startDateTime)}~${formatter(selectedPlan.endDateTime)}",
+                    setsize = 18.sp
                 )
-
-                Row (
+            }
+            if(showfinish) {
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Start)
-                        .padding(start = 38.dp),
-                ){
-                    val createDateList: MutableList<String> = ArrayList()
-                    for ((_, _, createDate) in diaryRangeList) {
-                        createDateList.add(planUCImpl.dateTimeFormat(createDate))
-                    }
-
-                    CreateDropDownMenu(
-                        options = createDateList,
-                        selectedOption = null,
-                        onOptionSelected = { selectedIndex = createDateList.indexOf(it) },
-                        getDisplayText = { it.toString()}
+                        .padding(top = 10.dp)
+                ) {
+                    CustomText().TextWithDiffColor(
+                        text = stringResource(R.string.isfinish),
+                        setsize = 40.sp
                     )
                 }
             }
-            false ->{
-                CreateToggleButton(
-                    onLeftClick = {},
-                    onRightClick = {showdatepick = true},
-                    leftText = stringResource(R.string.alltime),
-                    rightText = stringResource(R.string.date)
+            //TODO 達成度圖
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                GaugeChart(
+                    percentage = finishpercent,
+                    modifier = Modifier.size(200.dp)
+                )
+                CustomText().TextWithDiffColor(
+                    text = planUCImpl.formatToOneF(finishpercent) + "%",
+                    setsize = 40.sp
                 )
             }
-        }
-
-        //卡路里
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            var isWarnColor by remember { mutableIntStateOf(R.color.black_300) }
-            val Caloriesgoal = planSpecific.Caloriesgoal
-            isWarnColor = if (averagecalories > Caloriesgoal) R.color.red01
-            else R.color.black_300
-            //文字
-            Row (
+            //達成度文字
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Start)
-                    .padding(start = 22.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ){
-                Icon(
-                    painter = painterResource(id = R.drawable.calorie),
-                    contentDescription = "卡路里",
-                    tint = colorResource(id = isWarnColor),
-                    modifier = Modifier
-                        .scale(1.5f)
-                )
-
+                    .padding(start = 30.dp),
+            ) {
                 CustomText().TextWithDiffColor(
-                    text = stringResource(R.string.averagecalorie),
-                    setsize = 24.sp
+                    text = stringResource(R.string.finishratecontent)
                 )
             }
-            //BAR
-            CreateAnimationBar(Caloriesgoal,averagecalories,352.dp,25.dp)
-            Row (
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .width(370.dp),
+                color = colorResource(R.color.darkgray), thickness = 2.dp
+            )
+
+            //時間toglebutton
+            //顯示日期選擇
+            when (showdatepick) {
+                true -> {
+                    CreateToggleButton(
+                        onLeftClick = {
+                            selectedIndex = -1
+                            showdatepick = false
+                        },
+                        onRightClick = {},
+                        leftButtonColor = R.color.light_gray,
+                        rightButtonColor = R.color.primarycolor,
+                        leftTextColor = R.color.darkgray,
+                        rightTextColor = R.color.white,
+                        leftText = stringResource(R.string.alltime),
+                        rightText = stringResource(R.string.date),
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Start)
+                            .padding(start = 38.dp),
+                    ) {
+                        val createDateList: MutableList<String> = ArrayList()
+                        for ((_, _, createDate) in diaryRangeList) {
+                            createDateList.add(planUCImpl.dateTimeFormat(createDate))
+                        }
+
+                        CreateDropDownMenu(
+                            options = createDateList,
+                            selectedOption = null,
+                            onOptionSelected = { selectedIndex = createDateList.indexOf(it) },
+                            getDisplayText = { it.toString() }
+                        )
+                    }
+                }
+
+                false -> {
+                    CreateToggleButton(
+                        onLeftClick = {},
+                        onRightClick = { showdatepick = true },
+                        leftText = stringResource(R.string.alltime),
+                        rightText = stringResource(R.string.date)
+                    )
+                }
+            }
+
+            //卡路里
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                var isWarnColor by remember { mutableIntStateOf(R.color.black_300) }
+                val Caloriesgoal = planSpecific.Caloriesgoal
+                isWarnColor = if (averagecalories > Caloriesgoal) R.color.red01
+                else R.color.black_300
+                //文字
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Start)
+                        .padding(start = 22.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.calorie),
+                        contentDescription = "卡路里",
+                        tint = colorResource(id = isWarnColor),
+                        modifier = Modifier
+                            .scale(1.5f)
+                    )
+
+                    CustomText().TextWithDiffColor(
+                        text = stringResource(R.string.averagecalorie),
+                        setsize = 24.sp
+                    )
+                }
+                //BAR
+                CreateAnimationBar(Caloriesgoal, averagecalories, 352.dp, 25.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 22.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    CustomText().TextWithDiffColor(
+                        setcolor = isWarnColor,
+                        text = planUCImpl.formatToOneF(averagecalories) + stringResource(R.string.grams),
+                        setsize = 24.sp
+                    )
+                }
+            }
+            //三大項bar和pie chart
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 22.dp),
+                    .padding(start = 30.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(0.6f)
+                ) {
+                    //碳水
+                    ShowNutrition(
+                        nutritionName = R.string.carb,
+                        nutritionTextColor = R.color.light_red,
+                        goal = carbgoal,
+                        currentValue = averagecarb,
+                        planUCImpl = planUCImpl
+                    )
+
+                    //蛋白質
+                    ShowNutrition(
+                        nutritionName = R.string.protein,
+                        nutritionTextColor = R.color.sky_blue,
+                        goal = proteingoal,
+                        currentValue = averageprotein,
+                        planUCImpl = planUCImpl
+                    )
+
+                    //脂肪
+                    ShowNutrition(
+                        nutritionName = R.string.fat,
+                        nutritionTextColor = R.color.yellow_300,
+                        goal = fatgoal,
+                        currentValue = averagefat,
+                        planUCImpl = planUCImpl
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(end = 15.dp)
+                ) {
+                    val data = listOf(
+                        PieData(carbpercent, carbpercent, colorResource(R.color.light_red)),
+                        PieData(proteinpercent, proteinpercent, colorResource(R.color.sky_blue)),
+                        PieData(fatpercent, fatpercent, colorResource(R.color.yellow_300)),
+                    )
+                    CreatePieChart(
+                        dataCollection = data.toChartDataCollection(),
+                        modifier = Modifier.wrapContentSize()
+                    )
+                }
+            }
+            //營養成分標題
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Start)
+                    .padding(start = 28.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ){
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.nutrition),
+                    contentDescription = "卡路里",
+                    tint = colorResource(id = R.color.black_300),
+                    modifier = Modifier
+                        .scale(1.2f)
+                )
+
                 CustomText().TextWithDiffColor(
-                    setcolor = isWarnColor,
-                    text = planUCImpl.formatToOneF(averagecalories) + stringResource(R.string.grams),
+                    text = stringResource(R.string.nutritionstitle),
                     setsize = 24.sp
                 )
             }
-        }
-        //三大項bar和pie chart
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 30.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(0.6f)
-            ) {
-                //碳水
-                ShowNutrition(
-                    nutritionName = R.string.carb,
-                    nutritionTextColor = R.color.light_red,
-                    goal = carbgoal,
-                    currentValue = averagecarb,
-                    planUCImpl = planUCImpl
-                )
 
-                //蛋白質
-                ShowNutrition(
-                    nutritionName = R.string.protein,
-                    nutritionTextColor = R.color.sky_blue,
-                    goal = proteingoal,
-                    currentValue = averageprotein,
-                    planUCImpl = planUCImpl
-                )
-
-                //脂肪
-                ShowNutrition(
-                    nutritionName = R.string.fat,
-                    nutritionTextColor = R.color.yellow_300,
-                    goal = fatgoal,
-                    currentValue = averagefat,
-                    planUCImpl = planUCImpl
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .weight(0.5f)
-                    .padding(end = 15.dp)
-            ) {
-                val data = listOf(
-                    PieData(carbpercent, carbpercent, colorResource(R.color.light_red)),
-                    PieData(proteinpercent, proteinpercent, colorResource(R.color.sky_blue)),
-                    PieData(fatpercent, fatpercent, colorResource(R.color.yellow_300)),
-                )
-                CreatePieChart(
-                    dataCollection = data.toChartDataCollection(),
-                    modifier = Modifier.wrapContentSize()
-                )
-            }
-        }
-        //營養成分標題
-        Row (
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Start)
-                .padding(start = 28.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.nutrition),
-                contentDescription = "卡路里",
-                tint = colorResource(id = R.color.black_300),
-                modifier = Modifier
-                    .scale(1.2f)
-            )
-
-            CustomText().TextWithDiffColor(
-                text = stringResource(R.string.nutritionstitle),
-                setsize = 24.sp
-            )
-        }
-
-        //營養成分表
-        ShowNutritionList(
-            planSpecificModel = planSpecific,
+            //營養成分表
+            ShowNutritionList(
+                planSpecificModel = planSpecific,
 //            nutritionList = diaryRangeList,
-            planUCImpl = planUCImpl,
+                planUCImpl = planUCImpl,
 //            totalNutrition = totalNutrition,
-            carbgoal = carbgoal,
-            proteingoal = proteingoal,
-            fatgoal = fatgoal,
-            rangepercentcarb = rangepercentcarb,
-            rangepercentprotein = rangepercentprotein,
-            rangepercentfat = rangepercentfat,
-            averagesfiber = averagefiber,
-            averagesugar = averagesugar,
-            averagesodium = averagesodium,
-            averagescarb = averagecarb,
-            averagesprotein = averageprotein,
-            averagesfat = averagefat,
-        )
+                carbgoal = carbgoal,
+                proteingoal = proteingoal,
+                fatgoal = fatgoal,
+                rangepercentcarb = rangepercentcarb,
+                rangepercentprotein = rangepercentprotein,
+                rangepercentfat = rangepercentfat,
+                averagesfiber = averagefiber,
+                averagesugar = averagesugar,
+                averagesodium = averagesodium,
+                averagescarb = averagecarb,
+                averagesprotein = averageprotein,
+                averagesfat = averagefat,
+            )
+
+        } else {
+            Column (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                CustomText().TextWithDiffColor(
+                    setcolor = R.color.primarycolor,
+                    text = stringResource(R.string.no_diarytext),
+                    setsize = 40.sp
+                )
+            }
+        }
     }
+
 }
+
 
 @Composable
 fun ShowNutritionList(
@@ -422,22 +549,22 @@ fun ShowNutritionList(
     averagesfiber: Float,
     averagesugar: Float,
     averagesodium: Float,
-){
+) {
     val tag = "tag_ShowNutritionList"
     val fibergoal = 30f
-    val sugargoal = (planSpecificModel.Caloriesgoal)*0.1f
+    val sugargoal = (planSpecificModel.Caloriesgoal) * 0.1f
     val sodiumgoal = 2.4f
     var isWarnColor by remember { mutableIntStateOf(R.color.black_300) }
     val gramStr = stringResource(R.string.grams)
     val context = LocalContext.current
 
-    NutritionType.entries.forEachIndexed{index, nutritionType ->
-        Row (
+    NutritionType.entries.forEachIndexed { index, nutritionType ->
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 30.dp, bottom = 30.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Row(
                 modifier = Modifier
                     .weight(0.5f),
@@ -448,26 +575,25 @@ fun ShowNutritionList(
                     setsize = 14.sp
                 )
             }
-            Column (
+            Column(
                 modifier = Modifier
                     .weight(1.0f),
                 //horizontalAlignment = Alignment.Start
-            ){
+            ) {
                 Row(
                     modifier = Modifier.width(220.dp)
-                ){
-                    when(index)
-                    {
-                        0->{
+                ) {
+                    when (index) {
+                        0 -> {
                             CustomText().TextWithDiffColor(
                                 text = planUCImpl.formatToOneF(averagescarb) + gramStr,
                                 setsize = 14.sp
                             )
-                            Row (
+                            Row(
                                 modifier = Modifier.weight(1.0f),
                                 horizontalArrangement = Arrangement.End
-                            ){
-                                isWarnColor = if(rangepercentcarb.toFloat() > 100.0f) R.color.red01
+                            ) {
+                                isWarnColor = if (rangepercentcarb.toFloat() > 100.0f) R.color.red01
                                 else R.color.black_300
                                 CustomText().TextWithDiffColor(
                                     setcolor = isWarnColor,
@@ -476,17 +602,19 @@ fun ShowNutritionList(
                                 )
                             }
                         }
-                        1-> {
+
+                        1 -> {
                             CustomText().TextWithDiffColor(
                                 text = planUCImpl.formatToOneF(averagesprotein) + gramStr,
                                 setsize = 14.sp
                             )
-                            Row (
+                            Row(
                                 modifier = Modifier.weight(1.0f),
                                 horizontalArrangement = Arrangement.End
-                            ){
-                                isWarnColor = if(rangepercentprotein.toFloat() > 100.0f) R.color.red01
-                                else R.color.black_300
+                            ) {
+                                isWarnColor =
+                                    if (rangepercentprotein.toFloat() > 100.0f) R.color.red01
+                                    else R.color.black_300
                                 CustomText().TextWithDiffColor(
                                     setcolor = isWarnColor,
                                     text = "$rangepercentprotein%",
@@ -494,16 +622,17 @@ fun ShowNutritionList(
                                 )
                             }
                         }
-                        2-> {
+
+                        2 -> {
                             CustomText().TextWithDiffColor(
                                 text = planUCImpl.formatToOneF(averagesfat) + gramStr,
                                 setsize = 14.sp
                             )
-                            Row (
+                            Row(
                                 modifier = Modifier.weight(1.0f),
                                 horizontalArrangement = Arrangement.End
-                            ){
-                                isWarnColor = if(rangepercentfat.toFloat() > 100.0f) R.color.red01
+                            ) {
+                                isWarnColor = if (rangepercentfat.toFloat() > 100.0f) R.color.red01
                                 else R.color.black_300
                                 CustomText().TextWithDiffColor(
                                     setcolor = isWarnColor,
@@ -514,10 +643,9 @@ fun ShowNutritionList(
                         }
                     }
                     //fiber,sugar,sodium
-                    when(index)
-                    {
-                        3 ->{
-                            isWarnColor = if(averagesfiber > fibergoal) R.color.red01
+                    when (index) {
+                        3 -> {
+                            isWarnColor = if (averagesfiber > fibergoal) R.color.red01
                             else R.color.black_300
                             CustomText().TextWithDiffColor(
                                 setcolor = isWarnColor,
@@ -525,8 +653,9 @@ fun ShowNutritionList(
                                 setsize = 14.sp
                             )
                         }
+
                         4 -> {
-                            isWarnColor = if(averagesugar > sugargoal) R.color.red01
+                            isWarnColor = if (averagesugar > sugargoal) R.color.red01
                             else R.color.black_300
                             CustomText().TextWithDiffColor(
                                 setcolor = isWarnColor,
@@ -534,8 +663,9 @@ fun ShowNutritionList(
                                 setsize = 14.sp
                             )
                         }
+
                         5 -> {
-                            isWarnColor = if(averagesodium > sodiumgoal) R.color.red01
+                            isWarnColor = if (averagesodium > sodiumgoal) R.color.red01
                             else R.color.black_300
                             CustomText().TextWithDiffColor(
                                 text = planUCImpl.formatToOneF(averagesodium) + gramStr,
@@ -545,11 +675,11 @@ fun ShowNutritionList(
                     }
                 }
                 //create bar
-                when(index){
-                    0 ->{
-                        Row (
+                when (index) {
+                    0 -> {
+                        Row(
                             horizontalArrangement = Arrangement.Start
-                        ){
+                        ) {
                             isWarnColor = if (averagescarb > carbgoal) R.color.red01
                             else R.color.light_green
                             CreateAnimationBar(
@@ -557,13 +687,15 @@ fun ShowNutritionList(
                                 averagescarb,
                                 220.dp,
                                 10.dp,
-                                dynamicColor = isWarnColor)
+                                dynamicColor = isWarnColor
+                            )
                         }
                     }
-                    1 ->{
-                        Row (
+
+                    1 -> {
+                        Row(
                             horizontalArrangement = Arrangement.Start
-                        ){
+                        ) {
                             isWarnColor = if (averagesprotein > proteingoal) R.color.red01
                             else R.color.light_green
                             CreateAnimationBar(
@@ -571,9 +703,11 @@ fun ShowNutritionList(
                                 averagesprotein,
                                 220.dp,
                                 10.dp,
-                                dynamicColor = isWarnColor)
+                                dynamicColor = isWarnColor
+                            )
                         }
                     }
+
                     2 -> {
                         Row(
                             horizontalArrangement = Arrangement.Start
@@ -585,9 +719,11 @@ fun ShowNutritionList(
                                 averagesfat,
                                 220.dp,
                                 10.dp,
-                                dynamicColor = isWarnColor)
+                                dynamicColor = isWarnColor
+                            )
                         }
                     }
+
                     3 -> {
                         Row(
                             horizontalArrangement = Arrangement.Start
@@ -599,9 +735,11 @@ fun ShowNutritionList(
                                 averagesfiber,
                                 220.dp,
                                 10.dp,
-                                dynamicColor = isWarnColor)
+                                dynamicColor = isWarnColor
+                            )
                         }
                     }
+
                     4 -> {
                         Row(
                             horizontalArrangement = Arrangement.Start
@@ -613,9 +751,11 @@ fun ShowNutritionList(
                                 averagesugar,
                                 220.dp,
                                 10.dp,
-                                dynamicColor = isWarnColor)
+                                dynamicColor = isWarnColor
+                            )
                         }
                     }
+
                     5 -> {
                         Row(
                             horizontalArrangement = Arrangement.Start
@@ -627,7 +767,8 @@ fun ShowNutritionList(
                                 averagesodium,
                                 220.dp,
                                 10.dp,
-                                dynamicColor = isWarnColor)
+                                dynamicColor = isWarnColor
+                            )
                         }
                     }
                 }
@@ -647,37 +788,36 @@ fun ShowNutrition(
     barHeight: Dp = 10.dp,
     barWidth: Dp = 124.dp,
     planUCImpl: PlanUCImpl,
-){
+) {
     var adjustOffset = (-20).dp
     var isWarnColor by remember { mutableIntStateOf(R.color.light_green) }
     var showwarning by remember { mutableStateOf(false) }
-    if(currentValue > goal)
-    {
+    if (currentValue > goal) {
         showwarning = true
         isWarnColor = R.color.red01
-    }else{
+    } else {
         showwarning = false
         isWarnColor = R.color.light_green
     }
     if (!showwarning) adjustOffset = 0.dp
-    Column (
+    Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.Start
-    ){
+    ) {
         CustomText().TextWithDiffColor(
             text = stringResource(nutritionName),
             setsize = 18.sp,
             setcolor = nutritionTextColor
         )
         //bar+icon
-        Row (
+        Row(
             modifier = Modifier
                 //.fillMaxWidth()
                 .offset(adjustOffset),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ){
-            if(showwarning) {
+        ) {
+            if (showwarning) {
                 Icon(
                     painter = painterResource(id = R.drawable.warnsign),
                     contentDescription = "warn",
@@ -687,25 +827,24 @@ fun ShowNutrition(
                 )
             }
 
-            CreateAnimationBar(goal,currentValue,barWidth,barHeight,dynamicColor = isWarnColor)
+            CreateAnimationBar(goal, currentValue, barWidth, barHeight, dynamicColor = isWarnColor)
         }
         //文字敘述
         Row(
             modifier = Modifier
                 .width(124.dp),
-        ){
+        ) {
             CustomText().TextWithDiffColor(
                 text = "${planUCImpl.formatToOneF(goal)}${stringResource(R.string.grams)}",
                 setsize = 10.sp,
             )
-            Row (
+            Row(
                 modifier = Modifier
                     .weight(1.0f)
                     .padding(start = 10.dp),
                 horizontalArrangement = Arrangement.End
-            ){
-                if(currentValue > goal)
-                {
+            ) {
+                if (currentValue > goal) {
                     val count = currentValue - goal
                     CustomText().TextWithDiffColor(
                         setcolor = isWarnColor,
@@ -714,7 +853,7 @@ fun ShowNutrition(
                                 stringResource(R.string.grams),
                         setsize = 10.sp,
                     )
-                }else{
+                } else {
                     val count = goal - currentValue
                     CustomText().TextWithDiffColor(
                         text = stringResource(R.string.under) +
@@ -730,6 +869,6 @@ fun ShowNutrition(
 
 @Preview(showBackground = true)
 @Composable
-fun checkPlanPreview(){
+fun checkPlanPreview() {
     CheckPlan(planVM = viewModel(), managePlanVM = viewModel(), checkVM = viewModel())
 }

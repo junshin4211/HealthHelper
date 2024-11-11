@@ -6,12 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.plan.model.PlanSpecificModel
+import com.example.healthhelper.plan.model.PlanWithGoalModel
 import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -19,7 +22,7 @@ class PlanVM : ViewModel() {
     private val url = "$serverUrl/Plan"
     private val tag = "tag_PlanVM"
 
-    private val repository = PlanRepository
+    private var repository: PlanRepository = PlanRepository
     val myPlanState: StateFlow<PlanModel> = repository.myPlan
     val completePlanState: StateFlow<PlanModel> = repository.completePlan
 
@@ -28,8 +31,23 @@ class PlanVM : ViewModel() {
     val currentuserId = UserManager.getUser().userId
 
     init {
+        clear()
         getPlan()
         getCompletePlan()
+    }
+
+    fun clear() {
+        //repository = null
+        repository.setMyPlan(PlanModel())
+        Log.d(tag,"${repository.myPlan}")
+        repository.setCompletePlan(PlanModel())
+        Log.d(tag,"${repository.completePlan}")
+        repository.setMyPlanList(emptyList())
+        repository.setCompletePlanList(emptyList())
+        repository.setPlanSpecificData(PlanSpecificModel())
+        repository.setDiaryRangeList(emptyList())
+        repository.setSelectedPlan(PlanModel())
+        repository.setPlan(PlanWithGoalModel())
     }
 
     private suspend fun fetchPlanData(

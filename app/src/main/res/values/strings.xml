@@ -219,6 +219,9 @@
     <string name="delete_graph">刪除圖片</string>
     <string name="hello_world">Hello World!!!</string>
     <string name="save_text_record">儲存文字記錄</string>
+    <string name="no_plantext">尚未有計畫!!</string>
+    <string name="no_diarytext">尚未新增任何日記!!</string>
+    <string name="isfinish">已達成</string>
     <string name="updateFailed">更新失敗\n</string>
     <string name="dayNotification">每日提醒</string>
     <string name="addTime">添加</string>

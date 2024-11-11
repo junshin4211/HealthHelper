@@ -54,16 +54,6 @@ object PlanRepository {
         }
     }
 
-    //set plan from CompletePlan selection
-//    private val _selectedCompletePlan = MutableStateFlow(PlanModel())
-//    val selectedCompletePlan: StateFlow<PlanModel> = _selectedCompletePlan.asStateFlow()
-//
-//    fun setSelectedCompletePlan(plan: PlanModel) {
-//        _selectedCompletePlan.updateAndGet {
-//            plan
-//        }
-//    }
-
     //get plan specific data
     private val _planSpecificData = MutableStateFlow(PlanSpecificModel())
     val planSpecificData: StateFlow<PlanSpecificModel> = _planSpecificData.asStateFlow()

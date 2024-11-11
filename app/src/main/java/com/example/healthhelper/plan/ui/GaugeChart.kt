@@ -43,9 +43,9 @@ fun GaugeChart(
         // 進度弧線
         val sweepAngle = (percentage / 100f) * maxAngle
         val gradient = Brush.sweepGradient(
-            0f to Color.Red,
-            0.5f to Color.Yellow,
-            1f to Color.Green
+            0f to Color(0xFFFFA726), // 淺橘色
+            0.5f to Color(0xFFFF7043), // 橘紅色
+            1f to Color(0xFFFF9800) // 深橘色
         )
         drawArc(
             brush = gradient,
