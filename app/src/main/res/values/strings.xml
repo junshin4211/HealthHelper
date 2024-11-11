@@ -220,4 +220,7 @@
     <string name="hello_world">Hello World!!!</string>
     <string name="save_text_record">儲存文字記錄</string>
     <string name="updateFailed">更新失敗\n</string>
+    <string name="dayNotification">每日提醒</string>
+    <string name="addTime">添加</string>
+    <string name="cancelAlarm">刪除鬧鐘</string>
 </resources>
