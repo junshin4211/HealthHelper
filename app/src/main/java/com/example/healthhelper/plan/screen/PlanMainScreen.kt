@@ -23,7 +23,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,7 +46,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -61,7 +59,6 @@ import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,6 +77,8 @@ fun PlanMain(context: Context = LocalContext.current,
     val scrollstate = rememberScrollState()
     var isplandata by remember { mutableStateOf(false) }
     var iscompletedata by remember { mutableStateOf(false) }
+    var myplanimg by remember { mutableIntStateOf(0) }
+    var completeplanimg by remember { mutableIntStateOf(0) }
 
     val myplanlist by managePlanVM.myPlanListState.collectAsState(initial = emptyList())
     val completeplanlist by managePlanVM.completePlanListState.collectAsState(initial = emptyList())
@@ -102,6 +101,13 @@ fun PlanMain(context: Context = LocalContext.current,
             iscompletedata = true
         }
     }
+
+    setimagebyplantype(
+        myplan = myPlan,
+        completeplan = completePlan,
+        onsetplanimage = { myplanimg = it },
+        onsetcompleteplanimage = { completeplanimg = it }
+    )
 
     Column(
         modifier = Modifier
@@ -161,7 +167,7 @@ fun PlanMain(context: Context = LocalContext.current,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.myplanimg),
+                    painter = painterResource(id = myplanimg),
                     contentDescription = "myplanimg",
                     modifier = Modifier
                         .width(350.dp)
@@ -290,8 +296,8 @@ fun PlanMain(context: Context = LocalContext.current,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.myplanimg),
-                    contentDescription = "myplanimg",
+                    painter = painterResource(id = completeplanimg),
+                    contentDescription = "completeplanimg",
                     modifier = Modifier
                         .width(350.dp)
                         .height(188.dp),
@@ -461,6 +467,28 @@ fun PlanModel.isEmpty(): Boolean {
             && endDateTime == null
             && categoryId == 0
             && categoryName.isBlank()
+}
+
+fun setimagebyplantype(
+    myplan: PlanModel,
+    completeplan: PlanModel,
+    onsetplanimage: (Int) -> Unit,
+    onsetcompleteplanimage: (Int) -> Unit
+){
+    when(myplan.categoryId) {
+        1 -> onsetplanimage(R.drawable.highproteinimg)
+        2 -> onsetplanimage(R.drawable.lowcarbimg)
+        3 -> onsetplanimage(R.drawable.ketoneimg)
+        4 -> onsetplanimage(R.drawable.mediterraimg)
+        5 -> onsetplanimage(R.drawable.customimg)
+    }
+    when(completeplan.categoryId) {
+        1 -> onsetcompleteplanimage(R.drawable.highproteinimg)
+        2 -> onsetcompleteplanimage(R.drawable.lowcarbimg)
+        3 -> onsetcompleteplanimage(R.drawable.ketoneimg)
+        4 -> onsetcompleteplanimage(R.drawable.mediterraimg)
+        5 -> onsetplanimage(R.drawable.customimg)
+    }
 }
 
 
