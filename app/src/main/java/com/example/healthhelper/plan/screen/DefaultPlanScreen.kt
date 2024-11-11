@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -92,6 +93,9 @@ fun EditPlan(
 
     //display calorie value
     var calorie by remember { mutableFloatStateOf(0f) }
+
+//    var descriptiontitle by remember { mutableStateOf("") }
+//    var description by remember { mutableStateOf("") }
 
     //set nutrient percent value by planname
     planUCImpl.InitialDefaultGoal(
@@ -272,11 +276,12 @@ fun EditPlan(
             }
 
             CreateDesciption(
+                planname = planname,
                 type = stringResource(R.string.carb),
                 gram = carbgram,
                 percent = carbpercent,
-                stringResource(R.string.carbdescripttitle),
-                stringResource(R.string.carbdescription)
+//                stringResource(R.string.carbdescripttitle),
+//                stringResource(R.string.carbdescription)
             )
 
             HorizontalDivider(
@@ -285,11 +290,12 @@ fun EditPlan(
             )
 
             CreateDesciption(
+                planname = planname,
                 type = stringResource(R.string.protein),
                 gram = proteingram,
                 percent = proteinpercent,
-                stringResource(R.string.proteindescripttitle),
-                stringResource(R.string.proteindescription)
+//                stringResource(R.string.proteindescripttitle),
+//                stringResource(R.string.proteindescription)
             )
 
             HorizontalDivider(
@@ -298,11 +304,12 @@ fun EditPlan(
             )
 
             CreateDesciption(
+                planname = planname,
                 type = stringResource(R.string.fat),
                 gram = fatgram,
                 percent = fatpercent,
-                stringResource(R.string.fatdescripttitle),
-                stringResource(R.string.fatdescription)
+//                stringResource(R.string.fatdescripttitle),
+//                stringResource(R.string.fatdescription)
             )
 
             HorizontalDivider(
@@ -324,6 +331,7 @@ fun EditPlan(
         ) {
             CustomButton().CreateButton(
                 text = stringResource(R.string.save),
+                textcolor = R.color.white,
                 color = R.color.primarycolor,
                 onClick = OnClick@{
                     //save plan
@@ -382,12 +390,16 @@ fun EditPlan(
 
 @Composable
 fun CreateDesciption(
+    planname: PlanPage,
     type: String,
     gram: Float,
     percent: Float,
-    descriptiontitle: String,
-    description: String,
+//    descriptiontitle: String,
+//    description: String,
 ) {
+    var descriptiontitle by remember { mutableIntStateOf(0) }
+    var description by remember { mutableIntStateOf(0) }
+    setdescription(planname, onsettitle = {descriptiontitle = it}, onsetdescription = {description = it})
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -418,7 +430,7 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            CustomText().TextWithDiffColor(text = descriptiontitle, setsize = 20.sp)
+//            CustomText().TextWithDiffColor(text = descriptiontitle, setsize = 14.sp)
         }
 
         Row(
@@ -431,8 +443,34 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            CustomText().TextWithDiffColor(text = description, setsize = 14.sp)
+//            CustomText().TextWithDiffColor(text = description, setsize = 14.sp)
         }
+    }
+}
+
+fun setdescription(
+    planname: PlanPage,
+    onsettitle: (title: Int) -> Unit,
+    onsetdescription: (description: Int) -> Unit
+){
+    when(planname)
+    {
+        PlanPage.DietPlan -> TODO()
+        PlanPage.MyPlan -> TODO()
+        PlanPage.CompletedPlan -> TODO()
+        PlanPage.ManagePlan -> TODO()
+        PlanPage.CheckPlan -> TODO()
+
+        PlanPage.LowCarb -> {
+            onsettitle(R.string.carbdescripttitle)
+            onsetdescription(R.string.carbdescription)
+        }
+        PlanPage.HighProtein -> {
+
+        }
+        PlanPage.Ketone -> TODO()
+        PlanPage.Mediterra -> TODO()
+        PlanPage.Custom -> TODO()
     }
 }
 

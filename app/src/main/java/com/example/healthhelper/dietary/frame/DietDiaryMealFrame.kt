@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Checkbox
@@ -33,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -157,6 +157,12 @@ fun DietDiaryMealFrame(
                     .weight(0.05f)
                     .verticalScroll(verticalScrollState)
             ) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    thickness = 2.dp,
+                    color = colorResource(R.color.primarycolor)
+                )
+
                 SearchTextFieldWithDropDownMenuItem(
                     navController = navController,
                     modifier = Modifier

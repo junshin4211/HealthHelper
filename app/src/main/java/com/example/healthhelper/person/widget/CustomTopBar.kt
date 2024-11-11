@@ -45,6 +45,7 @@ fun CustomTopBar(
             ) {
                 Text(
                     text = title,
+                    color = colorResource(R.color.primarycolor),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
                 )
@@ -70,4 +71,5 @@ fun CustomTopBar(
         actions = actions,
         scrollBehavior = scrollBehavior,
     )
+
 }

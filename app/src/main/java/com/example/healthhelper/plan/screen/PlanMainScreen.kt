@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
@@ -75,6 +77,7 @@ fun PlanMain(context: Context = LocalContext.current,
     val formatter = PlanUCImpl()::dateTimeFormat;
     val planUCImpl = PlanUCImpl()
     val scope = rememberCoroutineScope()
+    val scrollstate = rememberScrollState()
     var isplandata by remember { mutableStateOf(false) }
     var iscompletedata by remember { mutableStateOf(false) }
 
@@ -103,6 +106,7 @@ fun PlanMain(context: Context = LocalContext.current,
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollstate)
             .background(color = colorResource(id = R.color.backgroundcolor))
             .padding(bottom = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -120,7 +124,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
-            color = colorResource(R.color.darkgray), thickness = 2.dp
+            color = colorResource(R.color.primarycolor), thickness = 2.dp
         )
 
         Row(
@@ -248,7 +252,7 @@ fun PlanMain(context: Context = LocalContext.current,
         }
 
         HorizontalDivider(
-            color = colorResource(id = R.color.darkgray),
+            color = colorResource(id = R.color.primarycolor),
             thickness = 2.dp
         )
 
@@ -406,41 +410,41 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
                                 5 -> Icon(
                                     painter = painterResource(R.drawable.protein),
                                     contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.primarycolor),
+                                    tint = colorResource(id = R.color.black_300),
                                     modifier = Modifier.size(30.dp) // 控制圖標大小
                                 )
 
                                 6 -> Icon(
                                     painter = painterResource(R.drawable.lowcarb),
                                     contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.primarycolor),
+                                    tint = colorResource(id = R.color.black_300),
                                     modifier = Modifier.size(30.dp)
                                 )
 
                                 7 -> Icon(
                                     painter = painterResource(R.drawable.ketone),
                                     contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.primarycolor),
+                                    tint = colorResource(id = R.color.black_300),
                                     modifier = Modifier.size(30.dp)
                                 )
 
                                 8 -> Icon(
                                     painter = painterResource(R.drawable.mediterra),
                                     contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.primarycolor),
+                                    tint = colorResource(id = R.color.black_300),
                                     modifier = Modifier.size(30.dp)
                                 )
 
                                 9 -> Icon(
                                     painter = painterResource(R.drawable.custom),
                                     contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.primarycolor),
+                                    tint = colorResource(id = R.color.black_300),
                                     modifier = Modifier.size(30.dp)
                                 )
                             }
                             Text(
                                 text = description.getPlanTitle(context),
-                                color = colorResource(id = R.color.primarycolor),
+                                color = colorResource(id = R.color.black_300),
                                 fontWeight = FontWeight(600)
                             )
                         }

@@ -55,7 +55,7 @@
     //black color
     <color name="very_light_black">#3D3D3D</color>
     <color name="black_200">#4F4C4C</color>
-    <color name="black_300">#292D32</color>
+    <color name="black_300">#333</color>
 
     //red color
     <color name="red_100">#F8312A</color>

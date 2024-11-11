@@ -285,7 +285,7 @@ fun CheckPlan(
                     )
                 }
             }
-            //TODO 達成度圖
+            //達成度圖
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -296,8 +296,8 @@ fun CheckPlan(
                     modifier = Modifier.size(200.dp)
                 )
                 CustomText().TextWithDiffColor(
-                    text = planUCImpl.formatToOneF(finishpercent) + "%",
-                    setsize = 40.sp
+                    text = stringResource(R.string.finishrate) + planUCImpl.formatToOneF(finishpercent) + "%",
+                    setsize = 35.sp
                 )
             }
             //達成度文字

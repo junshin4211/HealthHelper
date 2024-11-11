@@ -97,9 +97,6 @@ fun CustomDatePicker(
             state = datePickerState,
             showModeToggle = false,
             title = {
-
-            },
-            headline = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -112,12 +109,15 @@ fun CustomDatePicker(
                     Text(
                         text = selectedDate,
                         color = Color.White,
-                        fontSize = 18.sp,
+                        fontSize = 24.sp,
                         modifier = Modifier
                             .height(30.dp),
                     )
                 }
             },
+//            headline = {
+//
+//            },
             colors = DefaultColorViewModel.datePickerColors
         )
     }

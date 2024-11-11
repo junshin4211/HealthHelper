@@ -41,7 +41,7 @@ fun NutritionInfoCombo(
         item {
             LazyColumn(
                 modifier = Modifier.size(190.dp,200.dp),
-                horizontalAlignment = Alignment.End,
+                horizontalAlignment = Alignment.CenterHorizontally,
             ){
                 item {
                     NutritionPieChart(nutritionInfoVO)
