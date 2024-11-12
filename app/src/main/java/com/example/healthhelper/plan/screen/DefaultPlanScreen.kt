@@ -48,8 +48,6 @@ import com.example.healthhelper.plan.ui.CustomText
 import com.example.healthhelper.plan.ui.CustomTextField
 import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
-import com.example.healthhelper.plan.viewmodel.ManagePlanVM
-import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.ui.theme.HealthHelperTheme
@@ -277,11 +275,9 @@ fun EditPlan(
 
             CreateDesciption(
                 planname = planname,
-                type = stringResource(R.string.carb),
+                type = R.string.carb,
                 gram = carbgram,
                 percent = carbpercent,
-//                stringResource(R.string.carbdescripttitle),
-//                stringResource(R.string.carbdescription)
             )
 
             HorizontalDivider(
@@ -291,11 +287,9 @@ fun EditPlan(
 
             CreateDesciption(
                 planname = planname,
-                type = stringResource(R.string.protein),
+                type = R.string.protein,
                 gram = proteingram,
                 percent = proteinpercent,
-//                stringResource(R.string.proteindescripttitle),
-//                stringResource(R.string.proteindescription)
             )
 
             HorizontalDivider(
@@ -305,11 +299,9 @@ fun EditPlan(
 
             CreateDesciption(
                 planname = planname,
-                type = stringResource(R.string.fat),
+                type = R.string.fat,
                 gram = fatgram,
                 percent = fatpercent,
-//                stringResource(R.string.fatdescripttitle),
-//                stringResource(R.string.fatdescription)
             )
 
             HorizontalDivider(
@@ -391,15 +383,18 @@ fun EditPlan(
 @Composable
 fun CreateDesciption(
     planname: PlanPage,
-    type: String,
+    type: Int,
     gram: Float,
     percent: Float,
-//    descriptiontitle: String,
-//    description: String,
 ) {
     var descriptiontitle by remember { mutableIntStateOf(0) }
     var description by remember { mutableIntStateOf(0) }
-    setdescription(planname, onsettitle = {descriptiontitle = it}, onsetdescription = {description = it})
+    setDescription(
+        planname,
+        onsetTitle = {descriptiontitle = it},
+        onsetDescription = {description = it},
+        type = type
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -417,7 +412,7 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            CustomText().TextWithDiffColor(text = type, setsize = 25.sp)
+            CustomText().TextWithDiffColor(text = stringResource(type), setsize = 25.sp)
             CustomText().TextWithDiffColor(text = "$percent%(${String.format(Locale.US, "%.1f", gram)}克)", setsize = 20.sp)
         }
         Row(
@@ -448,32 +443,50 @@ fun CreateDesciption(
     }
 }
 
-fun setdescription(
+fun setDescription(
     planname: PlanPage,
-    onsettitle: (title: Int) -> Unit,
-    onsetdescription: (description: Int) -> Unit
-){
-    when(planname)
-    {
-        PlanPage.DietPlan -> TODO()
-        PlanPage.MyPlan -> TODO()
-        PlanPage.CompletedPlan -> TODO()
-        PlanPage.ManagePlan -> TODO()
-        PlanPage.CheckPlan -> TODO()
+    type: Int,
+    onsetTitle: (title: Int) -> Unit,
+    onsetDescription: (description: Int) -> Unit
+) {
+    // 根據 type 設置 title 和 description 的 resource id
+    val (titleResId, descriptionResId) = when (type) {
+        R.string.carb -> {
+            when (planname) {
+                PlanPage.LowCarb -> R.string.lowcarb_carb_title to R.string.lowcarb_carb_description
+                PlanPage.HighProtein -> R.string.highpro_carb_title to R.string.highpro_carb_description
+                PlanPage.Ketone -> R.string.ketone_carb_title to R.string.ketone_carb_description
+                PlanPage.Mediterra -> R.string.mediterra_carb_title to R.string.mediterra_carb_description
+                else -> R.string.defaulttitle to R.string.defaultdescription
 
-        PlanPage.LowCarb -> {
-            onsettitle(R.string.carbdescripttitle)
-            onsetdescription(R.string.carbdescription)
+            }
         }
-        PlanPage.HighProtein -> {
-            onsettitle(R.string.proteindescripttitle)
-            onsetdescription(R.string.proteindescription)
+        R.string.protein -> {
+            when (planname) {
+                PlanPage.LowCarb -> R.string.lowcarb_pro_title to R.string.lowcarb_pro_description
+                PlanPage.HighProtein -> R.string.highpro_pro_title to R.string.highpro_pro_description
+                PlanPage.Ketone -> R.string.ketone_pro_title to R.string.ketone_pro_description
+                PlanPage.Mediterra -> R.string.mediterra_pro_title to R.string.mediterra_pro_description
+                else -> R.string.defaulttitle to R.string.defaultdescription
+            }
         }
-        PlanPage.Ketone -> TODO()
-        PlanPage.Mediterra -> TODO()
-        PlanPage.Custom -> TODO()
+        R.string.fat -> {
+            when (planname) {
+                PlanPage.LowCarb -> R.string.lowcarb_fat_title to R.string.lowcarb_fat_descipt
+                PlanPage.HighProtein -> R.string.highpro_fat_title to R.string.highpro_fat_description
+                PlanPage.Ketone -> R.string.ketone_fat_title to R.string.ketone_fat_description
+                PlanPage.Mediterra -> R.string.meditera_fat_title to R.string.mediterra_fat_description
+                else -> R.string.defaulttitle to R.string.defaultdescription
+            }
+        }
+        else -> R.string.defaulttitle to R.string.defaultdescription
     }
+
+    // 設置 title 和 description
+    onsetTitle(titleResId)
+    onsetDescription(descriptionResId)
 }
+
 
 
 @Preview(locale = "zh-rTW")

@@ -1,7 +1,9 @@
 package com.example.healthhelper.dietary.dataclasses.string
 
+import androidx.compose.runtime.Composable
 import com.example.healthhelper.dietary.dataclasses.vo.NutritionInfoVO
 
+@Composable
 fun NutritionInfoText1(
     nutritionInfoVO: NutritionInfoVO,
 ):List<String>{

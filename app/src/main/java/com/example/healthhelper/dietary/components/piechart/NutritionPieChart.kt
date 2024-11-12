@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,13 +28,13 @@ fun NutritionPieChart(
     nutritionInfoVO: NutritionInfoVO,
 ) {
     val texts = listOf(
-        nutritionInfoVO.carbon.name,
-        nutritionInfoVO.protein.name,
-        nutritionInfoVO.fat.name,
+        stringResource(nutritionInfoVO.carbon.value.nameResId),
+        stringResource(nutritionInfoVO.protein.value.nameResId),
+        stringResource(nutritionInfoVO.fat.value.nameResId),
     )
-    val carbpercent = nutritionInfoVO.carbon.value.toFloat()
-    val proteinpercent = nutritionInfoVO.protein.value.toFloat()
-    val fatpercent = nutritionInfoVO.fat.value.toFloat()
+    val carbpercent = nutritionInfoVO.carbon.value.amount.value.toFloat()
+    val proteinpercent = nutritionInfoVO.protein.value.amount.value.toFloat()
+    val fatpercent = nutritionInfoVO.fat.value.amount.value.toFloat()
 
     val data = listOf(
         PieData(carbpercent, carbpercent, colorResource(R.color.light_red)),
