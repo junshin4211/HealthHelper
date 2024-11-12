@@ -39,25 +39,25 @@ fun LoginMain() {
     val loginVM: LoginVM = viewModel()
     var isLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        val savedAccount = encryptedPreferences.getString("account", "") ?: ""
-        val savedPassword = encryptedPreferences.getString("password", "") ?: ""
+    
+    val savedAccount = encryptedPreferences.getString("account", "") ?: ""
+    val savedPassword = encryptedPreferences.getString("password", "") ?: ""
 
-        if (savedAccount.isNotEmpty() && savedPassword.isNotEmpty()) {
-            loginVM.updateAccount(savedAccount)
-            loginVM.updatePassword(savedPassword)
-            loginVM.submitLogin(context,
-                onSuccess = {
-                    LoginState.isLogin.value = true
-                },
-                onError = { errorMessage ->
-                    Log.d("Auto-login failed::", "$errorMessage")
-                }
-            )
-        } else {
-            isLogin = false
-        }
+    if (savedAccount.isNotEmpty() && savedPassword.isNotEmpty()) {
+        loginVM.updateAccount(savedAccount)
+        loginVM.updatePassword(savedPassword)
+        loginVM.submitLogin(context,
+            onSuccess = {
+                LoginState.isLogin.value = true
+            },
+            onError = { errorMessage ->
+                Log.d("Auto-login failed::", "$errorMessage")
+            }
+        )
+    } else {
+        isLogin = false
     }
+
     if (isLogin == null) {
         isLoading = true
         Column(
@@ -88,7 +88,7 @@ fun LoginMain() {
         if (showRegister) {
             SignUpScreen(
                 onRegisterSuccess = { showRegister = false },
-                onBackToLogin = {  },
+                onBackToLogin = { },
             )
         } else {
             LoginScreen(
