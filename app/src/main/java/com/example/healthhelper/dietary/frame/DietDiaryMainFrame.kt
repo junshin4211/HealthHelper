@@ -72,10 +72,8 @@ fun DietDiaryMainFrame(
     val context = LocalContext.current
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
-    val selectedMealsOption by mealsOptionViewModel.selectedData.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
     val diaryVO by diaryViewModel.data.collectAsState()
-    val foodItemVOs by foodItemViewModel.data.collectAsState()
 
     var currentMealOption by remember { mutableStateOf(mealsOptions[0]) }
 
@@ -193,6 +191,12 @@ fun DietDiaryMainFrame(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top,
                     ) {
+                        Log.e(TAG, "&".repeat(50))
+                        Log.e(
+                            TAG,
+                            "In DietDiaryMainFrame function. ready to enter `NutritionInfoCombo` function. nutritionInfo:${nutritionInfo}"
+                        )
+                        Log.e(TAG, "&".repeat(50))
                         NutritionInfoCombo(
                             nutritionInfoVO = nutritionInfo,
                             showTitle = true,
@@ -209,9 +213,12 @@ fun DietDiaryMainFrame(
             }
 
             if (mealsButtonIsClicked) {
-                Log.e(TAG,"!".repeat(50))
-                Log.e(TAG,"In DietDiaryMainFrame function, mealsButtonIsClicked is true. currentMealOption:${currentMealOption}")
-                Log.e(TAG,"!".repeat(50))
+                Log.e(TAG, "!".repeat(50))
+                Log.e(
+                    TAG,
+                    "In DietDiaryMainFrame function, mealsButtonIsClicked is true. currentMealOption:${currentMealOption}"
+                )
+                Log.e(TAG, "!".repeat(50))
                 MealsOptionRepository.setSelectedData(currentMealOption)
                 navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
                 mealsButtonIsClicked = false

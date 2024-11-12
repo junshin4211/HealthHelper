@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
@@ -34,8 +32,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
+import com.example.healthhelper.dietary.dataclasses.vo.DiaryVO
 import com.example.healthhelper.dietary.repository.DiaryRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
+import com.example.healthhelper.dietary.repository.NutritionInfoRepository
 import com.example.healthhelper.dietary.repository.SelectedDateRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -111,11 +111,12 @@ fun CustomDatePicker(
                 FoodItemRepository.setSelectedDiaryId(0)
                 val affectedRows = diaryViewModel.insertDiary(diaryVO)
 
+                NutritionInfoRepository.setNutritionInfo(DiaryVO())
                 Toast.makeText(context, context.getString(R.string.insert_diary_failed), Toast.LENGTH_LONG).show()
                 return@LaunchedEffect
-
             }
 
+            NutritionInfoRepository.setNutritionInfo(queriedDiaryVOs[0])
             // fetch data successfully.
             Toast.makeText(
                 context, context.getString(R.string.fetch_diary_id_successfully),
