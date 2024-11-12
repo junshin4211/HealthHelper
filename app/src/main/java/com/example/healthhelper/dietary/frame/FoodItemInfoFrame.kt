@@ -49,6 +49,7 @@ import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDr
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
 import com.example.healthhelper.dietary.dataclasses.vo.FoodVO
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
+import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.repository.EnterStatusRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
@@ -315,7 +316,6 @@ fun FoodItemInfoFrame(
             "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodName:${foodName}"
         )
          val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
-        //foodId = getFoodIdByFoodName(newFoodVO,foodViewModel).
 
         Log.e(
             TAG,
@@ -341,7 +341,7 @@ fun FoodItemInfoFrame(
                 context.getString(R.string.save_data_successfully)
             }"
         )
-       navController.navigateUp()
+       navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }
 }
 
