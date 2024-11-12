@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -43,12 +44,17 @@ import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.bar.appbar.topappbar.FoodItemTopAppBar
 import com.example.healthhelper.dietary.components.button.DeleteButton
-import com.example.healthhelper.dietary.components.button.SaveButton
+import com.example.healthhelper.dietary.components.button.MyButton
 import com.example.healthhelper.dietary.components.dropdown.dropmenu.MyExposedDropDownMenu
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.TextFieldWithText
-import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.dataclasses.vo.FoodVO
+import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
+import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.repository.EnterStatusRepository
+import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
+import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 
@@ -58,13 +64,18 @@ fun FoodItemInfoFrame(
     navController: NavHostController,
     mealOptionViewModel: MealsOptionViewModel = viewModel(),
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
+    foodViewModel: FoodViewModel = viewModel(),
+    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
-
     val TAG = "tag_FoodItemInfoFrame"
 
     val context = LocalContext.current
 
     val mealOptions by mealOptionViewModel.data.collectAsState()
+    val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()
+    val selectedMealsOptionVO by mealsOptionViewModel.selectedData.collectAsState()
+    val foodItemVO by foodItemViewModel.selectedData.collectAsState()
 
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
 
@@ -72,8 +83,16 @@ fun FoodItemInfoFrame(
     var saveButtonIsClicked by remember { mutableStateOf(false) }
     val mealOptionNames by remember { mutableStateOf(mutableListOf<String>()) }
 
+    // get id of meal category that indicates the meal.
+    var currentMealCategoryId = getMealCategoryIdByName(
+        context = context,
+        targetMealName = selectedFoodItem.meal.value,
+        mealsOptionVOs = mealOptions,
+    )
+    Log.e(TAG,"~!".repeat(25))
+    Log.e(TAG,"In FoodItemInfoFrame function, currentMealCategoryId:${currentMealCategoryId}")
+    Log.e(TAG,"~!".repeat(25))
     LaunchedEffect(Unit) {
-        Log.e(TAG,"At LaunchedEffect was called in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
         mealOptions.forEach {
             mealOptionNames.add(context.getString(it.nameResId))
         }
@@ -82,6 +101,7 @@ fun FoodItemInfoFrame(
     LaunchedEffect(Unit) {
         EnterStatusRepository.setIsFirstEnter(false)
     }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -99,9 +119,7 @@ fun FoodItemInfoFrame(
                     .padding(innerPadding)
                     .background(color = colorResource(R.color.backgroundcolor)),
             ) {
-                Column(
-
-                ) {
+                Column() {
                     Spacer(
                         modifier = Modifier
                             .height(10.dp)
@@ -153,6 +171,15 @@ fun FoodItemInfoFrame(
                             modifier = Modifier.width(200.dp),
                             onValueChangedEvent = {
                                 selectedFoodItem.meal.value = it
+                                currentMealCategoryId = getMealCategoryIdByName(
+                                    context = context,
+                                    targetMealName = selectedFoodItem.meal.value,
+                                    mealsOptionVOs = mealOptions,
+                                )
+                                Log.e(
+                                    TAG,
+                                    "After onValueChangedEvent callback, currentMealCategoryId:${currentMealCategoryId}"
+                                )
                             },
                             options = mealOptionNames,
                             outlinedTextFieldColor = DefaultColorViewModel.outlinedTextFieldDefaultColors,
@@ -179,7 +206,7 @@ fun FoodItemInfoFrame(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     DeleteButton(
-                        buttonModifier = Modifier.size(100.dp,40.dp),
+                        buttonModifier = Modifier.size(100.dp, 40.dp),
                         onClick = {
                             deleteButtonIsClicked = true
                             saveButtonIsClicked = false
@@ -187,13 +214,16 @@ fun FoodItemInfoFrame(
                         buttonColors = DefaultColorViewModel.buttonColors,
                     )
                     Spacer(modifier = Modifier.width(20.dp))
-                    SaveButton(
-                        buttonModifier = Modifier.size(100.dp,40.dp),
+                    MyButton(
+                        buttonModifier = Modifier.size(100.dp, 40.dp),
                         onClick = {
                             saveButtonIsClicked = true
                             deleteButtonIsClicked = false
                         },
                         buttonColors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
+                        text = {
+                            Text(stringResource(R.string.save))
+                        },
                     )
                 }
                 Spacer(
@@ -241,24 +271,96 @@ fun FoodItemInfoFrame(
         }
     )
 
-    if (deleteButtonIsClicked) {
-        SelectedFoodItemsRepository.remove(selectedFoodItem)
+    LaunchedEffect(deleteButtonIsClicked) {
+        if (!deleteButtonIsClicked) return@LaunchedEffect
+
+        val foodName = selectedFoodItem.name.value
+        val newFoodVO = FoodVO()
+        newFoodVO.foodName = foodName
+        val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
+
+        FoodItemRepository.setSelectedFoodId(foodId)
+        FoodItemRepository.setSelectedFoodId(foodId)
+
+        FoodItemRepository.setSelectedMealCategoryId(0)
+
+        selectedFoodItem.meal.value = context.getString(MealCategoryEnum.EMPTY_STRING.title)
+        SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItem, false)
+
+        // remove data from database.
+        foodItemViewModel.deleteFoodItemByDiaryIdAndFoodId(foodItemVO)
 
         Toast.makeText(
             context,
-            stringResource(R.string.delete_data_successfully),
+            context.getString(R.string.delete_data_successfully),
             Toast.LENGTH_LONG
         ).show()
-        deleteButtonIsClicked = false
+        Log.e(
+            TAG,
+            "FoodItemInfoFrame function, LaunchedEffect(deleteButtonIsClicked) block was called.message:${
+                context.getString(R.string.delete_data_successfully)
+            }"
+        )
         navController.navigateUp()
-    } else if (saveButtonIsClicked) {
-
-        Log.e(TAG,"When saveButtonIsClicked is true in TAG:${TAG}, selectedFoodItem:${selectedFoodItem}")
-
-        Toast.makeText(context, stringResource(R.string.save_data_successfully), Toast.LENGTH_LONG)
-            .show()
-        saveButtonIsClicked = false
-        navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
-
     }
+
+    LaunchedEffect(saveButtonIsClicked) {
+        if (!saveButtonIsClicked) return@LaunchedEffect
+
+        val foodName = selectedFoodItem.name.value
+        val newFoodVO = FoodVO()
+        newFoodVO.foodName = foodName
+        Log.e(
+            TAG,
+            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodName:${foodName}"
+        )
+         val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
+        //foodId = getFoodIdByFoodName(newFoodVO,foodViewModel).
+
+        Log.e(
+            TAG,
+            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodId:${foodId}"
+        )
+        FoodItemRepository.setSelectedFoodId(foodId)
+        FoodItemRepository.setSelectedGrams(selectedFoodItem.grams.value)
+        FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
+        Log.e(
+            TAG,
+            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodItemVO:${foodItemVO}"
+        )
+        foodItemViewModel.updateFoodItemByDiaryIdAndFoodId(foodItemVO)
+        Toast.makeText(
+            context,
+            context.getString(R.string.save_data_successfully),
+            Toast.LENGTH_LONG
+        )
+            .show()
+        Log.e(
+            TAG,
+            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.message:${
+                context.getString(R.string.save_data_successfully)
+            }"
+        )
+       navController.navigateUp()
+    }
+}
+
+fun getMealCategoryIdByName(
+    context: Context,
+    targetMealName: String,
+    mealsOptionVOs: List<MealsOptionVO>
+): Int {
+    val mealNames = mealsOptionVOs.map { context.getString(it.nameResId) }
+    val mealCategoryId = mealNames.indexOf(targetMealName)
+    if (mealCategoryId == -1) {
+        return 0
+    }
+    return mealCategoryId + 1
+}
+
+suspend fun getFoodIdByFoodName(
+    newFoodVO:FoodVO,
+    foodViewModel: FoodViewModel
+):Int{
+    return foodViewModel.selectFoodIdByFoodName(newFoodVO)
 }

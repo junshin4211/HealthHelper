@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 import java.sql.Date
 
 data class SelectedDateVO(
-    @SerializedName("userId")
+    @SerializedName("userID")
     val userId:MutableState<Int> = mutableIntStateOf(-1),
 
     @SerializedName("createdate")

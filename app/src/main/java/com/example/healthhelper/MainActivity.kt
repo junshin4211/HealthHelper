@@ -6,9 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.healthhelper.screen.Main
 import com.example.healthhelper.signuplogin.LoginMain
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
@@ -18,6 +15,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             HealthHelperTheme {
+                Initialize()
+                EmulateInitialize()
+                //LoginMain()
                 LoginMain()
             }
         }
@@ -25,14 +25,5 @@ class MainActivity : ComponentActivity() {
             override fun handleOnBackPressed() {}
         })
     }
-
 }
 
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    HealthHelperTheme {
-//        LoginMain()
-//    }
-//}
