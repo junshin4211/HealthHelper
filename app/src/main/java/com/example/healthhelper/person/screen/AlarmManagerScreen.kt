@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -63,14 +64,15 @@ import java.util.Calendar
 fun AlarmManagerScreen(
     navController: NavHostController,
     alarmViewModel: AlarmViewModel,
-    context: Context
+    context: Context,
 ) {
     var timePickerDialogShown by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
     val alarms by alarmViewModel.alarms.collectAsState()
 
     val hasExactAlarmPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        val alarmManager =
+            context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
         alarmManager.canScheduleExactAlarms()
     } else {
         true
@@ -92,7 +94,11 @@ fun AlarmManagerScreen(
         }
     }
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .background(
+                colorResource(R.color.backgroundcolor)
+            ),
         topBar = {
             CustomTopBar(
                 title = stringResource(R.string.dayNotification),
@@ -105,51 +111,78 @@ fun AlarmManagerScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(innerPadding)
-                .background(colorResource(R.color.backgroundcolor)),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LazyColumn(modifier = Modifier.padding(16.dp)) {
-                items(alarms) { alarmTime ->
-                    AlarmItem(alarmTime = alarmTime, onRemove = { alarmViewModel.removeAlarm(context, alarmTime) })
-                }
-            }
-            Button(
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(R.color.primarycolor), thickness = 2.dp
+            )
+
+            Box(
                 modifier = Modifier
-                    .width(180.dp)
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.primarycolor)
-                ),
-                contentPadding = PaddingValues(0.dp),
-                onClick = { timePickerDialogShown = true }
+                    .fillMaxSize()
+                    .background(colorResource(R.color.backgroundcolor)),
             ) {
-                Text(stringResource(R.string.addTime), color = colorResource(R.color.backgroundcolor), fontSize = 24.sp)
-            }
-            if (timePickerDialogShown) {
-                CustomTimePickerDialog(
-                    onConfirm = { selectedTime ->
-                        if (hasExactAlarmPermission) {
-                            val alarmTime = Calendar.getInstance().apply {
-                                set(Calendar.HOUR_OF_DAY, selectedTime.hour)
-                                set(Calendar.MINUTE, selectedTime.minute)
-                                set(Calendar.SECOND, 0)
-                                if (timeInMillis <= System.currentTimeMillis()) {
-                                    add(Calendar.DAY_OF_YEAR, 1)
-                                }
-                            }
-                            alarmViewModel.addAlarm(context, alarmTime)
-                            timePickerDialogShown = false
-                        } else {
-                            showPermissionDialog = true
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LazyColumn(modifier = Modifier.padding(16.dp)) {
+                        items(alarms) { alarmTime ->
+                            AlarmItem(
+                                alarmTime = alarmTime,
+                                onRemove = { alarmViewModel.removeAlarm(context, alarmTime) })
                         }
-                    },
-                    onDismiss = { timePickerDialogShown = false }
-                )
-            }
-            if (showPermissionDialog) {
-                PermissionDialog(onDismiss = { showPermissionDialog = false })
+                    }
+                }
+
+                Button(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
+                        .width(180.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.primarycolor)
+                    ),
+                    contentPadding = PaddingValues(0.dp),
+                    onClick = { timePickerDialogShown = true }
+                ) {
+                    Text(
+                        stringResource(R.string.addTime),
+                        color = colorResource(R.color.backgroundcolor),
+                        fontSize = 24.sp
+                    )
+                }
+
+
+                if (timePickerDialogShown) {
+                    CustomTimePickerDialog(
+                        onConfirm = { selectedTime ->
+                            if (hasExactAlarmPermission) {
+                                val alarmTime = Calendar.getInstance().apply {
+                                    set(Calendar.HOUR_OF_DAY, selectedTime.hour)
+                                    set(Calendar.MINUTE, selectedTime.minute)
+                                    set(Calendar.SECOND, 0)
+                                    if (timeInMillis <= System.currentTimeMillis()) {
+                                        add(Calendar.DAY_OF_YEAR, 1)
+                                    }
+                                }
+                                alarmViewModel.addAlarm(context, alarmTime)
+                                timePickerDialogShown = false
+                            } else {
+                                showPermissionDialog = true
+                            }
+                        },
+                        onDismiss = { timePickerDialogShown = false }
+                    )
+                }
+                if (showPermissionDialog) {
+                    PermissionDialog(onDismiss = { showPermissionDialog = false })
+                }
             }
         }
     }
