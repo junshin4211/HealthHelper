@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import com.example.healthhelper.R
 import com.example.healthhelper.plan.NutritionType
 import com.example.healthhelper.plan.model.PlanModel
 import com.example.healthhelper.plan.model.PlanSpecificModel
+import com.example.healthhelper.plan.ui.AnimatedGaugeChart
 import com.example.healthhelper.plan.ui.CreateAnimationBar
 import com.example.healthhelper.plan.ui.CreateDropDownMenu
 import com.example.healthhelper.plan.ui.CreatePieChart
@@ -64,7 +66,6 @@ import java.util.Calendar
 import java.util.TimeZone
 
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CheckPlan(
     tabVM: TabViewModel = viewModel(),
@@ -93,7 +94,6 @@ fun CheckPlan(
     LaunchedEffect(Unit) {
         runCatching {
             checkVM.getSpecificPlan()
-//            if(checkVM.updatePlan() == )
         }.onFailure {
             Log.d(tag, "CheckPlan: ${it.message}")
         }
@@ -105,82 +105,84 @@ fun CheckPlan(
 
     if (diaryRangeList.isNotEmpty()) {
         isdiary = true
-
-
-        if (planSpecific.finishState == 0) {
-            var count = 0
-            diaryRangeList.forEach { diary ->
-                Log.d(tag, "finishState 0 : ${totalNutrition.totalCarbon / size}")
-                Log.d(tag, "finishState 0 : ${diary.totalCarbon}")
-                if (totalNutrition.totalCarbon / size >= diary.totalCarbon
-                    || totalNutrition.totalProtein / size >= diary.totalProtein
-                    || totalNutrition.totalFat / size >= diary.totalFat
-                ) {
-                    count++
+        when (planSpecific.finishState) {
+            0 -> {
+                var count = 0
+                diaryRangeList.forEach { diary ->
+                    Log.d(tag, "finishState 0 : ${totalNutrition.totalCarbon / size}")
+                    Log.d(tag, "finishState 0 : ${diary.totalCarbon}")
+                    if (totalNutrition.totalCarbon / size >= diary.totalCarbon
+                        || totalNutrition.totalProtein / size >= diary.totalProtein
+                        || totalNutrition.totalFat / size >= diary.totalFat
+                    ) {
+                        count++
+                    }
                 }
+                finishpercent = (count.toFloat() / size) * 100f
+                Log.d(tag, "finishState 0 : $finishpercent")
             }
-            finishpercent = (count.toFloat() / size) * 100f
-            Log.d(tag, "finishState 0 : $finishpercent")
-        } else if (planSpecific.finishState == 1) {
-            var count = 0
-            diaryRangeList.forEach { diary ->
-                if (totalNutrition.totalCarbon / size >= diary.totalCarbon
-                    && totalNutrition.totalProtein / size >= diary.totalProtein
-                    && totalNutrition.totalFat / size >= diary.totalFat
-                ) {
-                    count++
+            1 -> {
+                var count = 0
+                diaryRangeList.forEach { diary ->
+                    if (totalNutrition.totalCarbon / size >= diary.totalCarbon
+                        || totalNutrition.totalProtein / size >= diary.totalProtein
+                        || totalNutrition.totalFat / size >= diary.totalFat
+                    ) {
+                        count++
+                    }
                 }
+                finishpercent = (count.toFloat() / size)
+                // 檢查條件
+                if (finishpercent >= 0.60f) {
+                    showfinish = true
+                    scope.launch {
+                        checkVM.updatePlan(planSpecific.userDietPlanId, 2)
+                    }
+
+                }
+                Log.d(tag, "finishState 1 : $finishpercent")
             }
-            finishpercent = (count.toFloat() / size)
-            // 檢查條件
-            if (finishpercent >= 0.60f) {
-                showfinish = true
-                scope.launch {
-                    checkVM.updatePlan(planSpecific.userDietPlanId, 2)
+            2 -> {
+                var days: Long = 0
+
+                // 檢查 startTimestamp 和 endTimestamp 是否為 null
+                if (planSpecific.startDateTime == null || planSpecific.endDateTime == null) {
+                    days = 0
+                } else {
+                    // 提取毫秒數
+                    val startMillis = planSpecific.startDateTime?.time
+                    val endMillis = planSpecific.endDateTime?.time
+
+                    // 設定台北時區
+                    val timeZone = TimeZone.getTimeZone("Asia/Taipei")
+                    val calendarStart = Calendar.getInstance(timeZone)
+                    val calendarEnd = Calendar.getInstance(timeZone)
+
+                    // 設定開始與結束時間
+                    calendarStart.timeInMillis = startMillis ?: 0L
+                    calendarEnd.timeInMillis = endMillis ?: 0L
+
+                    // 計算區間天數
+                    val diffInMillis = calendarEnd.timeInMillis - calendarStart.timeInMillis
+                    days = (diffInMillis / (1000 * 60 * 60 * 24) + 1)
                 }
 
-            }
-            Log.d(tag, "finishState 1 : $finishpercent")
-        } else if (planSpecific.finishState == 2) {
-            var days: Long = 0
-
-            // 檢查 startTimestamp 和 endTimestamp 是否為 null
-            if (planSpecific.startDateTime == null || planSpecific.endDateTime == null) {
-                days = 0
-            } else {
-                // 提取毫秒數
-                val startMillis = planSpecific.startDateTime?.time
-                val endMillis = planSpecific.endDateTime?.time
-
-                // 設定台北時區
-                val timeZone = TimeZone.getTimeZone("Asia/Taipei")
-                val calendarStart = Calendar.getInstance(timeZone)
-                val calendarEnd = Calendar.getInstance(timeZone)
-
-                // 設定開始與結束時間
-                calendarStart.timeInMillis = startMillis ?: 0L
-                calendarEnd.timeInMillis = endMillis ?: 0L
-
-                // 計算區間天數
-                val diffInMillis = calendarEnd.timeInMillis - calendarStart.timeInMillis
-                days = (diffInMillis / (1000 * 60 * 60 * 24) + 1)
-            }
-
-            var count = 0
-            diaryRangeList.forEach { diary ->
-                if (totalNutrition.totalCarbon / days >= diary.totalCarbon
-                    && totalNutrition.totalProtein / days >= diary.totalProtein
-                    && totalNutrition.totalFat / days >= diary.totalFat
-                ) {
-                    count++
+                var count = 0
+                diaryRangeList.forEach { diary ->
+                    if (totalNutrition.totalCarbon / days >= diary.totalCarbon
+                        && totalNutrition.totalProtein / days >= diary.totalProtein
+                        && totalNutrition.totalFat / days >= diary.totalFat
+                    ) {
+                        count++
+                    }
                 }
+                finishpercent = (count.toFloat() / days)
+                // 檢查條件
+                if (finishpercent >= 0.60f) {
+                    showfinish = true
+                }
+                Log.d(tag, "finishState 2 : $finishpercent")
             }
-            finishpercent = (count.toFloat() / days)
-            // 檢查條件
-            if (finishpercent >= 0.60f) {
-                showfinish = true
-            }
-            Log.d(tag, "finishState 2 : $finishpercent")
         }
     }
 
@@ -291,8 +293,9 @@ fun CheckPlan(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                GaugeChart(
-                    percentage = finishpercent,
+
+                AnimatedGaugeChart(
+                    maxPercentage = finishpercent,
                     modifier = Modifier.size(200.dp)
                 )
                 CustomText().TextWithDiffColor(
@@ -342,6 +345,7 @@ fun CheckPlan(
                             .align(Alignment.Start)
                             .padding(start = 38.dp),
                     ) {
+                        Log.d(tag,"list size is ${diaryRangeList.size}")
                         val createDateList: MutableList<String> = ArrayList()
                         for ((_, _, createDate) in diaryRangeList) {
                             createDateList.add(planUCImpl.dateTimeFormat(createDate))
@@ -404,13 +408,13 @@ fun CheckPlan(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 22.dp),
+                        .padding(end = 22.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.End
                 ) {
                     CustomText().TextWithDiffColor(
                         setcolor = isWarnColor,
-                        text = planUCImpl.formatToOneF(averagecalories) + stringResource(R.string.grams),
+                        text = planUCImpl.formatToOneF(averagecalories) + stringResource(R.string.cals),
                         setsize = 24.sp
                     )
                 }
@@ -495,9 +499,7 @@ fun CheckPlan(
             //營養成分表
             ShowNutritionList(
                 planSpecificModel = planSpecific,
-//            nutritionList = diaryRangeList,
                 planUCImpl = planUCImpl,
-//            totalNutrition = totalNutrition,
                 carbgoal = carbgoal,
                 proteingoal = proteingoal,
                 fatgoal = fatgoal,
@@ -534,9 +536,7 @@ fun CheckPlan(
 @Composable
 fun ShowNutritionList(
     planSpecificModel: PlanSpecificModel,
-//    nutritionList: List<DiaryNutritionModel>,
     planUCImpl: PlanUCImpl,
-//    totalNutrition: DiaryNutritionModel,
     carbgoal: Float,
     proteingoal: Float,
     fatgoal: Float,
@@ -578,7 +578,6 @@ fun ShowNutritionList(
             Column(
                 modifier = Modifier
                     .weight(1.0f),
-                //horizontalAlignment = Alignment.Start
             ) {
                 Row(
                     modifier = Modifier.width(220.dp)
@@ -812,7 +811,6 @@ fun ShowNutrition(
         //bar+icon
         Row(
             modifier = Modifier
-                //.fillMaxWidth()
                 .offset(adjustOffset),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp)

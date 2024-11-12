@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -114,7 +116,7 @@ fun PlanMain(context: Context = LocalContext.current,
             .fillMaxSize()
             .verticalScroll(scrollstate)
             .background(color = colorResource(id = R.color.backgroundcolor))
-            .padding(bottom = 20.dp),
+            .padding(bottom = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -171,7 +173,8 @@ fun PlanMain(context: Context = LocalContext.current,
                     contentDescription = "myplanimg",
                     modifier = Modifier
                         .width(350.dp)
-                        .height(188.dp),
+                        .height(188.dp)
+                        .clip(RoundedCornerShape(20.dp)),
                     contentScale = ContentScale.FillBounds
                 )
 
@@ -259,7 +262,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         HorizontalDivider(
             color = colorResource(id = R.color.primarycolor),
-            thickness = 2.dp
+            thickness = 2.dp,
         )
 
         if (iscompletedata)
@@ -267,7 +270,7 @@ fun PlanMain(context: Context = LocalContext.current,
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(top = 5.dp, start = 10.dp, end = 5.dp)
+                    .padding(bottom = 5.dp ,start = 10.dp, end = 5.dp)
                     .fillMaxWidth()
             ) {
 
@@ -300,7 +303,8 @@ fun PlanMain(context: Context = LocalContext.current,
                     contentDescription = "completeplanimg",
                     modifier = Modifier
                         .width(350.dp)
-                        .height(188.dp),
+                        .height(188.dp)
+                        .clip(RoundedCornerShape(20.dp)),
                     contentScale = ContentScale.FillBounds
                 )
 
