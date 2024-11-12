@@ -80,10 +80,9 @@ fun DietDiaryMainFrame(
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
-    val verticalScrollState2 = rememberScrollState()
 
     LaunchedEffect(diaryVO) {
-        Log.e(TAG,"-".repeat(50))
+        Log.e(TAG, "-".repeat(50))
         Log.e(TAG, "LaunchedEffect(diaryVO) blocked was called,diaryVO:${diaryVO}")
         NutritionInfoRepository.setNutritionInfo(diaryVO)
         val newFoodItemVO = FoodItemVO(
@@ -92,14 +91,22 @@ fun DietDiaryMainFrame(
             grams = -1.0,
         )
         val queriedFoodItems = foodItemViewModel.selectFoodItemByDiaryId(newFoodItemVO)
-        if(queriedFoodItems.isEmpty()){ // fetch data failed.
-            Toast.makeText(context,context.getString(R.string.fetch_food_item_failed),Toast.LENGTH_LONG).show()
+        if (queriedFoodItems.isEmpty()) { // fetch data failed.
+            Toast.makeText(
+                context,
+                context.getString(R.string.fetch_food_item_failed),
+                Toast.LENGTH_LONG
+            ).show()
             return@LaunchedEffect
         }
 
         // fetch data successfully
-        Toast.makeText(context,context.getString(R.string.fetch_food_item_successfully),Toast.LENGTH_LONG).show()
-        Log.e(TAG,"-".repeat(50))
+        Toast.makeText(
+            context,
+            context.getString(R.string.fetch_food_item_successfully),
+            Toast.LENGTH_LONG
+        ).show()
+        Log.e(TAG, "-".repeat(50))
     }
 
     Scaffold(
@@ -115,83 +122,83 @@ fun DietDiaryMainFrame(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .background(color = colorResource(R.color.backgroundcolor)),
+                    .background(color = colorResource(R.color.backgroundcolor))
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
             ) {
-                Column(
+
+                Spacer(
                     modifier = Modifier
-                        .weight(0.7f)
-                        .verticalScroll(verticalScrollState2),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top,
-                ) {
-                    Spacer(
-                        modifier = Modifier
-                            .height(10.dp)
-                            .fillMaxWidth()
-                    )
+                        .height(10.dp)
+                        .fillMaxWidth()
+                )
 
-                    CustomDatePicker()
+                CustomDatePicker(
+                    diaryViewModel = diaryViewModel,
+                )
 
-                    Spacer(
-                        modifier = Modifier
-                            .height(10.dp)
-                            .fillMaxWidth()
-                    )
-
-                    mealsOptions.forEachIndexed { index, mealsOption ->
-                        val outerIconButtonModifier = Modifier
-                            .size(300.dp, 70.dp)
-                            .padding(10.dp)
-                        val spacerModifier = Modifier
-                            .width(30.dp)
-                            .fillMaxHeight()
-                        val outerIconButtonColor = IconButtonColors(
-                            contentColor = colorResource(R.color.primarycolor),
-                            containerColor = colorResource(R.color.primarycolor),
-                            disabledContentColor = colorResource(R.color.gray_300),
-                            disabledContainerColor = colorResource(R.color.gray_300),
-                        )
-                        val innerIconId = mealsOption.iconResId
-                        val innerText =
-                            @Composable {
-                                Text(
-                                    text = stringResource(mealsOption.nameResId),
-                                    color = Color.White,
-                                    fontSize = 30.sp,
-                                )
-                            }
-                        MealButton(
-                            outerIconButtonModifier = outerIconButtonModifier,
-                            outerIconButtonColor = outerIconButtonColor,
-                            onClick = {
-                                currentMealOption = mealsOption
-                                mealsButtonIsClicked = true
-                            },
-                            innerIconId = innerIconId,
-                            spacerModifier = spacerModifier,
-                            innerText = innerText,
-                        )
-                    }
-                }
-                Column(
+                Spacer(
                     modifier = Modifier
-                        .weight(0.3f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top,
-                ) {
-                    NutritionInfoCombo(
-                        nutritionInfoVO = nutritionInfo,
-                        showTitle = true,
-                        title = {
+                        .height(10.dp)
+                        .fillMaxWidth()
+                )
+
+                mealsOptions.forEachIndexed { index, mealsOption ->
+                    val outerIconButtonModifier = Modifier
+                        .size(300.dp, 70.dp)
+                        .padding(10.dp)
+                    val spacerModifier = Modifier
+                        .width(30.dp)
+                        .fillMaxHeight()
+                    val outerIconButtonColor = IconButtonColors(
+                        contentColor = colorResource(R.color.primarycolor),
+                        containerColor = colorResource(R.color.primarycolor),
+                        disabledContentColor = colorResource(R.color.gray_300),
+                        disabledContainerColor = colorResource(R.color.gray_300),
+                    )
+                    val innerIconId = mealsOption.iconResId
+                    val innerText =
+                        @Composable {
                             Text(
-                                text = "${stringResource(R.string.total_title)}:",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp,
+                                text = stringResource(mealsOption.nameResId),
+                                color = Color.White,
+                                fontSize = 30.sp,
                             )
                         }
+                    MealButton(
+                        outerIconButtonModifier = outerIconButtonModifier,
+                        outerIconButtonColor = outerIconButtonColor,
+                        onClick = {
+                            currentMealOption = mealsOption
+                            mealsButtonIsClicked = true
+                        },
+                        innerIconId = innerIconId,
+                        spacerModifier = spacerModifier,
+                        innerText = innerText,
                     )
+                }
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top,
+                ) {
+                    Log.d("TAG_NutritionInfoCombo",nutritionInfo.fat.value.amount.value.toString())
+                    if (nutritionInfo.fat.value.amount.value.toInt() != -1) {
+                        NutritionInfoCombo(
+                            nutritionInfoVO = nutritionInfo,
+                            showTitle = true,
+                            title = {
+                                Text(
+                                    text = "${stringResource(R.string.total_title)}:",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp,
+                                )
+                            }
+                        )
+                    }
+
+
                 }
             }
         }

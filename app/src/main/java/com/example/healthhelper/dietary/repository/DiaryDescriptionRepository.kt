@@ -1,6 +1,5 @@
 package com.example.healthhelper.dietary.repository
 
-import android.net.Uri
 import com.example.healthhelper.dietary.dataclasses.vo.DiaryDescriptionVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,10 +23,9 @@ object DiaryDescriptionRepository {
         _dataFlow.value.mealCategoryID = mealCategoryId
     }
 
-    fun setUri(uri:Uri?){
+    fun setUri(uri : String?) {
         _dataFlow.value.uri = uri
     }
-
     fun setDescription(description:String){
         _dataFlow.value.description = description
     }

@@ -1,6 +1,7 @@
 package com.example.healthhelper.dietary.interaction.database
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,12 +18,16 @@ fun LoadFoodDescription(
     context: Context,
     diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
 ){
+    val TAG = "tag_LoadFoodDescription"
+
     val currentDiaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
     LaunchedEffect(Unit) {
         val currentDiaryId = currentDiaryDescriptionVO.diaryID
         val currentMealCategoryId = currentDiaryDescriptionVO.mealCategoryID
         val targetDiaryDescriptionVO = DiaryDescriptionVO(diaryID = currentDiaryId, mealCategoryID = currentMealCategoryId)
+        Log.e(TAG,"LoadFoodDescription function, LaunchedEffect(Unit) blocked was called.targetDiaryDescriptionVO:${targetDiaryDescriptionVO}")
         val queriedDiaryDescriptionVOs = diaryDescriptionViewModel.fetchDataFromDatabase(targetDiaryDescriptionVO)
+        Log.e(TAG,"LoadFoodDescription function, LaunchedEffect(Unit) blocked was called.queriedDiaryDescriptionVOs:${queriedDiaryDescriptionVOs}")
         if(queriedDiaryDescriptionVOs.isEmpty()){ // load data failed as it is empty.
             DiaryDescriptionRepository.clearData()
             Toast.makeText(context,context.getString(R.string.load_diary_description_failed), Toast.LENGTH_LONG).show()

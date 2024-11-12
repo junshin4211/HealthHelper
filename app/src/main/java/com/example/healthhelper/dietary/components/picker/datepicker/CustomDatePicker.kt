@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
@@ -75,7 +73,7 @@ fun CustomDatePicker(
 
     LaunchedEffect(Unit) {
         val currentTimeMillis = System.currentTimeMillis()
-        Log.e(TAG,"currentTimeMillis:${currentTimeMillis}")
+        Log.e(TAG, "currentTimeMillis:${currentTimeMillis}")
         datePickerState.selectedDateMillis = currentTimeMillis
     }
     var selectedDateMillis by remember { mutableStateOf(datePickerState.selectedDateMillis) }
@@ -86,12 +84,10 @@ fun CustomDatePicker(
             .format(DateTimeFormatter.ofPattern(DateFormatterPattern.pattern))
     } ?: stringResource(R.string.noChoose)
 
-    val scrollState = rememberScrollState()
-
     LaunchedEffect(selectedDate) {
-        if(selectedDate!=context.getString(R.string.noChoose)){
-            Log.e(TAG,"-".repeat(50))
-            Log.e(TAG,"LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
+        if (selectedDate != context.getString(R.string.noChoose)) {
+            Log.e(TAG, "-".repeat(50))
+            Log.e(TAG, "LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
 
             // get date by formatting the given String.
             val date = Date.valueOf(selectedDate)
@@ -102,21 +98,20 @@ fun CustomDatePicker(
             // set data of repo so that its corresponding view model can access it.
             DiaryRepository.setCreateDate(selectedDateVO.selectedDate.value)
 
-            var queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
+            val queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
 
-            Log.e(TAG,"In LaunchedEffect(selectedDate) block,queriedDiaryVOs:${queriedDiaryVOs}")
-            Log.e(TAG,"-".repeat(50))
-            if(queriedDiaryVOs.isEmpty()){
+            Log.e(TAG, "In LaunchedEffect(selectedDate) block,queriedDiaryVOs:${queriedDiaryVOs}")
+            Log.e(TAG, "-".repeat(50))
+            if (queriedDiaryVOs.isEmpty()) {
                 val toastMessage = context.getString(R.string.load_diary_info_failed) +
                         context.getString(R.string.insert_diary_id_tip_message)
-                Toast.makeText(context,toastMessage,Toast.LENGTH_LONG).show()
+                Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
+                FoodItemRepository.setSelectedDiaryId(0)
                 val affectedRows = diaryViewModel.insertDiary(diaryVO)
 
-                queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
-                if(queriedDiaryVOs.isEmpty()){
-                    Toast.makeText(context,context.getString(R.string.insert_diary_failed) ,Toast.LENGTH_LONG).show()
-                    return@LaunchedEffect
-                }
+                Toast.makeText(context, context.getString(R.string.insert_diary_failed), Toast.LENGTH_LONG).show()
+                return@LaunchedEffect
+
             }
 
             // fetch data successfully.
@@ -125,8 +120,10 @@ fun CustomDatePicker(
                 Toast.LENGTH_SHORT
             ).show()
 
-            Toast.makeText(context,context.getString(R.string.fetch_nutrition_info_successfully),
-                Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context, context.getString(R.string.fetch_nutrition_info_successfully),
+                Toast.LENGTH_SHORT
+            ).show()
 
             DiaryRepository.setData(queriedDiaryVOs[0])
 
@@ -137,18 +134,14 @@ fun CustomDatePicker(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
-            .padding(16.dp,16.dp,16.dp,0.dp)
-            .verticalScroll(scrollState),
+            .padding(16.dp, 16.dp, 16.dp, 0.dp),
         shape = RoundedCornerShape(15.dp),
     ) {
         DatePicker(
 
             state = datePickerState,
             showModeToggle = false,
-            title = {
-
-            },
+            title = null,
             headline = {
                 Column(
                     modifier = Modifier

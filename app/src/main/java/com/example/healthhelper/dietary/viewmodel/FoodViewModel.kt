@@ -30,6 +30,11 @@ class FoodViewModel : ViewModel() {
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Log.e("TAG","onClear")
+    }
+
     suspend fun selectFoodIdByFoodName(
         foodVO: FoodVO,
     ):Int{

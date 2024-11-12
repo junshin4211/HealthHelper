@@ -1,6 +1,5 @@
 package com.example.healthhelper.dietary.dataclasses.vo
 
-import android.net.Uri
 import com.google.gson.annotations.SerializedName
 
 data class DiaryDescriptionVO(
@@ -11,7 +10,7 @@ data class DiaryDescriptionVO(
     var mealCategoryID: Int,
 
     @SerializedName("foodIconUri")
-    var uri: Uri? = null,
+    var uri: String? = null,
 
     @SerializedName("foodDescription")
     var description: String = "",

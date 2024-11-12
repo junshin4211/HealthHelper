@@ -19,8 +19,11 @@ object DietDiaryUrl {
     val updateDiaryInfoUrl: String
         get() = "${serverUrl}/dietDiary/update/updateDietDiary"
 
-    val updateMealCategoryIDUrl: String
-        get() = "${serverUrl}/dietDiary/foodItem/mealCategoryID/update"
+    val updateFoodItemByDiaryIdAndFoodId: String
+        get() = "${serverUrl}/dietDiary/foodItem/update/byDiaryIdAndFoodId"
+
+    val deleteFoodItemByDiaryIdAndFoodIdUrl:String
+        get() = "${serverUrl}/dietDiary/foodItem/delete/ByDiaryIdAndFoodId"
 
     val tryToInsertFoodItemUrl: String
         get() = "${serverUrl}/dietDiary/foodItem/tryToInsert"

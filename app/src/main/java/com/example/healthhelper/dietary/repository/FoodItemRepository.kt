@@ -1,16 +1,14 @@
 package com.example.healthhelper.dietary.repository
 
-import android.util.Log
 import com.example.healthhelper.dietary.dataclasses.vo.FoodItemVO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-
 object FoodItemRepository {
     val TAG = "tag_MealsOptionRepository"
 
-    private val _datasFlow: MutableStateFlow<MutableList<FoodItemVO>> = MutableStateFlow(mutableListOf())
+    private val _datasFlow: MutableStateFlow<List<FoodItemVO>> = MutableStateFlow(listOf())
     val datasFlow: StateFlow<List<FoodItemVO>>
         get() = _datasFlow.asStateFlow()
 
@@ -19,11 +17,7 @@ object FoodItemRepository {
         get() = _selectedDataFlow.asStateFlow()
 
     fun setDatas(newDatas:List<FoodItemVO>){
-        Log.e(TAG,"~".repeat(50))
-        Log.e(TAG,"In setDatas method,newDatas:${newDatas}")
-        _datasFlow.value = newDatas.toMutableList()
-        Log.e(TAG,"In setDatas method,_datasFlow.value:${_datasFlow.value}")
-        Log.e(TAG,"~".repeat(50))
+        _datasFlow.value = newDatas
     }
 
     fun setSelectedDiaryId(diaryId:Int){

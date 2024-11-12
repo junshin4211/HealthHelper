@@ -208,7 +208,7 @@
     <string name="weightKg">體重(kg)</string>
     <string name="body_fatpercent">體脂(%)</string>
     <string name="BodyDatatrend">變化趨勢</string>
-    <string name="empty_string">\"\"</string>
+    <string name="empty_string"></string>
     <string name="delete_graph">刪除圖片</string>
     <string name="hello_world">Hello World!!!</string>
     <string name="save_text_record">儲存文字記錄</string>

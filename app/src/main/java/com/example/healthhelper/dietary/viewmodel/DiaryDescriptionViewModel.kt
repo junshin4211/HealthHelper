@@ -21,10 +21,10 @@ class DiaryDescriptionViewModel: ViewModel(){
         return try {
             val result = httpPost(url, gson.toJson(diaryDescriptionVO))
             val collectionType = object : TypeToken<Int>() {}.type
-            gson.fromJson(result, collectionType) ?: 0
+            gson.fromJson(result, collectionType) ?: -1
         } catch (e: Exception) {
             Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
-            0
+            -1
         }
     }
 

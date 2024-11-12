@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,7 +40,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -68,27 +69,27 @@ import com.example.healthhelper.dietary.components.button.DietDiaryDescriptionBu
 import com.example.healthhelper.dietary.components.button.DietDiaryImageButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.textfield.outlinedtextfield.SearchTextFieldWithDropDownMenuItem
+import com.example.healthhelper.dietary.dataclasses.vo.FoodItemVO
+import com.example.healthhelper.dietary.dataclasses.vo.FoodVO
 import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
 import com.example.healthhelper.dietary.interaction.database.LoadFoodItemInfo
-import com.example.healthhelper.dietary.interaction.database.SaveFoodDescription
-import com.example.healthhelper.dietary.interaction.database.SaveFoodItem
 import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.FoodRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryDescriptionViewModel
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.dietary.viewmodel.EnterStatusViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 import com.example.healthhelper.person.widget.SaveButton
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MutableCollectionMutableState")
@@ -98,7 +99,6 @@ fun DietDiaryMealFrame(
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
-    enterStatusViewModel: EnterStatusViewModel = viewModel(),
     diaryDescriptionViewModel: DiaryDescriptionViewModel = viewModel(),
     foodViewModel: FoodViewModel = viewModel(),
     diaryViewModel: DiaryViewModel = viewModel(),
@@ -111,21 +111,20 @@ fun DietDiaryMealFrame(
     val verticalScrollState = rememberScrollState()
 
     val foodItems by selectedFoodItemsViewModel.data.collectAsState()
-    val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
-    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
+
+    val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
+
+    val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()
+    val selectedMealsOptionVO by mealsOptionViewModel.selectedData.collectAsState()
+
     val diaryDescriptionVO by diaryDescriptionViewModel.data.collectAsState()
-    val enterStatusVO by enterStatusViewModel.isFirstEnter.collectAsState()
     val foodVO by foodViewModel.data.collectAsState()
     val diaryVO by diaryViewModel.data.collectAsState()
     val foodItemVOs by foodItemViewModel.data.collectAsState()
 
     var availableFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
-    var checkedFoodItems by remember { mutableStateOf(listOf<SelectedFoodItemVO>()) }
-
-    LaunchedEffect(availableFoodItems) {
-        checkedFoodItems = availableFoodItems.filter { it.isCheckedWhenSelection.value }
-    }
+    var checkedFoodItems by remember { mutableStateOf(mutableListOf<SelectedFoodItemVO>()) }
 
     var clickedFoodItemVO by remember { mutableStateOf(SelectedFoodItemVO(name = mutableStateOf(""))) }
     var descriptionText by remember { mutableStateOf(diaryDescriptionVO.description) }
@@ -144,8 +143,19 @@ fun DietDiaryMealFrame(
 
     var shouldShowDescription by remember { mutableStateOf(false) }
 
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            selectedImageUri = uri
+        }
+    )
+
     // get id of meal category that indicates the meal.
-    val currentMealCategoryId = getMealCategoryId()
+    var currentMealCategoryId = getMealCategoryId(
+        mealsOptionVOs = mealsOptionVOs,
+        selectedMealsOptionVO = selectedMealsOptionVO,
+    )
 
     // set the data in repo so that its corresponding view model can access it.
     DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
@@ -158,53 +168,130 @@ fun DietDiaryMealFrame(
     LoadFoodItemInfo(context)
 
     availableFoodItems =
-        if (enterStatusVO.isFirstEnter.value) {
+        if (foodItems.isNotEmpty()) {
             foodItems.filter {
                 it.meal.value in listOf(
-                    stringResource(selectedMealOption.nameResId),
-                    stringResource(MealCategoryEnum.EMPTY_STRING.title)
+                    context.getString(selectedMealsOptionVO.nameResId),
+                    context.getString(MealCategoryEnum.EMPTY_STRING.title)
                 )
             }
         } else {
-            foodItems.filter {
-                it.meal.value in listOf(
-                    stringResource(selectedMealOption.nameResId),
-                )
-            }
+            emptyList()
         }
+    checkedFoodItems =
+        availableFoodItems?.filter { it.isCheckedWhenSelection.value }?.toMutableList()
+            ?: mutableListOf()
 
-    DisposableEffect(Unit) {
-        onDispose {
-            val currentUserId = diaryVO.userID
-            val currentDiaryId = diaryVO.diaryID
-            SaveFoodItem(
-                context = context,
-                currentUserId = currentUserId,
-                currentDiaryId = currentDiaryId,
-                checkedFoodItems = checkedFoodItems,
-            )
+    LaunchedEffect(diaryDescriptionVO) {
+        Log.e(
+            TAG,
+            "In DietDiaryMealFrame function, LaunchedEffect(diaryDescriptionVO) block was called.diaryDescriptionVO:${diaryDescriptionVO}"
+        )
+        descriptionText = diaryDescriptionVO.description
+        selectedImageUri =
+            if (diaryDescriptionVO.uri == null) null else Uri.parse(diaryDescriptionVO.uri)
+    }
+    LaunchedEffect(foodItemVOs) {
+        Log.e(
+            TAG,
+            "In DietDiaryMealFrame function, LaunchedEffect(foodItemVOs) block was called.availableFoodItems:${availableFoodItems}"
+        )
+        Log.e(
+            TAG,
+            "In DietDiaryMealFrame function, LaunchedEffect(foodItemVOs) blocked was called.foodItemVOs:${foodItemVOs}"
+        )
+
+        foodItemVOs.forEach { foodItemVO ->
+            val foodId = foodItemVO.foodID
+            val mealCategoryId = foodItemVO.mealCategoryID
+            val newFoodVO = FoodVO()
+            newFoodVO.foodID = foodId
+            val foodName = foodViewModel.selectFoodNameByFoodId(newFoodVO)
+            availableFoodItems.firstOrNull { it.name.value == foodName }?.isCheckedWhenSelection?.value =
+                true
+            availableFoodItems.firstOrNull { it.name.value == foodName }?.meal?.value =
+                when (mealCategoryId) {
+                    1 -> context.getString(MealCategoryEnum.BREAKFAST.title)
+                    2 -> context.getString(MealCategoryEnum.LUNCH.title)
+                    3 -> context.getString(MealCategoryEnum.DINNER.title)
+                    4 -> context.getString(MealCategoryEnum.SUPPER.title)
+                    else -> context.getString(MealCategoryEnum.EMPTY_STRING.title)
+                }
         }
     }
 
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    val pickImageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri: Uri? ->
-            selectedImageUri = uri
+    LaunchedEffect(saveFoodDescriptionButtonIsClicked) {
+        if (!saveFoodDescriptionButtonIsClicked) return@LaunchedEffect
+
+        // save data to database about fooditem table.
+        foodViewModel.viewModelScope.launch {
+            Log.e(
+                TAG,
+                "In DietDiaryMealFrame,DisposableEffect(Unit),onDispose,foodViewModel.viewModelScope.launch block.checkedFoodItems:${checkedFoodItems}"
+            )
+            Log.e(
+                TAG,
+                "In DietDiaryMealFrame,DisposableEffect(Unit),onDispose,foodViewModel.viewModelScope.launch block.currentMealCategoryId:${currentMealCategoryId}"
+            )
+            checkedFoodItems.forEach { checkedFoodItem ->
+                val foodName = checkedFoodItem.name.value
+                val newFoodVO = FoodVO()
+                newFoodVO.foodName = foodName
+                val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
+                val newFoodItemVO = FoodItemVO(
+                    diaryID = diaryVO.diaryID,
+                    foodID = foodId,
+                    mealCategoryID = currentMealCategoryId,
+                    grams = 100.0,
+                )
+                Log.e(
+                    TAG,
+                    "\"In DietDiaryMealFrame,DisposableEffect(Unit),onDispose,foodViewModel.viewModelScope.launch block. newFoodItemVO:${newFoodItemVO}"
+                )
+                foodItemViewModel.tryToInsertFoodItem(newFoodItemVO)
+            }
+            Toast.makeText(
+                context,
+                context.getString(R.string.save_food_item_successfully),
+                Toast.LENGTH_LONG
+            ).show()
         }
-    )
+        // save data to database about diarydescription table.
+        diaryDescriptionViewModel.viewModelScope.launch {
+            Log.e(
+                TAG,
+                "\"In DietDiaryMealFrame,DisposableEffect(Unit),onDispose, diaryDescriptionViewModel.viewModelScope.launch block. diaryDescriptionVO:${diaryDescriptionVO}"
+            )
+            DiaryDescriptionRepository.setDiaryId(diaryVO.diaryID)
+            DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
+            DiaryDescriptionRepository.setDescription(descriptionText)
+            DiaryDescriptionRepository.setUri(selectedImageUri?.toString())
+            Log.e(
+                TAG,
+                "\"In DietDiaryMealFrame,DisposableEffect(Unit),onDispose, diaryDescriptionViewModel.viewModelScope.launch block. diaryDescriptionVO:${diaryDescriptionVO}"
+            )
+            diaryDescriptionViewModel.tryToInsert(diaryDescriptionVO)
+            Toast.makeText(
+                context,
+                context.getString(R.string.save_food_description_successfully),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        navController.navigate(DietDiaryScreenEnum.FoodItemInfoFrame.name)
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
             navController = navController,
-            title = { Text(stringResource(selectedMealOption.nameResId)) },
+            title = { Text(stringResource(selectedMealsOptionVO.nameResId)) },
         )
     }, content = { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(color = colorResource(R.color.backgroundcolor)),
+                .background(color = colorResource(R.color.backgroundcolor))
+                .verticalScroll(rememberScrollState()),
         ) {
             Column(
                 modifier = Modifier
@@ -263,7 +350,7 @@ fun DietDiaryMealFrame(
                                                 MyCheckBox(
                                                     context = context,
                                                     foodItem = foodItem,
-                                                    mealsOptionVO = selectedMealOption,
+                                                    mealsOptionVO = selectedMealsOptionVO,
                                                 )
 
                                                 Text(
@@ -405,7 +492,7 @@ fun DietDiaryMealFrame(
     })
 
     if (iconButtonIsClicked) {
-        SelectedFoodItemsRepository.setSelectedDataMealValue(stringResource(selectedMealOption.nameResId))
+        SelectedFoodItemsRepository.setSelectedDataMealValue(stringResource(selectedMealsOptionVO.nameResId))
         SelectedFoodItemsRepository.setCheckedWhenSelectionState(selectedFoodItem, true)
         FoodRepository.setFoodName(clickedFoodItemVO.name.value)
         LaunchedEffect(Unit) {
@@ -445,18 +532,8 @@ fun DietDiaryMealFrame(
         isCleanEventTriggeredMeetPrerequisites = true
         dietDiaryDescriptionButtonIsClicked = false
     }
-
-    if (saveFoodDescriptionButtonIsClicked) {
-        Log.e(TAG, "saveFoodDescriptionButtonIsClicked is true.")
-        SaveFoodDescription(
-            navController = navController,
-            context = context,
-            foodIconUri = selectedImageUri,
-            foodDescription = descriptionText,
-        )
-        saveFoodDescriptionButtonIsClicked = false
-    }
 }
+
 
 @Composable
 fun MyCheckBox(
@@ -494,15 +571,22 @@ fun MyOutLinedTextField(
     }
 }
 
-@Composable
 fun getMealCategoryId(
-    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
+    mealsOptionVOs: List<MealsOptionVO>,
+    selectedMealsOptionVO: MealsOptionVO,
 ): Int {
-    val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()
-    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
-    val index = mealsOptionVOs.indexOf(selectedMealOption)
+    val TAG = "tag_getMealCategoryId"
+    Log.e(TAG, "-".repeat(50))
+    Log.e(TAG, "getMealCategoryId function was called. mealsOptionVOs:${mealsOptionVOs}")
+    Log.e(
+        TAG,
+        "getMealCategoryId function was called. selectedMealsOptionVO:${selectedMealsOptionVO}"
+    )
+    val index = mealsOptionVOs.indexOf(selectedMealsOptionVO)
+    Log.e(TAG, "getMealCategoryId function was called. index:${index}")
+    Log.e(TAG, "-".repeat(50))
     if (index == -1) {
-        return 0 + 1
+        return 0
     }
     return index + 1
 }

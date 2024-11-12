@@ -18,11 +18,13 @@ import com.example.healthhelper.dietary.frame.DietDiaryMainFrame
 import com.example.healthhelper.dietary.frame.DietDiaryMealFrame
 import com.example.healthhelper.dietary.frame.FoodItemInfoFrame
 import com.example.healthhelper.dietary.frame.SearchHintFrame
+import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 
 @Composable
 fun DietDiaryMainScreen(
     navController: NavHostController = rememberNavController(),
+    foodViewModel: FoodViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMainScreen"
@@ -53,6 +55,7 @@ fun DietDiaryMainScreen(
             ) {
                 DietDiaryMealFrame(
                     navController = navController,
+                    foodViewModel = foodViewModel
                 )
             }
 
