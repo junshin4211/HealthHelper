@@ -198,4 +198,10 @@ class PlanUCImpl : PlanUC {
         return currentDateTimeInTaipei.isAfter(timestampDateTime)
     }
 
+    override fun dayNutrition(goal: Float, totalcurrent: Float): String {
+        val percentage = (totalcurrent / goal) * 100
+        val formattedPercentage = "%.1f".format(percentage)
+        return formattedPercentage
+    }
+
 }

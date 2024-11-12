@@ -24,10 +24,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
+import com.example.healthhelper.R
 import com.himanshoe.charty.common.ChartDataCollection
 import com.himanshoe.charty.common.config.ChartDefaults
 import com.himanshoe.charty.common.config.ChartyLabelTextConfig
@@ -114,14 +117,15 @@ fun CreatePieChart(
                             text = "${String.format(Locale.US, "%.1f", it.xValue)}%",
                             fontSize = textLabelTextConfig.textSize,
                             fontStyle = textLabelTextConfig.fontStyle,
-                            fontWeight = textLabelTextConfig.fontWeight,
+                            fontWeight = FontWeight(600),
                             fontFamily = textLabelTextConfig.fontFamily,
                             maxLines = textLabelTextConfig.maxLine,
                             overflow = textLabelTextConfig.overflow,
                             modifier = Modifier.padding(
                                 end = 15.dp,
                                 start = 4.dp
-                            )
+                            ),
+                            color = colorResource(R.color.black_300)
                         )
                     }
 

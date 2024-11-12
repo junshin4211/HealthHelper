@@ -1,5 +1,7 @@
 package com.example.healthhelper.dietary.components.picker.datepicker
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,9 +35,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.repository.DiaryRepository
+import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedDateRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
 import java.sql.Date
 import java.time.Instant
@@ -48,11 +52,14 @@ import java.time.format.DateTimeFormatter
 fun CustomDatePicker(
     diaryViewModel: DiaryViewModel = viewModel(),
     selectedDateViewModel: SelectedDateViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_CustomDatePicker"
     val context = LocalContext.current
 
     val selectedDateVO by selectedDateViewModel.selectedDate.collectAsState()
+    val diaryVO by diaryViewModel.data.collectAsState()
+    val selectedFoodItemVO by foodItemViewModel.selectedData.collectAsState()
 
     val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
@@ -66,6 +73,11 @@ fun CustomDatePicker(
         }
     )
 
+    LaunchedEffect(Unit) {
+        val currentTimeMillis = System.currentTimeMillis()
+        Log.e(TAG, "currentTimeMillis:${currentTimeMillis}")
+        datePickerState.selectedDateMillis = currentTimeMillis
+    }
     var selectedDateMillis by remember { mutableStateOf(datePickerState.selectedDateMillis) }
     val selectedDate = selectedDateMillis?.let {
         Instant.ofEpochMilli(it)
@@ -74,29 +86,65 @@ fun CustomDatePicker(
             .format(DateTimeFormatter.ofPattern(DateFormatterPattern.pattern))
     } ?: stringResource(R.string.noChoose)
 
-    val scrollState = rememberScrollState()
-
     LaunchedEffect(selectedDate) {
-        if(selectedDate!=context.getString(R.string.noChoose)){
+        if (selectedDate != context.getString(R.string.noChoose)) {
+            Log.e(TAG, "-".repeat(50))
+            Log.e(TAG, "LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
+
+            // get date by formatting the given String.
             val date = Date.valueOf(selectedDate)
+
+            // set data of repo so that its corresponding view model can access it.
             SelectedDateRepository.setDate(date)
-            val diaryVOs = diaryViewModel.fetchDataFromWebRequest(selectedDateVO)
-            DiaryRepository.setData(diaryVOs)
+
+            // set data of repo so that its corresponding view model can access it.
+            DiaryRepository.setCreateDate(selectedDateVO.selectedDate.value)
+
+            val queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
+
+            Log.e(TAG, "In LaunchedEffect(selectedDate) block,queriedDiaryVOs:${queriedDiaryVOs}")
+            Log.e(TAG, "-".repeat(50))
+            if (queriedDiaryVOs.isEmpty()) {
+                val toastMessage = context.getString(R.string.load_diary_info_failed) +
+                        context.getString(R.string.insert_diary_id_tip_message)
+                Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
+                FoodItemRepository.setSelectedDiaryId(0)
+                val affectedRows = diaryViewModel.insertDiary(diaryVO)
+
+                Toast.makeText(context, context.getString(R.string.insert_diary_failed), Toast.LENGTH_LONG).show()
+                return@LaunchedEffect
+
+            }
+
+            // fetch data successfully.
+            Toast.makeText(
+                context, context.getString(R.string.fetch_diary_id_successfully),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            Toast.makeText(
+                context, context.getString(R.string.fetch_nutrition_info_successfully),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            DiaryRepository.setData(queriedDiaryVOs[0])
+
+            FoodItemRepository.setSelectedDiaryId(queriedDiaryVOs[0].diaryID)
         }
     }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
-            .padding(16.dp,16.dp,16.dp,0.dp)
-            .verticalScroll(scrollState),
+            .padding(16.dp, 16.dp, 16.dp, 0.dp),
         shape = RoundedCornerShape(15.dp),
     ) {
         DatePicker(
 
             state = datePickerState,
             showModeToggle = false,
-            title = {
+            title = null,
+            headline = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -109,15 +157,12 @@ fun CustomDatePicker(
                     Text(
                         text = selectedDate,
                         color = Color.White,
-                        fontSize = 24.sp,
+                        fontSize = 18.sp,
                         modifier = Modifier
                             .height(30.dp),
                     )
                 }
             },
-//            headline = {
-//
-//            },
             colors = DefaultColorViewModel.datePickerColors
         )
     }

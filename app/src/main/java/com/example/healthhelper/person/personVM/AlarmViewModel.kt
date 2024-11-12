@@ -9,14 +9,12 @@ import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import com.example.healthhelper.signuplogin.UserManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Calendar
 
 class AlarmViewModel : ViewModel() {
-
     private val _alarms = MutableStateFlow<List<Calendar>>(emptyList())
     val alarms: StateFlow<List<Calendar>> = _alarms.asStateFlow()
 

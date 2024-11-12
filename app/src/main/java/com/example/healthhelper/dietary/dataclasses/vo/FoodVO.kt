@@ -4,32 +4,32 @@ import com.google.gson.annotations.SerializedName
 
 data class FoodVO(
     @SerializedName("foodID")
-    val foodID : Int,
+    var foodID : Int = -1,
 
-    @SerializedName("foodname")
-    val foodname: String,
+    @SerializedName("foodName")
+    var foodName: String = "",
 
     @SerializedName("gram")
-    val gram: Double,
+    val gram: Double = 0.0,
 
     @SerializedName("fat")
-    val fat: Double,
+    val fat: Double = 0.0,
 
     @SerializedName("carbon")
-    val carbon: Double,
+    val carbon: Double = 0.0,
 
     @SerializedName("protein")
-    val protein: Double,
+    val protein: Double = 0.0,
 
     @SerializedName("fiber")
-    val fiber: Double,
+    val fiber: Double = 0.0,
 
     @SerializedName("sugar")
-    val sugar: Double,
+    val sugar: Double = 0.0,
 
     @SerializedName("sodium")
-    val sodium: Double,
+    val sodium: Double = 0.0,
 
     @SerializedName("calories")
-    val calories: Double,
+    val calories: Double = 0.0,
 )

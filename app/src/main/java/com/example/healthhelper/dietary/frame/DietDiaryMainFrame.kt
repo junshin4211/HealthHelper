@@ -2,6 +2,7 @@ package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,8 +46,13 @@ import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTop
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
+import com.example.healthhelper.dietary.dataclasses.vo.FoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
+import com.example.healthhelper.dietary.repository.NutritionInfoRepository
+import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
+import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
@@ -57,6 +63,9 @@ fun DietDiaryMainFrame(
     navController: NavHostController,
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
+    diaryViewModel: DiaryViewModel = viewModel(),
+    foodViewModel: FoodViewModel = viewModel(),
+    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMainFrame"
 
@@ -65,12 +74,41 @@ fun DietDiaryMainFrame(
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
     val selectedMealsOption by mealsOptionViewModel.selectedData.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
+    val diaryVO by diaryViewModel.data.collectAsState()
+    val foodItemVOs by foodItemViewModel.data.collectAsState()
 
     var currentMealOption by remember { mutableStateOf(mealsOptions[0]) }
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
-    val verticalScrollState2 = rememberScrollState()
+
+    LaunchedEffect(diaryVO) {
+        Log.e(TAG, "-".repeat(50))
+        Log.e(TAG, "LaunchedEffect(diaryVO) blocked was called,diaryVO:${diaryVO}")
+        NutritionInfoRepository.setNutritionInfo(diaryVO)
+        val newFoodItemVO = FoodItemVO(
+            diaryID = diaryVO.diaryID,
+            foodID = -1,
+            grams = -1.0,
+        )
+        val queriedFoodItems = foodItemViewModel.selectFoodItemByDiaryId(newFoodItemVO)
+        if (queriedFoodItems.isEmpty()) { // fetch data failed.
+            Toast.makeText(
+                context,
+                context.getString(R.string.fetch_food_item_failed),
+                Toast.LENGTH_LONG
+            ).show()
+            return@LaunchedEffect
+        }
+
+        // fetch data successfully
+        Toast.makeText(
+            context,
+            context.getString(R.string.fetch_food_item_successfully),
+            Toast.LENGTH_LONG
+        ).show()
+        Log.e(TAG, "-".repeat(50))
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -83,7 +121,7 @@ fun DietDiaryMainFrame(
                         fontSize = 24.sp,
                         fontWeight = FontWeight(600)
                     )
-                        },
+                },
             )
         },
         content = { innerPadding ->
@@ -91,14 +129,13 @@ fun DietDiaryMainFrame(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .background(color = colorResource(R.color.backgroundcolor)),
+                    .background(color = colorResource(R.color.backgroundcolor))
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top,
             ) {
                 Column(
-                    modifier = Modifier
-                        .weight(0.7f)
-                        .verticalScroll(verticalScrollState2),
+                    modifier = Modifier,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
                 ) {
@@ -107,7 +144,9 @@ fun DietDiaryMainFrame(
                         color = colorResource(R.color.primarycolor)
                     )
 
-                    CustomDatePicker()
+                    CustomDatePicker(
+                        diaryViewModel = diaryViewModel,
+                    )
 
                     Spacer(
                         modifier = Modifier
@@ -149,35 +188,32 @@ fun DietDiaryMainFrame(
                             innerText = innerText,
                         )
                     }
-                }
-                Column(
-                    modifier = Modifier
-                        .weight(0.3f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top,
-                ) {
-                    NutritionInfoCombo(
-                        nutritionInfoVO = nutritionInfo,
-                        showTitle = true,
-                        title = {
-                            Text(
-                                text = "${stringResource(R.string.total_title)}:",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp,
-                            )
-                        }
-                    )
+                    Column(
+                        modifier = Modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top,
+                    ) {
+                        NutritionInfoCombo(
+                            nutritionInfoVO = nutritionInfo,
+                            showTitle = true,
+                            title = {
+                                Text(
+                                    text = "${stringResource(R.string.total_title)}:",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 24.sp,
+                                )
+                            }
+                        )
+                    }
                 }
             }
-        }
-    )
 
-    if (mealsButtonIsClicked) {
-        MealsOptionRepository.setSelectedData(currentMealOption)
-        Log.e(TAG,"At mealsButtonIsClicked is true in TAG:${TAG}, selectedMealsOption:${selectedMealsOption}")
-        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
-        mealsButtonIsClicked = false
-    }
+            if (mealsButtonIsClicked) {
+                MealsOptionRepository.setSelectedData(currentMealOption)
+                navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
+                mealsButtonIsClicked = false
+            }
+        })
 }
 
 @Preview(showBackground = true)

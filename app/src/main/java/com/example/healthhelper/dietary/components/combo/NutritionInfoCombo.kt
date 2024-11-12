@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import com.example.healthhelper.dietary.dataclasses.vo.NutritionInfoVO
 
 @Composable
 fun NutritionInfoCombo(
+    modifier: Modifier  = Modifier,
     nutritionInfoVO: NutritionInfoVO,
     title:@Composable ()->Unit,
     showTitle : Boolean,
@@ -25,7 +24,7 @@ fun NutritionInfoCombo(
     val TAG = "tag_NutritionInfoCombo"
 
     LazyRow(
-        modifier = Modifier.size(400.dp,450.dp).verticalScroll(rememberScrollState()),
+        modifier = modifier,
         horizontalArrangement = Arrangement.Center,
     ) {
         item {

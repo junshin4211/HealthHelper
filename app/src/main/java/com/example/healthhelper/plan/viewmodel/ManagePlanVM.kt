@@ -114,7 +114,10 @@ class ManagePlanVM : ViewModel() {
         viewModelScope.launch {
             try {
                 val completePlanList = fetchPlanData(currentuserId, 1)
-                repository.setCompletePlanList(completePlanList)
+                val completeplanachive = fetchPlanData(currentuserId,2)
+                val combinelist = completePlanList + completeplanachive
+                var sortlist = combinelist.sortedBy { it.startDateTime }
+                repository.setCompletePlanList(sortlist)
                 Log.d(tag, "Fetched completePlanState: ${completePlanListState.value}")
             } catch (e: Exception) {
                 Log.e(tag, "Error fetching completePlanState: ${e.message}")

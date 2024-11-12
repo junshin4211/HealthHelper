@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,15 +16,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,7 +51,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -61,7 +64,6 @@ import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,6 +82,8 @@ fun PlanMain(context: Context = LocalContext.current,
     val scrollstate = rememberScrollState()
     var isplandata by remember { mutableStateOf(false) }
     var iscompletedata by remember { mutableStateOf(false) }
+    var myplanimg by remember { mutableIntStateOf(0) }
+    var completeplanimg by remember { mutableIntStateOf(0) }
 
     val myplanlist by managePlanVM.myPlanListState.collectAsState(initial = emptyList())
     val completeplanlist by managePlanVM.completePlanListState.collectAsState(initial = emptyList())
@@ -103,12 +107,19 @@ fun PlanMain(context: Context = LocalContext.current,
         }
     }
 
+    setimagebyplantype(
+        myplan = myPlan,
+        completeplan = completePlan,
+        onsetplanimage = { myplanimg = it },
+        onsetcompleteplanimage = { completeplanimg = it }
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollstate)
             .background(color = colorResource(id = R.color.backgroundcolor))
-            .padding(bottom = 20.dp),
+            .padding(bottom = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -161,11 +172,12 @@ fun PlanMain(context: Context = LocalContext.current,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.myplanimg),
+                    painter = painterResource(id = myplanimg),
                     contentDescription = "myplanimg",
                     modifier = Modifier
                         .width(350.dp)
-                        .height(188.dp),
+                        .height(188.dp)
+                        .clip(RoundedCornerShape(20.dp)),
                     contentScale = ContentScale.FillBounds
                 )
 
@@ -181,7 +193,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         text = myPlan.categoryName,
 
                         style = TextStyle(
-                            fontSize = 16.sp,
+                            fontSize = 20.sp,
                             lineHeight = 24.sp,
                             fontFamily = FontFamily.Default,
                             fontWeight = FontWeight(600),
@@ -198,7 +210,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         text = "${formatter(myPlan.startDateTime)}~${formatter(myPlan.endDateTime)}",
 
                         style = TextStyle(
-                            fontSize = 16.sp,
+                            fontSize = 20.sp,
                             lineHeight = 24.sp,
                             fontFamily = FontFamily.Default,
                             fontWeight = FontWeight(600),
@@ -253,7 +265,7 @@ fun PlanMain(context: Context = LocalContext.current,
 
         HorizontalDivider(
             color = colorResource(id = R.color.primarycolor),
-            thickness = 2.dp
+            thickness = 2.dp,
         )
 
         if (iscompletedata)
@@ -261,7 +273,7 @@ fun PlanMain(context: Context = LocalContext.current,
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(top = 5.dp, start = 10.dp, end = 5.dp)
+                    .padding(bottom = 5.dp ,start = 10.dp, end = 5.dp)
                     .fillMaxWidth()
             ) {
 
@@ -290,11 +302,12 @@ fun PlanMain(context: Context = LocalContext.current,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.myplanimg),
-                    contentDescription = "myplanimg",
+                    painter = painterResource(id = completeplanimg),
+                    contentDescription = "completeplanimg",
                     modifier = Modifier
                         .width(350.dp)
-                        .height(188.dp),
+                        .height(188.dp)
+                        .clip(RoundedCornerShape(20.dp)),
                     contentScale = ContentScale.FillBounds
                 )
 
@@ -310,7 +323,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         text = completePlan.categoryName,
 
                         style = TextStyle(
-                            fontSize = 16.sp,
+                            fontSize = 20.sp,
                             lineHeight = 24.sp,
                             fontFamily = FontFamily.Default,
                             fontWeight = FontWeight(600),
@@ -326,7 +339,7 @@ fun PlanMain(context: Context = LocalContext.current,
                         text = "${formatter(completePlan.startDateTime)}~${formatter(completePlan.endDateTime)}",
 
                         style = TextStyle(
-                            fontSize = 16.sp,
+                            fontSize = 20.sp,
                             lineHeight = 24.sp,
                             fontFamily = FontFamily.Default,
                             fontWeight = FontWeight(600),
@@ -388,71 +401,85 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
         divider = {
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
-                color = Color.Transparent, // 設置為透明
+                color = Color.Transparent,
                 thickness = 2.dp
             )
         }
     ) {
         PlanPage.entries.forEachIndexed { index, description ->
             if (index >= 5) {
-                Tab(
-                    selected = tabindex == index,
-                    onClick = {
-                        tabindex = index
-                        navcontroller.navigate(description.name)
-                    },
-                    text = {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(vertical = 4.dp) // 控制內部的間距
-                        ) {
-                            when (index) {
-                                5 -> Icon(
-                                    painter = painterResource(R.drawable.protein),
-                                    contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.black_300),
-                                    modifier = Modifier.size(30.dp) // 控制圖標大小
-                                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (index != 5) {
+                        Divider(
+                            color = colorResource(id = R.color.primarycolor),
+                            modifier = Modifier
+                                .height(40.dp)
+                                .width(2.dp)
+                        )
+                    }
 
-                                6 -> Icon(
-                                    painter = painterResource(R.drawable.lowcarb),
-                                    contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.black_300),
-                                    modifier = Modifier.size(30.dp)
-                                )
+                    Tab(
+                        selected = tabindex == index,
+                        onClick = {
+                            tabindex = index
+                            navcontroller.navigate(description.name)
+                        },
+                        text = {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            ) {
+                                when (index) {
+                                    5 -> Icon(
+                                        painter = painterResource(R.drawable.protein),
+                                        contentDescription = description.getPlanTitle(context),
+                                        tint = colorResource(id = R.color.black_300),
+                                        modifier = Modifier.size(30.dp)
+                                    )
 
-                                7 -> Icon(
-                                    painter = painterResource(R.drawable.ketone),
-                                    contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.black_300),
-                                    modifier = Modifier.size(30.dp)
-                                )
+                                    6 -> Icon(
+                                        painter = painterResource(R.drawable.lowcarb),
+                                        contentDescription = description.getPlanTitle(context),
+                                        tint = colorResource(id = R.color.black_300),
+                                        modifier = Modifier.size(30.dp)
+                                    )
 
-                                8 -> Icon(
-                                    painter = painterResource(R.drawable.mediterra),
-                                    contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.black_300),
-                                    modifier = Modifier.size(30.dp)
-                                )
+                                    7 -> Icon(
+                                        painter = painterResource(R.drawable.ketone),
+                                        contentDescription = description.getPlanTitle(context),
+                                        tint = colorResource(id = R.color.black_300),
+                                        modifier = Modifier.size(30.dp)
+                                    )
 
-                                9 -> Icon(
-                                    painter = painterResource(R.drawable.custom),
-                                    contentDescription = description.getPlanTitle(context),
-                                    tint = colorResource(id = R.color.black_300),
-                                    modifier = Modifier.size(30.dp)
+                                    8 -> Icon(
+                                        painter = painterResource(R.drawable.mediterra),
+                                        contentDescription = description.getPlanTitle(context),
+                                        tint = colorResource(id = R.color.black_300),
+                                        modifier = Modifier.size(30.dp)
+                                    )
+
+                                    9 -> Icon(
+                                        painter = painterResource(R.drawable.custom),
+                                        contentDescription = description.getPlanTitle(context),
+                                        tint = colorResource(id = R.color.black_300),
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                }
+                                Text(
+                                    text = description.getPlanTitle(context),
+                                    color = colorResource(id = R.color.black_300),
+                                    fontWeight = FontWeight(600)
                                 )
                             }
-                            Text(
-                                text = description.getPlanTitle(context),
-                                color = colorResource(id = R.color.black_300),
-                                fontWeight = FontWeight(600)
-                            )
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
+
 }
 
 fun PlanModel.isEmpty(): Boolean {
@@ -461,6 +488,28 @@ fun PlanModel.isEmpty(): Boolean {
             && endDateTime == null
             && categoryId == 0
             && categoryName.isBlank()
+}
+
+fun setimagebyplantype(
+    myplan: PlanModel,
+    completeplan: PlanModel,
+    onsetplanimage: (Int) -> Unit,
+    onsetcompleteplanimage: (Int) -> Unit
+){
+    when(myplan.categoryId) {
+        1 -> onsetplanimage(R.drawable.highproteinimg)
+        2 -> onsetplanimage(R.drawable.lowcarbimg)
+        3 -> onsetplanimage(R.drawable.ketoneimg)
+        4 -> onsetplanimage(R.drawable.mediterraimg)
+        5 -> onsetplanimage(R.drawable.customimg)
+    }
+    when(completeplan.categoryId) {
+        1 -> onsetcompleteplanimage(R.drawable.highproteinimg)
+        2 -> onsetcompleteplanimage(R.drawable.lowcarbimg)
+        3 -> onsetcompleteplanimage(R.drawable.ketoneimg)
+        4 -> onsetcompleteplanimage(R.drawable.mediterraimg)
+        5 -> onsetplanimage(R.drawable.customimg)
+    }
 }
 
 

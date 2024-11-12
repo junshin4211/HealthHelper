@@ -127,7 +127,7 @@ fun PersonScreen(
                     )
                 }
             }
-            Spacer(modifier = Modifier.padding(top = 8.dp))
+//            Spacer(modifier = Modifier.padding(top = 4.dp))
             Button(
                 modifier = Modifier
                     .width(240.dp)
