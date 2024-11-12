@@ -265,4 +265,12 @@
     <string name="mediterra_fat_description">•在地中海飲食中，脂肪的質量比數量更重要。尤其是單元不飽和脂肪和Omega-3脂肪酸，對心血管健康、抗炎和長期健康有積極影響。\n•減少攝取飽和脂肪和反式脂肪，並將其替換為來自植物性來源的脂肪，這樣能有效促進整體健康，並降低慢性疾病的風險。</string>
     <string name="defaulttitle">每日建議</string>
     <string name="defaultdescription">營養成分建議</string>
+
+    <string name="finishratecontent">完成目標日數/經過天數\ne.g.計畫進行到第5天,碳水每日目標達成3天\n完成率為60%</string>
+    <string name="alltime">全部時間</string>
+    <string name="date">日期</string>
+    <string name="averagecalorie">平均卡路里</string>
+    <string name="over">超過</string>
+    <string name="under">剩餘</string>
+    <string name="nutritionstitle">營養成分</string>
 </resources>
