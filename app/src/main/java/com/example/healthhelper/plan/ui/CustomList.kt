@@ -40,11 +40,13 @@ class CustomList {
                         .padding(top = 5.dp, bottom = 5.dp),
                     headlineContent = {
                         CustomText().TextWithDiffColor(
+                            setcolor = R.color.white,
                             text = plan.categoryName
                         )
                     },
                     supportingContent = {
                         CustomText().TextWithDiffColor(
+                            setcolor = R.color.white,
                             text = "${formatter(plan.startDateTime)}~${formatter(plan.endDateTime)}"
                         )
                     },

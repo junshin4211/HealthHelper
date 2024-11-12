@@ -39,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -298,6 +299,12 @@ fun DietDiaryMealFrame(
                     .weight(0.05f)
                     .verticalScroll(verticalScrollState)
             ) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    thickness = 2.dp,
+                    color = colorResource(R.color.primarycolor)
+                )
+
                 SearchTextFieldWithDropDownMenuItem(
                     navController = navController,
                     modifier = Modifier

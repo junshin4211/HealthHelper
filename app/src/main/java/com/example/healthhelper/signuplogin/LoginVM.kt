@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.healthhelper.web.httpPost
+import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +22,11 @@ class LoginVM : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private val gson = Gson()
+
+    init {
+        UserManager.clearUser()
+        Log.d("userdata", "${UserManager.getUser()}")
+    }
 
     // 更新帳號輸入
     fun updateAccount(account: String) {
@@ -70,7 +77,7 @@ class LoginVM : ViewModel() {
                 }
 
                 val user = gson.fromJson(result, User::class.java)
-
+                Log.e("LoginSusses", "$user")
                 UserManager.setUser(user)
 
                 _uiState.update { currentState ->
@@ -86,8 +93,8 @@ class LoginVM : ViewModel() {
                         Username: ${user.username}
                         Email: ${user.userEmail}
                         RoleID: ${user.roleID}
+                        photoUrl:${user.photoUrl}
                     """.trimIndent())
-
                 onSuccess(user.userId)
             } catch (e: Exception) {
                 println("Debug - Network error: ${e.message}")
@@ -98,11 +105,9 @@ class LoginVM : ViewModel() {
             }
         }
     }
-
-
 }
 
 data class LoginUiState(
-    val formState: LoginProperty = LoginProperty(),
+    var formState: LoginProperty = LoginProperty(),
     val loggedInUser: User? = null
 )

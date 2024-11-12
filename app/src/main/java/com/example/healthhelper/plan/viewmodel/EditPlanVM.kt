@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.model.PlanWithGoalModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
@@ -20,6 +21,7 @@ class EditPlanVM:ViewModel() {
     private val repository = PlanRepository
     //get the insert plan value from here
     val planSetState: StateFlow<PlanWithGoalModel> = repository.setPlanState
+//    val currentuserId = UserManager.getUser().userId
 
     //update plan value by function
     fun updateCategoryId(categoryId: Int) {

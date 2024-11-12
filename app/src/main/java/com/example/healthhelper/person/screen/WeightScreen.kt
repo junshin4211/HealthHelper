@@ -1,4 +1,4 @@
-package com.example.healthhelper.person
+package com.example.healthhelper.person.screen
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
+import com.example.healthhelper.person.PersonScreenEnum
 import com.example.healthhelper.person.model.WeightData
 import com.example.healthhelper.person.personVM.WeightViewModel
 import com.example.healthhelper.person.widget.CustomDateRangePickerDialog
@@ -65,8 +66,9 @@ import java.util.Locale
 @Composable
 fun WeightScreen(
     navController: NavHostController,
-    weightViewModel: WeightViewModel,
+    weightViewModel: WeightViewModel
 ) {
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var showDatePickerRangeDialog by remember { mutableStateOf(false) }
 
@@ -83,6 +85,7 @@ fun WeightScreen(
         stringResource(R.string.BMI),
         stringResource(R.string.body_fatpercent)
     )
+
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -107,133 +110,143 @@ fun WeightScreen(
             )
         }
     ) { innerpadding ->
-        Column(
+        Column (
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(innerpadding)
-                .background(colorResource(R.color.backgroundcolor))
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
+        ){
+            HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                color = colorResource(R.color.primarycolor), thickness = 2.dp
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colorResource(R.color.backgroundcolor))
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = selectedDateRange,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(
-                    onClick = {
-                        showDatePickerRangeDialog = true
-                    }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = stringResource(R.string.calendar)
+                    Text(
+                        text = selectedDateRange,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = {
+                            showDatePickerRangeDialog = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = stringResource(R.string.calendar)
+                        )
+                    }
+                }
+
+                if (showDatePickerRangeDialog) {
+                    CustomDateRangePickerDialog(
+                        onDismissRequest = { showDatePickerRangeDialog = false },
+                        onConfirm = { startDate, endDate ->
+                            selectedDateRange = "$startDate ~ $endDate"
+                            weightViewModel.setDateRange(startDate, endDate)
+                            showDatePickerRangeDialog = false
+                        }
                     )
                 }
-            }
 
-            if (showDatePickerRangeDialog) {
-                CustomDateRangePickerDialog(
-                    onDismissRequest = { showDatePickerRangeDialog = false },
-                    onConfirm = { startDate, endDate ->
-                        selectedDateRange = "$startDate ~ $endDate"
-                        weightViewModel.setDateRange(startDate, endDate)
-                        showDatePickerRangeDialog = false
-                    }
-                )
-            }
-
-            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .shadow(4.dp, shape = RoundedCornerShape(16.dp)),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .shadow(4.dp, shape = RoundedCornerShape(16.dp)),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White
+                            )
                         ) {
-                            Text(
-                                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
-                                text = stringResource(R.string.BodyDatatrend),
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-
-
-                            CustomTabRow(
-                                selectedTab = selectedTab,
-                                onTabSelected = { newTab -> selectedTab = newTab },
-                                textColor = colorResource(R.color.primarycolor),
-                                selectedTextColor = Color.White,
-                                labels = labels
-                            )
-                            if (weightData.size < 2) {
+                            Column(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
                                 Text(
-                                    stringResource(R.string.noBodyData),
-                                    color = Color.Red,
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 24.sp
+                                    modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                                    text = stringResource(R.string.BodyDatatrend),
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
                                 )
-                            } else {
-                                showLineChart = true
-                                when (selectedTab) {
-                                    0 -> LineChartWeightData(
-                                        weightData,
-                                        valueSelector = { it.weight.toFloat() },
-                                        showLineChart
-                                    )
 
-                                    1 -> LineChartWeightData(
-                                        weightData,
-                                        valueSelector = { it.bmi.toFloat() },
-                                        showLineChart
-                                    )
 
-                                    2 -> LineChartWeightData(
-                                        weightData,
-                                        valueSelector = { it.bodyFat.toFloat() },
-                                        showLineChart
+                                CustomTabRow(
+                                    selectedTab = selectedTab,
+                                    onTabSelected = { newTab -> selectedTab = newTab },
+                                    textColor = colorResource(R.color.primarycolor),
+                                    selectedTextColor = Color.White,
+                                    labels = labels
+                                )
+                                if (weightData.size < 2) {
+                                    Text(
+                                        stringResource(R.string.noBodyData),
+                                        color = Color.Red,
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 24.sp
                                     )
+                                } else {
+                                    showLineChart = true
+                                    when (selectedTab) {
+                                        0 -> LineChartWeightData(
+                                            weightData,
+                                            valueSelector = { it.weight.toFloat() },
+                                            showLineChart
+                                        )
+
+                                        1 -> LineChartWeightData(
+                                            weightData,
+                                            valueSelector = { it.bmi.toFloat() },
+                                            showLineChart
+                                        )
+
+                                        2 -> LineChartWeightData(
+                                            weightData,
+                                            valueSelector = { it.bodyFat.toFloat() },
+                                            showLineChart
+                                        )
+                                    }
+                                    Text(stringResource(R.string.month))
                                 }
-                                Text(stringResource(R.string.month))
                             }
                         }
+
+                    }
+                    item {
+                        Spacer(modifier = Modifier.padding(top = 8.dp))
+                        Text(
+                            stringResource(R.string.historyRecord),
+                            modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        ListItem(
+                            { HeaderRow() },
+                            colors = ListItemDefaults.colors(containerColor = colorResource(R.color.backgroundcolor)),
+                        )
+                    }
+                    items(weightData) { item ->
+                        WeightDataRow(item, navController = navController)
+                        HorizontalDivider(
+                            color = colorResource(R.color.primarycolor),
+                            thickness = 1.dp
+                        )
                     }
 
                 }
-                item {
-                    Spacer(modifier = Modifier.padding(top = 8.dp))
-                    Text(
-                        stringResource(R.string.historyRecord),
-                        modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    ListItem(
-                        { HeaderRow() },
-                        colors = ListItemDefaults.colors(containerColor = colorResource(R.color.backgroundcolor)),
-                    )
-                }
-                items(weightData) { item ->
-                    WeightDataRow(item, navController = navController)
-                    HorizontalDivider(
-                        color = colorResource(R.color.primarycolor),
-                        thickness = 1.dp
-                    )
-                }
-
             }
         }
     }
@@ -268,7 +281,6 @@ fun HeaderRow() {
             modifier = Modifier.weight(0.5f),
             fontSize = 18.sp
         )
-//        Spacer(modifier = Modifier.weight(0.2f))
     }
 }
 
@@ -300,13 +312,6 @@ fun WeightDataRow(data: WeightData, navController: NavHostController) {
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
-//        Icon(
-//            modifier = Modifier.weight(0.2f),
-//            painter = painterResource(R.drawable.baseline_mode_edit_24),
-////            imageVector = Icons.Default.PlayArrow,
-//            contentDescription = "edit"
-//
-//        )
     }
 }
 

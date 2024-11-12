@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,9 +48,8 @@ import com.example.healthhelper.plan.ui.CustomText
 import com.example.healthhelper.plan.ui.CustomTextField
 import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
-import com.example.healthhelper.plan.viewmodel.ManagePlanVM
-import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.himanshoe.charty.common.toChartDataCollection
 import com.himanshoe.charty.pie.model.PieData
@@ -65,14 +65,13 @@ fun EditPlan(
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
     navcontroller: NavHostController = rememberNavController(),
-    planVM: PlanVM,
-    ManagePlanVM: ManagePlanVM
 ) {
     val tag = "tag_EditPlan"
     val scrollstate = rememberScrollState()
     tabViewModel.setTabVisibility(false)
     val context = LocalContext.current
     val planUCImpl = remember { PlanUCImpl() }
+    val currentuserId = UserManager.getUser().userId
 
     val calorieErr = stringResource(R.string.calorieerror)
     val dateErr = stringResource(R.string.dateerror)
@@ -92,6 +91,9 @@ fun EditPlan(
 
     //display calorie value
     var calorie by remember { mutableFloatStateOf(0f) }
+
+//    var descriptiontitle by remember { mutableStateOf("") }
+//    var description by remember { mutableStateOf("") }
 
     //set nutrient percent value by planname
     planUCImpl.InitialDefaultGoal(
@@ -272,11 +274,10 @@ fun EditPlan(
             }
 
             CreateDesciption(
-                type = stringResource(R.string.carb),
+                planname = planname,
+                type = R.string.carb,
                 gram = carbgram,
                 percent = carbpercent,
-                stringResource(R.string.carbdescripttitle),
-                stringResource(R.string.carbdescription)
             )
 
             HorizontalDivider(
@@ -285,11 +286,10 @@ fun EditPlan(
             )
 
             CreateDesciption(
-                type = stringResource(R.string.protein),
+                planname = planname,
+                type = R.string.protein,
                 gram = proteingram,
                 percent = proteinpercent,
-                stringResource(R.string.proteindescripttitle),
-                stringResource(R.string.proteindescription)
             )
 
             HorizontalDivider(
@@ -298,11 +298,10 @@ fun EditPlan(
             )
 
             CreateDesciption(
-                type = stringResource(R.string.fat),
+                planname = planname,
+                type = R.string.fat,
                 gram = fatgram,
                 percent = fatpercent,
-                stringResource(R.string.fatdescripttitle),
-                stringResource(R.string.fatdescription)
             )
 
             HorizontalDivider(
@@ -324,6 +323,7 @@ fun EditPlan(
         ) {
             CustomButton().CreateButton(
                 text = stringResource(R.string.save),
+                textcolor = R.color.white,
                 color = R.color.primarycolor,
                 onClick = OnClick@{
                     //save plan
@@ -351,7 +351,7 @@ fun EditPlan(
                         return@OnClick
                     }
 
-                    EditPlanVM.updateUserId(2)
+                    EditPlanVM.updateUserId(currentuserId)
                     EditPlanVM.updateFinishState(0)
                     EditPlanVM.updateCaloriesGoal(calorie)
                     scope.launch {
@@ -382,12 +382,19 @@ fun EditPlan(
 
 @Composable
 fun CreateDesciption(
-    type: String,
+    planname: PlanPage,
+    type: Int,
     gram: Float,
     percent: Float,
-    descriptiontitle: String,
-    description: String,
 ) {
+    var descriptiontitle by remember { mutableIntStateOf(0) }
+    var description by remember { mutableIntStateOf(0) }
+    setDescription(
+        planname,
+        onsetTitle = {descriptiontitle = it},
+        onsetDescription = {description = it},
+        type = type
+    )
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -405,7 +412,7 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            CustomText().TextWithDiffColor(text = type, setsize = 25.sp)
+            CustomText().TextWithDiffColor(text = stringResource(type), setsize = 25.sp)
             CustomText().TextWithDiffColor(text = "$percent%(${String.format(Locale.US, "%.1f", gram)}克)", setsize = 20.sp)
         }
         Row(
@@ -418,7 +425,7 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            CustomText().TextWithDiffColor(text = descriptiontitle, setsize = 20.sp)
+            CustomText().TextWithDiffColor(text = stringResource(descriptiontitle), setsize = 14.sp)
         }
 
         Row(
@@ -431,10 +438,55 @@ fun CreateDesciption(
             verticalAlignment = Alignment.CenterVertically
 
         ) {
-            CustomText().TextWithDiffColor(text = description, setsize = 14.sp)
+            CustomText().TextWithDiffColor(text = stringResource(description), setsize = 14.sp)
         }
     }
 }
+
+fun setDescription(
+    planname: PlanPage,
+    type: Int,
+    onsetTitle: (title: Int) -> Unit,
+    onsetDescription: (description: Int) -> Unit
+) {
+    // 根據 type 設置 title 和 description 的 resource id
+    val (titleResId, descriptionResId) = when (type) {
+        R.string.carb -> {
+            when (planname) {
+                PlanPage.LowCarb -> R.string.lowcarb_carb_title to R.string.lowcarb_carb_description
+                PlanPage.HighProtein -> R.string.highpro_carb_title to R.string.highpro_carb_description
+                PlanPage.Ketone -> R.string.ketone_carb_title to R.string.ketone_carb_description
+                PlanPage.Mediterra -> R.string.mediterra_carb_title to R.string.mediterra_carb_description
+                else -> R.string.defaulttitle to R.string.defaultdescription
+
+            }
+        }
+        R.string.protein -> {
+            when (planname) {
+                PlanPage.LowCarb -> R.string.lowcarb_pro_title to R.string.lowcarb_pro_description
+                PlanPage.HighProtein -> R.string.highpro_pro_title to R.string.highpro_pro_description
+                PlanPage.Ketone -> R.string.ketone_pro_title to R.string.ketone_pro_description
+                PlanPage.Mediterra -> R.string.mediterra_pro_title to R.string.mediterra_pro_description
+                else -> R.string.defaulttitle to R.string.defaultdescription
+            }
+        }
+        R.string.fat -> {
+            when (planname) {
+                PlanPage.LowCarb -> R.string.lowcarb_fat_title to R.string.lowcarb_fat_descipt
+                PlanPage.HighProtein -> R.string.highpro_fat_title to R.string.highpro_fat_description
+                PlanPage.Ketone -> R.string.ketone_fat_title to R.string.ketone_fat_description
+                PlanPage.Mediterra -> R.string.meditera_fat_title to R.string.mediterra_fat_description
+                else -> R.string.defaulttitle to R.string.defaultdescription
+            }
+        }
+        else -> R.string.defaulttitle to R.string.defaultdescription
+    }
+
+    // 設置 title 和 description
+    onsetTitle(titleResId)
+    onsetDescription(descriptionResId)
+}
+
 
 
 @Preview(locale = "zh-rTW")

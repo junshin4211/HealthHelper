@@ -3,6 +3,7 @@ package com.example.healthhelper.signuplogin
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.dietary.gson.gson
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.healthhelper.web.serverUrl
+import com.example.healthhelper.web.httpPost
 
 class SignUpViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SignUpUiState())
@@ -22,7 +25,6 @@ class SignUpViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-   // private val serverUrl = "http://10.0.2.2:8080/HealthyHelperServer" // 替換成你的伺服器網址
 
     // 表單更新方法
     fun updateAccount(account: String) {
@@ -137,23 +139,57 @@ class SignUpViewModel : ViewModel() {
         }
     }
 
+    fun updateUserRole(isNutritionist: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                formState = currentState.formState.copy(
+                    isNutritionist = isNutritionist,
+                    isNormalUser = !isNutritionist
+                )
+            )
+        }
+    }
+
     // 檔案處理
     fun handleFileSelection(context: Context, uri: Uri) {
+
         viewModelScope.launch {
             try {
-                val base64String = convertFileToBase64(context, uri)
-                if (base64String != null) {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                inputStream?.use { stream ->
+                    val bytes = stream.readBytes()
+                    Log.d("TEST_CERTIFICATE", "image size: ${bytes.size} bytes")
+                    val base64String = Base64.encodeToString(bytes, Base64.NO_WRAP)
+                   //
+                    // val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
+                    Log.d("TEST_CERTIFICATE", """
+                    Base64 result:
+                    length: ${base64String.length}
+                    50 words: ${base64String.take(50)}
+                    blank space or change line: ${base64String.contains("\n") || base64String.contains(" ")}
+                    code mode: DEFAULT
+                    not null check: ${base64String.isNotEmpty()}
+                """.trimIndent())
+
+                    // 檢查解碼是否正確
+                    try {
+                        val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+                        Log.d("TEST_CERTIFICATE", "size: ${decodedBytes.size} bytes")
+                    } catch (e: Exception) {
+                        Log.e("TEST_CERTIFICATE", "Error: ${e.message}")
+                    }
+
                     _uiState.update { currentState ->
                         currentState.copy(
                             formState = currentState.formState.copy(
-                                certificate = "已選擇檔案",
+                                certificate = "select image (${bytes.size} bytes)",
                                 certificateBase64 = base64String
                             )
                         )
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("TEST_CERTIFICATE", "error: ${e.message}")
             }
         }
     }
@@ -194,6 +230,7 @@ class SignUpViewModel : ViewModel() {
                 val jsonObject = JsonObject().apply {
                     addProperty("account", _uiState.value.formState.account)
                     addProperty("password", _uiState.value.formState.password)
+                    addProperty("cPassword", _uiState.value.formState.confirmPassword)
                     addProperty("username", _uiState.value.formState.username)
                     addProperty("userEmail", _uiState.value.formState.email)
                     addProperty("phoneno", _uiState.value.formState.phone)

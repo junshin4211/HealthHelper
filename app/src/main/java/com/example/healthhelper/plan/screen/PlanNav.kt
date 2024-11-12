@@ -1,10 +1,12 @@
 package com.example.healthhelper.plan.screen
 
 import android.content.Context
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -36,6 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.ui.CustomText
+import com.example.healthhelper.plan.viewmodel.CheckPlanVM
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
@@ -48,7 +52,8 @@ fun Plan(
     tabViewModel: TabViewModel = viewModel(),
     planVM: PlanVM = viewModel(),
     managePlanVM: ManagePlanVM = viewModel(),
-    EditPlanVM: EditPlanVM = viewModel()
+    EditPlanVM: EditPlanVM = viewModel(),
+    checkPlanVM: CheckPlanVM = viewModel()
 ) {
     val tag = "tag_PlanNav"
     val context = LocalContext.current
@@ -73,104 +78,109 @@ fun Plan(
                 onShowDelete = {
                     showdeleteicon = planVM.showdelete
                 },
-                planViewModel = planVM
+                PlanVM = planVM,
+                checkPlanVM = checkPlanVM
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = PlanPage.DietPlan.name,
+        Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
+                .fillMaxSize()
         ) {
-            composable(route = PlanPage.DietPlan.name) {
-                PlanMain(
-                    navcontroller = navController,
-                    tabVM = tabViewModel,
-                    planVM = planVM
-                )
-            }
-            composable(route = PlanPage.HighProtein.name) {
-                EditPlan(
-                    planname = PlanPage.HighProtein,
-                    tabViewModel = tabViewModel,
-                    EditPlanVM = EditPlanVM,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
-                )
-            }
-            composable(route = PlanPage.LowCarb.name) {
-                EditPlan(
-                    planname = PlanPage.LowCarb,
-                    tabViewModel = tabViewModel,
-                    EditPlanVM = EditPlanVM,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
-                )
-            }
-            composable(route = PlanPage.Ketone.name) {
-                EditPlan(
-                    planname = PlanPage.Ketone,
-                    tabViewModel = tabViewModel,
-                    EditPlanVM = EditPlanVM,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
-                )
-            }
-            composable(route = PlanPage.Mediterra.name) {
-                EditPlan(
-                    planname = PlanPage.Mediterra,
-                    tabViewModel = tabViewModel,
-                    EditPlanVM = EditPlanVM,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
-                )
-            }
-            composable(route = PlanPage.Custom.name) {
-                CustomEditPlan(
-                    planname = PlanPage.Custom,
-                    tabViewModel = tabViewModel,
-                    EditPlanVM = EditPlanVM,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState,
-                    navcontroller = navController,
-                    planVM = planVM,
-                    ManagePlanVM = managePlanVM
-                )
-            }
-            composable(route = PlanPage.ManagePlan.name) {
-                ManagePlan(
-                    planVM = planVM,
-                    managePlanVM = managePlanVM,
-                    showdeleteicon,
-                    tabViewModel,
-                    scope = scope,
-                    snackbarHostState = snackbarHostState
-                )
-            }
-            composable(route = PlanPage.CheckPlan.name)
-            {
-                CheckPlan(
-                    navcontroller = navController,
-                    tabViewModel,
-                    planVM,
-                    managePlanVM,
-                    currentScreen
-                )
+            HorizontalDivider(
+                color = colorResource(id = R.color.primarycolor),
+                thickness = 2.dp
+            )
+
+            NavHost(
+                navController = navController,
+                startDestination = PlanPage.DietPlan.name,
+                modifier = Modifier
+                    .fillMaxSize()
+//                    .padding(innerPadding)
+            ) {
+                composable(route = PlanPage.DietPlan.name) {
+                    PlanMain(
+                        navcontroller = navController,
+                        tabVM = tabViewModel,
+                        planVM = planVM,
+                        checkPlanVM = checkPlanVM,
+                        managePlanVM = managePlanVM
+                    )
+                }
+                composable(route = PlanPage.HighProtein.name) {
+                    EditPlan(
+                        planname = PlanPage.HighProtein,
+                        tabViewModel = tabViewModel,
+                        EditPlanVM = EditPlanVM,
+                        scope = scope,
+                        snackbarHostState = snackbarHostState,
+                        navcontroller = navController,
+                    )
+                }
+                composable(route = PlanPage.LowCarb.name) {
+                    EditPlan(
+                        planname = PlanPage.LowCarb,
+                        tabViewModel = tabViewModel,
+                        EditPlanVM = EditPlanVM,
+                        scope = scope,
+                        snackbarHostState = snackbarHostState,
+                        navcontroller = navController,
+                    )
+                }
+                composable(route = PlanPage.Ketone.name) {
+                    EditPlan(
+                        planname = PlanPage.Ketone,
+                        tabViewModel = tabViewModel,
+                        EditPlanVM = EditPlanVM,
+                        scope = scope,
+                        snackbarHostState = snackbarHostState,
+                        navcontroller = navController,
+                    )
+                }
+                composable(route = PlanPage.Mediterra.name) {
+                    EditPlan(
+                        planname = PlanPage.Mediterra,
+                        tabViewModel = tabViewModel,
+                        EditPlanVM = EditPlanVM,
+                        scope = scope,
+                        snackbarHostState = snackbarHostState,
+                        navcontroller = navController,
+                    )
+                }
+                composable(route = PlanPage.Custom.name) {
+                    CustomEditPlan(
+                        planname = PlanPage.Custom,
+                        tabVM = tabViewModel,
+                        editPlanVM = EditPlanVM,
+                        scope = scope,
+                        snackBarHostState = snackbarHostState,
+                        navController = navController,
+                    )
+                }
+                composable(route = PlanPage.ManagePlan.name) {
+                    ManagePlan(
+                        planVM = planVM,
+                        managePlanVM = managePlanVM,
+                        showdelete = showdeleteicon,
+                        tabVM = tabViewModel,
+                        scope = scope,
+                        snackbarHostState = snackbarHostState,
+                        checkPlanVM = checkPlanVM,
+                        navcontroller = navController
+                    )
+                }
+                composable(route = PlanPage.CheckPlan.name)
+                {
+                    CheckPlan(
+                        tabVM = tabViewModel,
+                        planVM = planVM,
+                        managePlanVM = managePlanVM,
+                        checkVM = checkPlanVM
+                    )
+                }
             }
         }
     }
@@ -185,11 +195,12 @@ fun PlanAppBar(
     onShowDelete: () -> Unit,
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
-    planViewModel: PlanVM
+    PlanVM: PlanVM,
+    checkPlanVM: CheckPlanVM
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colorResource(id = R.color.primarycolor),
+            containerColor = colorResource(id = R.color.backgroundcolor),
             titleContentColor = colorResource(id = R.color.black)
         ),
         title = {
@@ -202,20 +213,26 @@ fun PlanAppBar(
                     PlanPage.DietPlan -> {
                         PlanPage.DietPlan.getPlanTitle(context)
                     }
-
+                    PlanPage.CheckPlan -> {
+                        checkPlanVM.getCateGoryName()
+                    }
                     else -> {
                         currentScreen.getPlanTitle(context) + "飲食計畫" // 其他頁面的標題
                     }
                 }
             CustomText().TextWithDiffColor(
+                setcolor = R.color.primarycolor,
                 text = titleText,
-                setsize = 30.sp
+                setsize = 24.sp
             )
         },
         navigationIcon = {
             if (cannavigateback) {
                 IconButton(
-                    onClick = { navController.popBackStack() }
+                    onClick = {
+                        navController.popBackStack()
+                        checkPlanVM.clear()
+                    }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.arrow),
@@ -223,6 +240,7 @@ fun PlanAppBar(
                         modifier = Modifier
                             .scale(2.2f)
                             .graphicsLayer(scaleX = -1f),
+                        tint = colorResource(R.color.primarycolor)
                     )
                 }
             }
@@ -232,7 +250,7 @@ fun PlanAppBar(
             if (currentScreen == PlanPage.ManagePlan) {
                 IconButton(
                     onClick = {
-                        planViewModel.showdelete = !planViewModel.showdelete
+                        PlanVM.showdelete = !PlanVM.showdelete
                         onShowDelete()
                     }
                 ) {

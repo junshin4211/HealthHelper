@@ -98,6 +98,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.cloudinary.android)
     implementation( "com.google.guava:guava:31.0.1-android")
+    implementation(libs.androidx.security.crypto.ktx)
 
 
     testImplementation(libs.junit)

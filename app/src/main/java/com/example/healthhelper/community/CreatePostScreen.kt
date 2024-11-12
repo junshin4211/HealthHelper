@@ -1,8 +1,13 @@
 package com.example.healthhelper.community
 
+import android.net.Uri
+import android.util.Base64
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,8 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -28,6 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,78 +41,64 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.community.components.CmtNavbarComponent
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
-
 @Composable
-fun CreatePostScreen(navController: NavHostController) {
+fun CreatePostScreen(
+    navController: NavHostController,
+    postVM: PostVM = viewModel(),
+) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
+    var titleError by remember { mutableStateOf(false) }
+    var contentError by remember { mutableStateOf(false) }
+    //加入圖片功能
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    /* 呼叫rememberLauncherForActivityResult並搭配PickVisualMedia()
+        以建立可以啟用photo picker的launcher物件。
+        照片挑選完畢會執行onResult並傳來該照片的URI供後續處理 */
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            selectedImageUri = uri
+        }
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(colorResource(id = R.color.backgroundcolor))
     ) {
-        CmtNavbarComponent(navController = navController)
+        CmtNavbarComponent(navController = navController, postVM = postVM)
         Column(
-            // 內容物水平置中
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
-            // Profile row
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.profile),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier.size(48.dp),
-                    colorResource(R.color.primarycolor)
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Text(
-                    text = stringResource(id = R.string.userName),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.black_200)
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Close",
-                    modifier = Modifier
-                        .clickable {
-                            navController.navigate(CmtScreenEnum.CmtMainScreen.name)
-                        }
-                )
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             // Title TextField
-            //Title字數限制尚未完成
             OutlinedTextField(
                 value = title,
-                onValueChange = { title = it },
+                onValueChange = {
+                    title = it
+                    titleError = title.isBlank() || title.length > 30
+                },
                 placeholder = {
                     Text(
                         text = stringResource(R.string.input_post_title),
                         color = colorResource(id = R.color.gray_300)
                     )
                 },
+                isError = titleError,
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
@@ -118,24 +110,35 @@ fun CreatePostScreen(navController: NavHostController) {
                         color = colorResource(id = R.color.gray_200),
                         shape = RoundedCornerShape(size = 4.dp)
                     )
-
             )
+
+            if (titleError) {
+                Text(
+                    text = "標題不可為空且需小於 30 字",
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Content TextField
             OutlinedTextField(
                 value = content,
-                onValueChange = { content = it },
+                onValueChange = {
+                    content = it
+                    contentError = content.isBlank()
+                },
                 placeholder = {
                     Text(
                         text = stringResource(R.string.input_post_content),
                         color = colorResource(id = R.color.gray_300)
                     )
                 },
+                isError = contentError,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp) // 控制輸入框的高度
+                    .height(150.dp)
                     .border(
                         width = 1.dp,
                         color = colorResource(id = R.color.gray_300),
@@ -148,16 +151,31 @@ fun CreatePostScreen(navController: NavHostController) {
                 maxLines = 5,
             )
 
+            if (contentError) {
+                Text(
+                    text = "內容不可為空",
+                    color = Color.Red,
+                    fontSize = 12.sp
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Add Image and Submit Button Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+                //點選跳出相簿處
                 Button(
-                    onClick = { /* 點擊加入圖片的邏輯 */ },
-                    shape = RoundedCornerShape(size = 9.22006.dp),
+                    onClick = {
+                        pickImageLauncher.launch(
+                            PickVisualMediaRequest(
+                                // 設定只能挑選圖片
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
+                    },
+                    shape = RoundedCornerShape(size = 9.dp),
                     modifier = Modifier
                         .width(150.dp)
                         .height(52.dp),
@@ -168,7 +186,6 @@ fun CreatePostScreen(navController: NavHostController) {
                         contentDescription = "Add Image",
                         modifier = Modifier,
                         colorResource(id = R.color.black_200)
-
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -178,11 +195,32 @@ fun CreatePostScreen(navController: NavHostController) {
                         color = colorResource(id = R.color.black_300)
                     )
                 }
-
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Button(
-                    onClick = { navController.navigate(CmtScreenEnum.MyPostsScreen.name)},
+                    onClick = {
+                        titleError = title.isBlank() || title.length > 30
+                        contentError = content.isBlank()
+
+
+//                        if (!titleError && !contentError) {
+//                            postVM.insertPost(title = title, content = content)
+//                            navController.navigate(CmtScreenEnum.MyPostsScreen.name)
+//                        }
+
+                        if (!titleError && !contentError) {
+                            val pictureBytes = selectedImageUri?.let { uri ->
+                                val inputStream = navController.context.contentResolver.openInputStream(uri)
+                                val bytes = inputStream?.readBytes()
+                                inputStream?.close()
+                                bytes  // 直接返回 ByteArray
+                            }
+
+                            // 將 pictureBytes 傳入 insertPost
+                            postVM.insertPost(title, content, pictureBytes)
+                            navController.navigate(CmtScreenEnum.MyPostsScreen.name)
+                        }
+                    },
                     modifier = Modifier
                         .width(161.dp)
                         .height(52.dp)
@@ -197,9 +235,18 @@ fun CreatePostScreen(navController: NavHostController) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-
+            Spacer(modifier = Modifier.height(40.dp))
+            // 當照片被選取則URI不為null，就將該照片顯示
+            selectedImageUri?.let { uri ->
+                Image(
+                    painter = rememberAsyncImagePainter(uri),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(350.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }
@@ -211,4 +258,26 @@ fun CreatePostScreenPreview() {
         CreatePostScreen(rememberNavController())
     }
 }
-
+//原Button
+//                Button(
+//                    onClick = { /* 點擊加入圖片的邏輯 */ },
+//                    shape = RoundedCornerShape(size = 9.dp),
+//                    modifier = Modifier
+//                        .width(150.dp)
+//                        .height(52.dp),
+//                    colors = ButtonDefaults.buttonColors(colorResource(id = R.color.gray_100))
+//                ) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.baseline_photo_24),
+//                        contentDescription = "Add Image",
+//                        modifier = Modifier,
+//                        colorResource(id = R.color.black_200)
+//                    )
+//                    Spacer(modifier = Modifier.width(8.dp))
+//                    Text(
+//                        text = "加入圖片",
+//                        fontSize = 14.75.sp,
+//                        fontWeight = FontWeight(600),
+//                        color = colorResource(id = R.color.black_300)
+//                    )
+//                }

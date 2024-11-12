@@ -34,9 +34,9 @@ import android.widget.Toast
 import androidx.compose.ui.tooling.preview.Preview
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SignUpScreen(
+    onRegisterSuccess: () -> Unit, onBackToLogin: () -> Unit,
     navController: NavHostController = rememberNavController(),
     viewModel: SignUpViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
@@ -54,11 +54,13 @@ fun SignUpScreen(
     }
 
     val textFieldColors = TextFieldDefaults.colors(
-        errorContainerColor = Color(0xFFFFCDD2),
+      //errorContainerColor = Color(0xFFFFCDD2),
         focusedIndicatorColor = Color(0xFFD75813),
         unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
-        focusedContainerColor = Color.White
+        focusedContainerColor = Color.White,
+        focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
+       //unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
 
     Box(
@@ -92,13 +94,13 @@ fun SignUpScreen(
                 label = { Text("帳號") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
             )
 
-            // 密碼
+            // 密碼欄位
             TextField(
                 value = uiState.formState.password,
                 onValueChange = { viewModel.updatePassword(it) },
@@ -120,13 +122,22 @@ fun SignUpScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
-                colors = textFieldColors
+                colors = textFieldColors,
+              //  isError = uiState.formState.passwordErrorMessage.isNotEmpty()
             )
 
-            // 確認密碼
+//            if (uiState.formState.passwordErrorMessage.isNotEmpty()) {
+//                Text(
+//                    text = uiState.formState.passwordErrorMessage,
+//                    color = Color.Red,
+//                    modifier = Modifier.padding(top = 1.dp)
+//                )
+//            }
+
+// 確認密碼欄位
             TextField(
                 value = uiState.formState.confirmPassword,
                 onValueChange = { viewModel.updateConfirmPassword(it) },
@@ -148,20 +159,20 @@ fun SignUpScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors,
-                isError = uiState.formState.passwordErrorMessage.isNotEmpty()
+                //isError = uiState.formState.confirmPasswordErrorMessage.isNotEmpty()
             )
 
-            if (uiState.formState.passwordErrorMessage.isNotEmpty()) {
-                Text(
-                    text = uiState.formState.passwordErrorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 1.dp)
-                )
-            }
+//            if (uiState.formState.confirmPasswordErrorMessage.isNotEmpty()) {
+//                Text(
+//                    text = uiState.formState.confirmPasswordErrorMessage,
+//                    color = Color.Red,
+//                    modifier = Modifier.padding(top = 1.dp)
+//                )
+//            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -175,7 +186,7 @@ fun SignUpScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White),
                     colors = textFieldColors
@@ -189,7 +200,7 @@ fun SignUpScreen(
                         .weight(1f)
                         .height(56.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .background(Color.White)
                         .clickable { viewModel.toggleGenderDropdown() }
                         .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -202,7 +213,7 @@ fun SignUpScreen(
                         Text(
                             text = if (uiState.formState.gender.isEmpty()) "性別"
                             else uiState.formState.gender,
-                            color = Color.Gray,
+                            color = Color(0xFF40434B),
                             fontSize = 16.sp
                         )
 
@@ -240,20 +251,20 @@ fun SignUpScreen(
                 label = { Text("電話") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors,
-                isError = uiState.formState.phoneErrorMessage.isNotEmpty()
+               // isError = uiState.formState.phoneErrorMessage.isNotEmpty()
             )
 
-            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
-                Text(
-                    text = uiState.formState.phoneErrorMessage,
-                    color = Color.Red,
-                    modifier = Modifier.padding(top = 1.dp)
-                )
-            }
+//            if (uiState.formState.phoneErrorMessage.isNotEmpty()) {
+//                Text(
+//                    text = uiState.formState.phoneErrorMessage,
+//                    color = Color.Red,
+//                    modifier = Modifier.padding(top = 1.dp)
+//                )
+//            }
 
             // Email
             TextField(
@@ -262,7 +273,7 @@ fun SignUpScreen(
                 label = { Text("信箱") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -278,14 +289,15 @@ fun SignUpScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.calender),
                             contentDescription = "生日",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.Gray
                         )
                     }
                 },
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                    .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White),
                 colors = textFieldColors
@@ -328,8 +340,10 @@ fun SignUpScreen(
                         modifier = Modifier.padding(horizontal = 8.dp)
                     ) {
                         RadioButton(
-                            selected = !uiState.formState.isNutritionist,
-                            onClick = { viewModel.updateIsNutritionist(false) },
+                            selected = uiState.formState.isNormalUser,  // 使用 isNormalUser 狀態
+                            onClick = {
+                                viewModel.updateUserRole(false)  // false 代表一般用戶
+                            },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = Color(0xFF555555),
                                 unselectedColor = Color(0xFF555555)
@@ -365,59 +379,90 @@ fun SignUpScreen(
                             Icon(
                                 painter = painterResource(id = R.drawable.upload),
                                 contentDescription = "上傳證書",
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.Gray
                             )
                         }
                     },
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(3.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
+                        .border(2.dp, Color(0xFFF19204), RoundedCornerShape(16.dp))
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.White),
                     colors = textFieldColors
                 )
             }
 
-            Button(
-                onClick = {
-                    viewModel.submitForm(
-                        context = context,
-                        onSuccess = {
-                            Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
-                            navController.navigate("LoginScreen")
-                        },
-                        onError = { errorMessage ->
-                            Toast.makeText(
-                                context,
-                                errorMessage,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
-                },
+            // 並排的按鈕
+            Row(
                 modifier = Modifier
-                    .width(150.dp)
-                    .padding(vertical = 16.dp)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD75813)),
-                enabled = !isLoading
+                    .fillMaxWidth()  // 讓 Row 佔滿寬度
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.Center,  // 置中對齊
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White
+                // 取消按鈕
+                Button(
+                    onClick = {
+                        onBackToLogin()
+//                        navController.navigate("LoginScreen") {
+                         //   popUpTo("LoginScreen") { inclusive = true }
+//                        }
+                    },
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFAEAD1))
+                ) {
+                    Text(
+                        text = "取消",
+                        fontSize = 16.sp,
+                        color = Color(0xFFD75813)
                     )
-                } else {
-                    Text(text = "註冊", fontSize = 16.sp, color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))  // 按鈕之間的間距
+
+                // 註冊按鈕
+                Button(
+                    onClick = {
+                        viewModel.submitForm(
+                            context = context,
+                            onSuccess = {
+                                Toast.makeText(context, "註冊成功", Toast.LENGTH_SHORT).show()
+                                onRegisterSuccess()
+
+                            },
+                            onError = { errorMessage ->
+                                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    },
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD75813)),
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White
+                        )
+                    } else {
+                        Text(text = "註冊", fontSize = 16.sp, color = Color.White)
+                    }
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewSignUp() {
-    SignUpScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewSignUp() {
+//    SignUpScreen()
+//}

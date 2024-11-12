@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
@@ -20,6 +21,7 @@ class ManagePlanVM : ViewModel() {
     private val repository = PlanRepository
     val myPlanListState: StateFlow<List<PlanModel>> = repository.myPlanList
     val completePlanListState: StateFlow<List<PlanModel>> = repository.completePlanList
+    val currentuserId = UserManager.getUser().userId
 
     init {
         getPlanList()
@@ -77,11 +79,10 @@ class ManagePlanVM : ViewModel() {
 
     suspend fun deletePlan(
         plan: PlanModel,
-        userId: Int,
         userDietPlanID: Int,
         finishState: Int,
     ):Boolean {
-        if (deletePlanRequest(userId, userDietPlanID, finishState)) {
+        if (deletePlanRequest(currentuserId, userDietPlanID, finishState)) {
             when (finishState) {
                 0 ->{
                     repository.removeMyPlan(plan)
@@ -100,7 +101,7 @@ class ManagePlanVM : ViewModel() {
     fun getPlanList() {
         viewModelScope.launch {
             try {
-                val myPlanList = fetchPlanData(2, 0)
+                val myPlanList = fetchPlanData(currentuserId, 0)
                 repository.setMyPlanList(myPlanList)
                 Log.d(tag, "Fetched myPlanState: ${myPlanListState.value}")
             } catch (e: Exception) {
@@ -112,7 +113,7 @@ class ManagePlanVM : ViewModel() {
     fun getCompletePlanList() {
         viewModelScope.launch {
             try {
-                val completePlanList = fetchPlanData(2, 1)
+                val completePlanList = fetchPlanData(currentuserId, 1)
                 repository.setCompletePlanList(completePlanList)
                 Log.d(tag, "Fetched completePlanState: ${completePlanListState.value}")
             } catch (e: Exception) {

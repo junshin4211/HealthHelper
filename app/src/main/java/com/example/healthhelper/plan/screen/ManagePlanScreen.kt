@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.model.PlanModel
@@ -31,6 +31,7 @@ import com.example.healthhelper.plan.ui.CustomIcon
 import com.example.healthhelper.plan.ui.CustomList
 import com.example.healthhelper.plan.ui.CustomSnackBar
 import com.example.healthhelper.plan.usecase.PlanUCImpl
+import com.example.healthhelper.plan.viewmodel.CheckPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
@@ -43,11 +44,13 @@ fun ManagePlan(
     planVM: PlanVM,
     managePlanVM: ManagePlanVM,
     showdelete: Boolean,
-    tabViewModel: TabViewModel,
+    tabVM: TabViewModel,
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
+    checkPlanVM: CheckPlanVM,
+    navcontroller: NavHostController
 ) {
-    tabViewModel.setTabVisibility(false)
+    tabVM.setTabVisibility(false)
     val context = LocalContext.current
     val tag = "tag_ManagePlan"
     val planUCImpl = remember { PlanUCImpl() }
@@ -88,7 +91,8 @@ fun ManagePlan(
                 CustomList().ItemList(
                     inputList = myPlanList,
                     onItemClick = {
-                        //TODO 導入到計畫詳細頁面
+                        checkPlanVM.setSelectedPlan(it)
+                        navcontroller.navigate(PlanPage.CheckPlan.name)
                     },
                     leadingIcon = {
                         Image(
@@ -140,7 +144,8 @@ fun ManagePlan(
                 CustomList().ItemList(
                     inputList = completePlanList,
                     onItemClick = {
-                        //TODO 導入到計畫詳細頁面
+                        checkPlanVM.setSelectedPlan(it)
+                        navcontroller.navigate(PlanPage.CheckPlan.name)
                     },
                     leadingIcon = {
                         Image(
@@ -181,7 +186,6 @@ fun ManagePlan(
                     scope.launch {
                         val isSuccess = managePlanVM.deletePlan(
                             plan = selectedPlan,
-                            userId = 2, //TODO 換成給定的userid
                             userDietPlanID = selectedPlan.userDietPlanId,
                             finishState = 0
                         )

@@ -50,6 +50,7 @@ import com.example.healthhelper.plan.viewmodel.EditPlanVM
 import com.example.healthhelper.plan.viewmodel.ManagePlanVM
 import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 import com.himanshoe.charty.common.toChartDataCollection
 import com.himanshoe.charty.pie.model.PieData
@@ -61,21 +62,18 @@ import java.util.Locale
 @Composable
 fun CustomEditPlan(
     planname: PlanPage,
-    tabViewModel: TabViewModel = viewModel(),
-    EditPlanVM: EditPlanVM,
+    tabVM: TabViewModel = viewModel(),
+    editPlanVM: EditPlanVM,
     scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    navcontroller: NavHostController = rememberNavController(),
-    planVM: PlanVM,
-    ManagePlanVM: ManagePlanVM,
+    snackBarHostState: SnackbarHostState,
+    navController: NavHostController = rememberNavController(),
 ) {
     val tag = "tag_CustomEditPlan"
     val scrollstate = rememberScrollState()
-    tabViewModel.setTabVisibility(false)
+    tabVM.setTabVisibility(false)
     val context = LocalContext.current
-    val fetchSingle = PlanUCImpl()::fetchSingle
-    val fetchList = PlanUCImpl()::fetchList
     val df = DecimalFormat("#.#")
+    val currentuserId = UserManager.getUser().userId
 
     val calorieErr = stringResource(R.string.calorieerror)
     val dateErr = stringResource(R.string.dateerror)
@@ -102,7 +100,7 @@ fun CustomEditPlan(
     planUCImpl.customPlanInitial(
         planName = planname,
         onSetCateId = { cateId ->
-            EditPlanVM.updateCategoryId(cateId)
+            editPlanVM.updateCategoryId(cateId)
         }
     )
 
@@ -168,7 +166,7 @@ fun CustomEditPlan(
                 )
             )
 
-            CreateDatePicker(dateSelected = selectedDate, EditPlanVM = EditPlanVM)
+            CreateDatePicker(dateSelected = selectedDate, EditPlanVM = editPlanVM)
 
             Text(
                 text = stringResource(R.string.enddate),
@@ -185,7 +183,7 @@ fun CustomEditPlan(
             CreateDatePicker(
                 dateSelected = selectedDate,
                 dateStart = false,
-                EditPlanVM = EditPlanVM
+                EditPlanVM = editPlanVM
             )
         }
 
@@ -471,7 +469,7 @@ fun CustomEditPlan(
                         scope.launch {
                             CustomSnackBar().CreateSnackBar(
                                 message = calorieErr,
-                                snackbarHostState = snackbarHostState
+                                snackbarHostState = snackBarHostState
                             )
                             Log.d(tag, "calorieErr SnackBar")
                         }
@@ -479,13 +477,13 @@ fun CustomEditPlan(
                     }
 
                     //檢查日期不能同一天和空值
-                    val startdate = EditPlanVM.planSetState.value.startDateTime
-                    val enddate = EditPlanVM.planSetState.value.endDateTime
+                    val startdate = editPlanVM.planSetState.value.startDateTime
+                    val enddate = editPlanVM.planSetState.value.endDateTime
                     if (startdate == enddate || startdate == null || enddate == null) {
                         scope.launch {
                             CustomSnackBar().CreateSnackBar(
                                 message = dateErr,
-                                snackbarHostState = snackbarHostState
+                                snackbarHostState = snackBarHostState
                             )
                             Log.d(tag, "dateErr SnackBar")
                         }
@@ -497,30 +495,30 @@ fun CustomEditPlan(
                         scope.launch {
                             CustomSnackBar().CreateSnackBar(
                                 message = percentErr,
-                                snackbarHostState = snackbarHostState
+                                snackbarHostState = snackBarHostState
                             )
                         }
                         return@OnClick
                     }
 
-                    EditPlanVM.updateCarbGoal(df.format(carbpercent).toFloat())
-                    EditPlanVM.updateProteinGoal(df.format(proteinpercent).toFloat())
-                    EditPlanVM.updateFatGoal(df.format(fatpercent).toFloat())
-                    EditPlanVM.updateUserId(2)
-                    EditPlanVM.updateFinishState(0)
-                    EditPlanVM.updateCaloriesGoal(calorie)
+                    editPlanVM.updateCarbGoal(df.format(carbpercent).toFloat())
+                    editPlanVM.updateProteinGoal(df.format(proteinpercent).toFloat())
+                    editPlanVM.updateFatGoal(df.format(fatpercent).toFloat())
+                    editPlanVM.updateUserId(currentuserId)
+                    editPlanVM.updateFinishState(0)
+                    editPlanVM.updateCaloriesGoal(calorie)
                     scope.launch {
-                        if (EditPlanVM.insertPlan()) {
+                        if (editPlanVM.insertPlan()) {
                             CustomSnackBar().CreateSnackBar(
                                 message = insertSuccess,
-                                snackbarHostState = snackbarHostState
+                                snackbarHostState = snackBarHostState
                             )
                             Log.d(tag, "insertSuccess")
-                            navcontroller.navigate(PlanPage.DietPlan.name)
+                            navController.navigate(PlanPage.DietPlan.name)
                         } else {
                             CustomSnackBar().CreateSnackBar(
                                 message = insertFailed,
-                                snackbarHostState = snackbarHostState
+                                snackbarHostState = snackBarHostState
                             )
                             Log.d(tag, "insertFailed")
                         }

@@ -67,10 +67,10 @@ object DefaultColorViewModel {
     val topAppBarColors: TopAppBarColors
         @Composable
         get() = TopAppBarColors(
-            containerColor = colorResource(R.color.primarycolor),
+            containerColor = colorResource(R.color.backgroundcolor),
             scrolledContainerColor = colorResource(R.color.primarycolor),
             navigationIconContentColor = Color.Black,
-            titleContentColor = Color.White,
+            titleContentColor = colorResource(R.color.primarycolor),
             actionIconContentColor = Color.Black,
         )
 

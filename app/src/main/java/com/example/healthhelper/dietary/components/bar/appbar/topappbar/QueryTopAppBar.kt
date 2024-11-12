@@ -31,7 +31,7 @@ fun QueryTopAppBar(
         colors = DefaultColorViewModel.topAppBarColors,
         title = title,
         navigationIcon = {
-            NavigateUpNavigationIcon(navController)
+            //NavigateUpNavigationIcon(navController)
         },
         scrollBehavior = scrollBehavior,
     )

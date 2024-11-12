@@ -67,7 +67,7 @@ fun EditPostScreen(navController: NavHostController) {
             .fillMaxSize()
             .background(colorResource(id = R.color.backgroundcolor))
     ) {
-        CmtNavbarComponent(navController = navController)
+//        CmtNavbarComponent(navController = navController, postVM = postVM)
         Column(
             // 內容物水平置中
             horizontalAlignment = Alignment.CenterHorizontally,

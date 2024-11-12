@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,12 +37,12 @@ fun CreateToggleButton(
     barWidth: Dp = 280.dp,
     topPadding: Dp = 15.dp
 ) {
-
+    val size = barWidth/2
     Row(
         modifier = Modifier
             .padding(topPadding)
             .height(barHeight)
-            .width(barWidth)
+            .width(barWidth+40.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(colorResource(id = backgroundColor)),
         verticalAlignment = Alignment.CenterVertically,
@@ -50,7 +51,7 @@ fun CreateToggleButton(
 
         Column(
             Modifier
-                .size(140.dp)
+                .size(width = 160.dp, height = barHeight)
                 .clip(RoundedCornerShape(30))
                 .background(colorResource(id = leftButtonColor))
                 .clickable {
@@ -73,8 +74,8 @@ fun CreateToggleButton(
         )
 
         Column(
-            Modifier
-                .size(140.dp)
+            modifier = Modifier
+                .size(width = 160.dp, height = barHeight)
                 .clip(RoundedCornerShape(30))
                 .background(colorResource(id = rightButtonColor))
                 .clickable {

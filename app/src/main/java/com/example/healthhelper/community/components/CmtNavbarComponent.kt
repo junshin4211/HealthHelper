@@ -21,9 +21,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.community.CmtScreenEnum
+import com.example.healthhelper.community.PostVM
 
 @Composable
-fun CmtNavbarComponent(navController: NavHostController) {
+fun CmtNavbarComponent(navController: NavHostController, postVM: PostVM) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -34,6 +35,7 @@ fun CmtNavbarComponent(navController: NavHostController) {
     ) {
         IconButton(
             onClick = {
+                postVM.fetchAllPosts()
                 navController.navigate(CmtScreenEnum.CmtMainScreen.name)
             },
             modifier = Modifier,

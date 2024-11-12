@@ -6,11 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.plan.PlanPage
 import com.example.healthhelper.plan.PlanRepository
 import com.example.healthhelper.plan.model.PlanModel
+import com.example.healthhelper.plan.model.PlanSpecificModel
+import com.example.healthhelper.plan.model.PlanWithGoalModel
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -18,16 +22,32 @@ class PlanVM : ViewModel() {
     private val url = "$serverUrl/Plan"
     private val tag = "tag_PlanVM"
 
-    private val repository = PlanRepository
+    private var repository: PlanRepository = PlanRepository
     val myPlanState: StateFlow<PlanModel> = repository.myPlan
     val completePlanState: StateFlow<PlanModel> = repository.completePlan
 
     var panneelname: String = PlanPage.MyPlan.name
     var showdelete: Boolean = false
+    val currentuserId = UserManager.getUser().userId
 
     init {
+        clear()
         getPlan()
         getCompletePlan()
+    }
+
+    fun clear() {
+        //repository = null
+        repository.setMyPlan(PlanModel())
+        Log.d(tag,"${repository.myPlan}")
+        repository.setCompletePlan(PlanModel())
+        Log.d(tag,"${repository.completePlan}")
+        repository.setMyPlanList(emptyList())
+        repository.setCompletePlanList(emptyList())
+        repository.setPlanSpecificData(PlanSpecificModel())
+        repository.setDiaryRangeList(emptyList())
+        repository.setSelectedPlan(PlanModel())
+        repository.setPlan(PlanWithGoalModel())
     }
 
     private suspend fun fetchPlanData(
@@ -56,7 +76,8 @@ class PlanVM : ViewModel() {
     fun getPlan(){
         viewModelScope.launch {
             try {
-                val myPlan = fetchPlanData(2, 0)
+                Log.d(tag,"$currentuserId")
+                val myPlan = fetchPlanData(currentuserId, 0)
                 repository.setMyPlan(myPlan)
                 Log.d(tag, "Fetched myPlanState: ${myPlanState.value}")
             } catch (e: Exception) {
@@ -68,7 +89,7 @@ class PlanVM : ViewModel() {
     fun getCompletePlan(){
         viewModelScope.launch {
             try {
-                val completePlan = fetchPlanData(2, 1)
+                val completePlan = fetchPlanData(currentuserId, 1)
                 repository.setCompletePlan(completePlan)
                 Log.d(tag, "Fetched completePlanState: ${completePlanState.value}")
             } catch (e: Exception) {

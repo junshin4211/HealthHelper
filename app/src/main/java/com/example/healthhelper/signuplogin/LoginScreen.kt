@@ -1,9 +1,7 @@
 package com.example.healthhelper.signuplogin
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,17 +36,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.R
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController = rememberNavController(),
-    viewModel: LoginVM = androidx.lifecycle.viewmodel.compose.viewModel()
+    onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit,
+    viewModel: LoginVM,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -56,11 +52,15 @@ fun LoginScreen(
 
     val textFieldColors = TextFieldDefaults.colors(
         errorContainerColor = Color(0xFFFFCDD2),  // 淺紅色代表錯誤
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Color(0xFFD75813),
+        unfocusedIndicatorColor = Color(0xFFD75813),
         unfocusedContainerColor = Color.White,
-        focusedContainerColor = Color.White
+        focusedContainerColor = Color.White,
+        focusedLabelColor = Color.Gray, // 標籤在聚焦時的顏色
+        // unfocusedLabelColor = Color.Gray // 標籤在未聚焦時的顏色
     )
+
+    val encryptedPreferences = getEncryptedPreferences(context)
 
     Box(
         modifier = Modifier
@@ -112,7 +112,7 @@ fun LoginScreen(
                             else painterResource(id = R.drawable.eyenoshow),
                             contentDescription = if (uiState.formState.passwordVisible)
                                 "隱藏密碼" else "顯示密碼",
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = Color.Gray
                         )
                     }
@@ -133,7 +133,10 @@ fun LoginScreen(
             ) {
                 // 註冊按鈕
                 Button(
-                    onClick = { navController.navigate("SignUpScreen") },
+                    onClick = {
+//                        navController.navigate("SignUpScreen")
+                        onRegisterClick()
+                    },
                     modifier = Modifier
                         .width(150.dp)
                         .height(48.dp)
@@ -150,7 +153,12 @@ fun LoginScreen(
                             context = context,
                             onSuccess = { userId ->
                                 // 登入成功後直接導航到更新頁面
-                                navController.navigate("UpdateInfoScreen")
+//                                navController.navigate("Main")
+                                encryptedPreferences.edit()
+                                    .putString("account", uiState.formState.account)
+                                    .putString("password", uiState.formState.password)
+                                    .apply()
+                                onLoginSuccess()
                                 Toast.makeText(context, "登入成功", Toast.LENGTH_SHORT).show()
                             },
                             onError = { error ->
@@ -179,9 +187,11 @@ fun LoginScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    val navController = rememberNavController()
-    LoginScreen(navController = navController)
-}
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginPreview() {
+//    val navController = rememberNavController()
+//    LoginScreen(navController = navController)
+//}

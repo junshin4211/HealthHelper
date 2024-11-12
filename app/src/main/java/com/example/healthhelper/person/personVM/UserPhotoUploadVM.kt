@@ -9,12 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
-import com.example.healthhelper.person.model.ErrorMsg
 import com.example.healthhelper.person.model.UserPhoto
+import com.example.healthhelper.signuplogin.User
+import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.web.httpPost
 import com.example.healthhelper.web.serverUrl
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.protobuf.Internal.BooleanList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,20 +27,25 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 class UserPhotoUploadVM : ViewModel() {
+//    val user :StateFlow<User>  = UserManager.currentUser
     private val _userPhotoUrlState = MutableStateFlow(UserPhoto())
     val userPhotoUrlState: StateFlow<UserPhoto> = _userPhotoUrlState.asStateFlow()
+    private val _isloading = MutableStateFlow(false)
+    val isloading : StateFlow<Boolean> = _isloading.asStateFlow()
 
     private val uploadedUrl: MutableStateFlow<String?> = MutableStateFlow(null)
 
+    val userId = UserManager.getUser().userId
+
     init {
         viewModelScope.launch {
-            _userPhotoUrlState.value = fetchUserPhoto(2)
+            _userPhotoUrlState.value = fetchUserPhoto(userId)
         }
 
         viewModelScope.launch {
             uploadedUrl.collect {
                 if (it?.isNotEmpty() == true) {
-                    insertUserPhotoUrl(2, it)
+                    insertUserPhotoUrl(userId, it)
                 }
             }
         }
@@ -46,7 +53,8 @@ class UserPhotoUploadVM : ViewModel() {
 
     private fun refreshUserPhoto() {
         viewModelScope.launch {
-            _userPhotoUrlState.value = fetchUserPhoto(2)
+            _userPhotoUrlState.value = fetchUserPhoto(userId)
+            _isloading.value =false
         }
     }
 
@@ -54,7 +62,7 @@ class UserPhotoUploadVM : ViewModel() {
         val url = "$serverUrl/selectUserPhoto"
         val gson = Gson()
         val jsonObject = JsonObject()
-        jsonObject.addProperty("userId", userId) // TODO: 需要修改 userId
+        jsonObject.addProperty("userId", userId)
 
         return try {
             val result = httpPost(url, jsonObject.toString())
@@ -70,7 +78,7 @@ class UserPhotoUploadVM : ViewModel() {
         val url = "$serverUrl/insertUserPhoto"
         val gson = Gson()
         val jsonObject = JsonObject().apply {
-            addProperty("userId", 2) // TODO: 需要修改 userId
+            addProperty("userId", userId)
             addProperty("photoUrl", photoUrl)
         }
         Log.d("dataout02", jsonObject.toString())
@@ -78,10 +86,11 @@ class UserPhotoUploadVM : ViewModel() {
         val result = httpPost(url, jsonObject.toString())
         val response = gson.fromJson(result, JsonObject::class.java)
         Log.d("dataout", response.get("errMsg").toString())
+
         if (response.get("result").asBoolean) {
             refreshUserPhoto()
         }
-        ErrorMsg.errMsg = response.get("errMsg").toString()
+
         return response.get("result").asBoolean
     }
 
@@ -92,6 +101,7 @@ class UserPhotoUploadVM : ViewModel() {
         val file = File(fileUri.path ?: return false)
         return withContext(Dispatchers.IO) {
             try {
+                _isloading.value = true
                 val response = cloudinary.uploader().upload(file, ObjectUtils.emptyMap())
                 val url = response["url"] as String
                 uploadedUrl.value = url
@@ -110,6 +120,7 @@ class UserPhotoUploadVM : ViewModel() {
     ) {
         withContext(Dispatchers.IO) {
             try {
+                _isloading.value = true
                 val inputStream = contentResolver.openInputStream(contentUri)
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 val byteArrayOutputStream = ByteArrayOutputStream()
