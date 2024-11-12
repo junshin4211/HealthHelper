@@ -273,8 +273,7 @@ fun AchievementDetailDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
-                .padding(16.dp),
+                .height(300.dp),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(colorResource(R.color.backgroundcolor))
         ) {
@@ -301,7 +300,7 @@ fun AchievementDetailDialog(
                         bitmap = bitmap.asImageBitmap(),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(90.dp)
+                            .size(100.dp)
                             .padding(bottom = 8.dp)
                     )
                 } ?: Image(

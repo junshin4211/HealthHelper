@@ -273,4 +273,5 @@
     <string name="over">超過</string>
     <string name="under">剩餘</string>
     <string name="nutritionstitle">營養成分</string>
+    <string name="openSetting">開啟設定</string>
 </resources>
