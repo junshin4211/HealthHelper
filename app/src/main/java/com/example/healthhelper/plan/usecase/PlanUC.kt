@@ -23,4 +23,5 @@ interface PlanUC {
     fun calculateTotalNutrition(nutritionList: List<DiaryNutritionModel>): DiaryNutritionModel
     fun averageNutrition(size:Int, goal:Float, totalcurrent:Float): String
     fun isTimeAfterToday(timeStamp: Timestamp): Boolean
+    fun dayNutrition(goal:Float, totalcurrent:Float): String
 }

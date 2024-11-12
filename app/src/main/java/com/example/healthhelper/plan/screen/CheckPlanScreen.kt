@@ -246,10 +246,11 @@ fun CheckPlan(
             proteinpercent = (element.totalProtein / totalthree) * 100
             fatpercent = (element.totalFat / totalthree) * 100
             rangepercentcarb =
-                planUCImpl.averageNutrition(size = size, carbgoal, element.totalCarbon)
+                planUCImpl.dayNutrition(carbgoal, element.totalCarbon)
             rangepercentprotein =
-                planUCImpl.averageNutrition(size = size, proteingoal, element.totalProtein)
-            rangepercentfat = planUCImpl.averageNutrition(size = size, fatgoal, element.totalFat)
+                planUCImpl.dayNutrition(proteingoal, element.totalProtein)
+            rangepercentfat =
+                planUCImpl.dayNutrition(fatgoal, element.totalFat)
             averagefiber = element.totalFiber
             averagesugar = element.totalSugar
             averagesodium = (element.totalSodium) * 0.001f

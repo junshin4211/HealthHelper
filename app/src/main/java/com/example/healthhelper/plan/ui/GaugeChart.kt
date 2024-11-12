@@ -1,6 +1,8 @@
 package com.example.healthhelper.plan.ui
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -74,7 +76,10 @@ fun AnimatedGaugeChart(
     var currentPercentage by remember { mutableStateOf(0f) }
 
     // 使用動畫來顯示當前百分比
-    val animatedPercentage by animateFloatAsState(targetValue = currentPercentage, label = "")
+    val animatedPercentage by animateFloatAsState(
+        targetValue = currentPercentage,
+        label = "",
+    )
 
     // 使用 LaunchedEffect 來增加百分比
     LaunchedEffect(Unit) {
