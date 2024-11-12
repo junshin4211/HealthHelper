@@ -10,7 +10,7 @@ data class FoodVO(
     var foodName: String = "",
 
     @SerializedName("gram")
-    val gram: Double = 0.0,
+    var gram: Double = 0.0,
 
     @SerializedName("fat")
     val fat: Double = 0.0,

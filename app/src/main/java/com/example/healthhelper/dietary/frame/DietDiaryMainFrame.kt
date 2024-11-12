@@ -209,6 +209,9 @@ fun DietDiaryMainFrame(
             }
 
             if (mealsButtonIsClicked) {
+                Log.e(TAG,"!".repeat(50))
+                Log.e(TAG,"In DietDiaryMainFrame function, mealsButtonIsClicked is true. currentMealOption:${currentMealOption}")
+                Log.e(TAG,"!".repeat(50))
                 MealsOptionRepository.setSelectedData(currentMealOption)
                 navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
                 mealsButtonIsClicked = false

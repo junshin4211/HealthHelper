@@ -110,7 +110,7 @@ fun DietDiaryMealFrame(
 
     val verticalScrollState = rememberScrollState()
 
-    val foodItems by selectedFoodItemsViewModel.data.collectAsState()
+    val selectedFoodItemsVOs by selectedFoodItemsViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
 
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
@@ -152,7 +152,7 @@ fun DietDiaryMealFrame(
     )
 
     // get id of meal category that indicates the meal.
-    var currentMealCategoryId = getMealCategoryId(
+    val currentMealCategoryId = getMealCategoryId(
         mealsOptionVOs = mealsOptionVOs,
         selectedMealsOptionVO = selectedMealsOptionVO,
     )
@@ -167,9 +167,11 @@ fun DietDiaryMealFrame(
     // load food items about this diaryId from database and try to set it into repo -- FoodItemRepository if one can.
     LoadFoodItemInfo(context)
 
+    Log.e(TAG,"In DietDiaryMealFrame function, foodItemVOs:${foodItemVOs}")
+    Log.e(TAG,"In DietDiaryMealFrame function, selectedFoodItemsVOs:${selectedFoodItemsVOs}")
     availableFoodItems =
-        if (foodItems.isNotEmpty()) {
-            foodItems.filter {
+        if (selectedFoodItemsVOs.isNotEmpty()) {
+            selectedFoodItemsVOs.filter {
                 it.meal.value in listOf(
                     context.getString(selectedMealsOptionVO.nameResId),
                     context.getString(MealCategoryEnum.EMPTY_STRING.title)
@@ -178,9 +180,13 @@ fun DietDiaryMealFrame(
         } else {
             emptyList()
         }
+    Log.e(TAG,"In DietDiaryMealFrame function, availableFoodItems:${availableFoodItems}")
+
     checkedFoodItems =
         availableFoodItems?.filter { it.isCheckedWhenSelection.value }?.toMutableList()
             ?: mutableListOf()
+
+    Log.e(TAG,"In DietDiaryMealFrame function, checkedFoodItems:${checkedFoodItems}")
 
     LaunchedEffect(diaryDescriptionVO) {
         Log.e(
@@ -204,11 +210,12 @@ fun DietDiaryMealFrame(
         foodItemVOs.forEach { foodItemVO ->
             val foodId = foodItemVO.foodID
             val mealCategoryId = foodItemVO.mealCategoryID
+            val grams = foodItemVO.grams
             val newFoodVO = FoodVO()
             newFoodVO.foodID = foodId
             val foodName = foodViewModel.selectFoodNameByFoodId(newFoodVO)
-            availableFoodItems.firstOrNull { it.name.value == foodName }?.isCheckedWhenSelection?.value =
-                true
+            availableFoodItems.firstOrNull { it.name.value == foodName }?.grams?.value = grams
+            availableFoodItems.firstOrNull { it.name.value == foodName }?.isCheckedWhenSelection?.value = true
             availableFoodItems.firstOrNull { it.name.value == foodName }?.meal?.value =
                 when (mealCategoryId) {
                     1 -> context.getString(MealCategoryEnum.BREAKFAST.title)
@@ -235,6 +242,7 @@ fun DietDiaryMealFrame(
             )
             checkedFoodItems.forEach { checkedFoodItem ->
                 val foodName = checkedFoodItem.name.value
+                val grams = checkedFoodItem.grams.value
                 val newFoodVO = FoodVO()
                 newFoodVO.foodName = foodName
                 val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
@@ -242,7 +250,7 @@ fun DietDiaryMealFrame(
                     diaryID = diaryVO.diaryID,
                     foodID = foodId,
                     mealCategoryID = currentMealCategoryId,
-                    grams = 100.0,
+                    grams = grams,
                 )
                 Log.e(
                     TAG,

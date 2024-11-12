@@ -67,15 +67,12 @@ fun FoodItemInfoFrame(
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
     foodItemViewModel: FoodItemViewModel = viewModel(),
     foodViewModel: FoodViewModel = viewModel(),
-    mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
     val TAG = "tag_FoodItemInfoFrame"
 
     val context = LocalContext.current
 
     val mealOptions by mealOptionViewModel.data.collectAsState()
-    val mealsOptionVOs by mealsOptionViewModel.data.collectAsState()
-    val selectedMealsOptionVO by mealsOptionViewModel.selectedData.collectAsState()
     val foodItemVO by foodItemViewModel.selectedData.collectAsState()
 
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
@@ -90,9 +87,6 @@ fun FoodItemInfoFrame(
         targetMealName = selectedFoodItem.meal.value,
         mealsOptionVOs = mealOptions,
     )
-    Log.e(TAG,"~!".repeat(25))
-    Log.e(TAG,"In FoodItemInfoFrame function, currentMealCategoryId:${currentMealCategoryId}")
-    Log.e(TAG,"~!".repeat(25))
     LaunchedEffect(Unit) {
         mealOptions.forEach {
             mealOptionNames.add(context.getString(it.nameResId))
@@ -307,27 +301,13 @@ fun FoodItemInfoFrame(
 
     LaunchedEffect(saveButtonIsClicked) {
         if (!saveButtonIsClicked) return@LaunchedEffect
-
         val foodName = selectedFoodItem.name.value
         val newFoodVO = FoodVO()
         newFoodVO.foodName = foodName
-        Log.e(
-            TAG,
-            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodName:${foodName}"
-        )
-         val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
-
-        Log.e(
-            TAG,
-            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodId:${foodId}"
-        )
+        val foodId = foodViewModel.selectFoodIdByFoodName(newFoodVO)
         FoodItemRepository.setSelectedFoodId(foodId)
         FoodItemRepository.setSelectedGrams(selectedFoodItem.grams.value)
         FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
-        Log.e(
-            TAG,
-            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.foodItemVO:${foodItemVO}"
-        )
         foodItemViewModel.updateFoodItemByDiaryIdAndFoodId(foodItemVO)
         Toast.makeText(
             context,
@@ -335,12 +315,6 @@ fun FoodItemInfoFrame(
             Toast.LENGTH_LONG
         )
             .show()
-        Log.e(
-            TAG,
-            "FoodItemInfoFrame function, LaunchedEffect(saveButtonIsClicked) block was called.message:${
-                context.getString(R.string.save_data_successfully)
-            }"
-        )
        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }
 }
