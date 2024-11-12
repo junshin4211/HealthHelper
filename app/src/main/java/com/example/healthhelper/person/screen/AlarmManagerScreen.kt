@@ -2,7 +2,10 @@ package com.example.healthhelper.person.screen
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,7 +78,7 @@ fun AlarmManagerScreen(
             context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
         alarmManager.canScheduleExactAlarms()
     } else {
-        true
+        false
     }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val locationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -181,7 +184,13 @@ fun AlarmManagerScreen(
                     )
                 }
                 if (showPermissionDialog) {
-                    PermissionDialog(onDismiss = { showPermissionDialog = false })
+                    PermissionDialog(
+                        onDismiss = { showPermissionDialog = false },
+                        onOpenSettings = {
+                            openAppSettings(context)
+                            showPermissionDialog = false
+                        }
+                    )
                 }
             }
         }
@@ -212,7 +221,7 @@ fun AlarmItem(alarmTime: Calendar, onRemove: () -> Unit) {
 
 
 @Composable
-fun PermissionDialog(onDismiss: () -> Unit) {
+fun PermissionDialog(onDismiss: () -> Unit, onOpenSettings: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier.padding(16.dp),
@@ -224,10 +233,27 @@ fun PermissionDialog(onDismiss: () -> Unit) {
             ) {
                 Text(text = "請授權以設置鬧鐘提醒", fontSize = 20.sp)
                 Spacer(modifier = Modifier.height(16.dp))
-                TextButton(onClick = onDismiss) {
-                    Text("知道了")
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    TextButton(onClick = onOpenSettings) {
+                        Text(stringResource(R.string.openSetting))
+                    }
                 }
             }
         }
     }
+}
+
+
+fun openAppSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+    }
+    context.startActivity(intent)
 }

@@ -227,4 +227,5 @@
     <string name="dayNotification">每日提醒</string>
     <string name="addTime">添加</string>
     <string name="cancelAlarm">刪除鬧鐘</string>
+    <string name="openSetting">開啟設定</string>
 </resources>
