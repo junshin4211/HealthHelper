@@ -296,7 +296,7 @@ fun FoodItemInfoFrame(
                 context.getString(R.string.delete_data_successfully)
             }"
         )
-        navController.navigateUp()
+        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }
 
     LaunchedEffect(saveButtonIsClicked) {

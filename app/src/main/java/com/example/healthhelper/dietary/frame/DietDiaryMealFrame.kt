@@ -180,33 +180,17 @@ fun DietDiaryMealFrame(
         } else {
             emptyList()
         }
-    Log.e(TAG,"In DietDiaryMealFrame function, availableFoodItems:${availableFoodItems}")
 
     checkedFoodItems =
         availableFoodItems?.filter { it.isCheckedWhenSelection.value }?.toMutableList()
             ?: mutableListOf()
 
-    Log.e(TAG,"In DietDiaryMealFrame function, checkedFoodItems:${checkedFoodItems}")
-
     LaunchedEffect(diaryDescriptionVO) {
-        Log.e(
-            TAG,
-            "In DietDiaryMealFrame function, LaunchedEffect(diaryDescriptionVO) block was called.diaryDescriptionVO:${diaryDescriptionVO}"
-        )
         descriptionText = diaryDescriptionVO.description
         selectedImageUri =
             if (diaryDescriptionVO.uri == null) null else Uri.parse(diaryDescriptionVO.uri)
     }
     LaunchedEffect(foodItemVOs) {
-        Log.e(
-            TAG,
-            "In DietDiaryMealFrame function, LaunchedEffect(foodItemVOs) block was called.availableFoodItems:${availableFoodItems}"
-        )
-        Log.e(
-            TAG,
-            "In DietDiaryMealFrame function, LaunchedEffect(foodItemVOs) blocked was called.foodItemVOs:${foodItemVOs}"
-        )
-
         foodItemVOs.forEach { foodItemVO ->
             val foodId = foodItemVO.foodID
             val mealCategoryId = foodItemVO.mealCategoryID
@@ -232,14 +216,6 @@ fun DietDiaryMealFrame(
 
         // save data to database about fooditem table.
         foodViewModel.viewModelScope.launch {
-            Log.e(
-                TAG,
-                "In DietDiaryMealFrame,DisposableEffect(Unit),onDispose,foodViewModel.viewModelScope.launch block.checkedFoodItems:${checkedFoodItems}"
-            )
-            Log.e(
-                TAG,
-                "In DietDiaryMealFrame,DisposableEffect(Unit),onDispose,foodViewModel.viewModelScope.launch block.currentMealCategoryId:${currentMealCategoryId}"
-            )
             checkedFoodItems.forEach { checkedFoodItem ->
                 val foodName = checkedFoodItem.name.value
                 val grams = checkedFoodItem.grams.value
@@ -252,10 +228,6 @@ fun DietDiaryMealFrame(
                     mealCategoryID = currentMealCategoryId,
                     grams = grams,
                 )
-                Log.e(
-                    TAG,
-                    "\"In DietDiaryMealFrame,DisposableEffect(Unit),onDispose,foodViewModel.viewModelScope.launch block. newFoodItemVO:${newFoodItemVO}"
-                )
                 foodItemViewModel.tryToInsertFoodItem(newFoodItemVO)
             }
             Toast.makeText(
@@ -266,18 +238,10 @@ fun DietDiaryMealFrame(
         }
         // save data to database about diarydescription table.
         diaryDescriptionViewModel.viewModelScope.launch {
-            Log.e(
-                TAG,
-                "\"In DietDiaryMealFrame,DisposableEffect(Unit),onDispose, diaryDescriptionViewModel.viewModelScope.launch block. diaryDescriptionVO:${diaryDescriptionVO}"
-            )
             DiaryDescriptionRepository.setDiaryId(diaryVO.diaryID)
             DiaryDescriptionRepository.setMealCategoryId(currentMealCategoryId)
             DiaryDescriptionRepository.setDescription(descriptionText)
             DiaryDescriptionRepository.setUri(selectedImageUri?.toString())
-            Log.e(
-                TAG,
-                "\"In DietDiaryMealFrame,DisposableEffect(Unit),onDispose, diaryDescriptionViewModel.viewModelScope.launch block. diaryDescriptionVO:${diaryDescriptionVO}"
-            )
             diaryDescriptionViewModel.tryToInsert(diaryDescriptionVO)
             Toast.makeText(
                 context,
@@ -285,7 +249,7 @@ fun DietDiaryMealFrame(
                 Toast.LENGTH_LONG
             ).show()
         }
-        navController.navigate(DietDiaryScreenEnum.FoodItemInfoFrame.name)
+        navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
     }
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
@@ -511,15 +475,11 @@ fun DietDiaryMealFrame(
         FoodRepository.setFoodName(clickedFoodItemVO.name.value)
         LaunchedEffect(Unit) {
             val currentFoodId = foodViewModel.selectFoodIdByFoodName(foodVO)
-            Log.e(TAG, "LaunchedEffect(Unit) was called. currentFoodId:${currentFoodId}")
             FoodItemRepository.setSelectedFoodId(currentFoodId)
         }
 
         FoodItemRepository.setSelectedGrams(clickedFoodItemVO.grams.value)
-        Log.e(TAG, "At IconButton onClick event triggers,selectedFoodItem:${selectedFoodItem}")
-        navController.navigate(
-            DietDiaryScreenEnum.FoodItemInfoFrame.name
-        )
+        navController.navigate(DietDiaryScreenEnum.FoodItemInfoFrame.name)
         iconButtonIsClicked = false
     }
 
@@ -534,7 +494,6 @@ fun DietDiaryMealFrame(
     }
 
     LaunchedEffect(selectedImageUri) {
-        Log.e(TAG, "After opening the photo picker, selectedImageUri:${selectedImageUri}")
         val id = if (selectedImageUri != null) R.string.delete_graph else R.string.add_graph
         dietDiaryImageButtonText = context.getString(id)
     }
