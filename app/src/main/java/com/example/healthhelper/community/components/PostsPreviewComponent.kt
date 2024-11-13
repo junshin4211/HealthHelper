@@ -93,19 +93,23 @@ fun PostsPreviewComponent(navController: NavHostController, post: Post) {
                             color = colorResource(R.color.black_200)
                         )
                     }
-                    Column {
+                    Column(
+                        modifier = Modifier.padding(start = 4.dp)
+                    ) {
                         Text(
                             text = post.title,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            maxLines = 2,
                             color = colorResource(R.color.black_200)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = post.content,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             color = colorResource(R.color.dark_blue_100),
                             fontWeight = FontWeight.Bold,
-                            lineHeight = 10.sp,
+                            lineHeight = 20.sp,
                             maxLines = 3,
                             overflow = TextOverflow.Ellipsis
                         )

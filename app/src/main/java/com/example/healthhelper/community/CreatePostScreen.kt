@@ -84,7 +84,23 @@ fun CreatePostScreen(
                 .padding(16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-
+            Row(modifier = Modifier.fillMaxWidth()) {
+                if (titleError) {
+                    Text(
+                        text = "標題不可為空且需小於 30 字",
+                        color = colorResource(id = R.color.red_100),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        text = "*",
+                        color = colorResource(id = R.color.red_100),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(4.dp))
             // Title TextField
             OutlinedTextField(
                 value = title,
@@ -111,54 +127,54 @@ fun CreatePostScreen(
                         shape = RoundedCornerShape(size = 4.dp)
                     )
             )
-
-            if (titleError) {
-                Text(
-                    text = "標題不可為空且需小於 30 字",
-                    color = Color.Red,
-                    fontSize = 12.sp
-                )
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Content TextField
-            OutlinedTextField(
-                value = content,
-                onValueChange = {
-                    content = it
-                    contentError = content.isBlank()
-                },
-                placeholder = {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (contentError) {
                     Text(
-                        text = stringResource(R.string.input_post_content),
-                        color = colorResource(id = R.color.gray_300)
+                        text = "內容不可為空",
+                        color = colorResource(id = R.color.red_100),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
                     )
-                },
-                isError = contentError,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray_300),
-                        shape = RoundedCornerShape(size = 4.dp)
+                    Text(
+                        text = "*",
+                        color = colorResource(id = R.color.red_100),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
                     )
-                    .background(
-                        color = colorResource(id = R.color.gray_200),
-                        shape = RoundedCornerShape(size = 4.dp)
-                    ),
-                maxLines = 5,
-            )
-
-            if (contentError) {
-                Text(
-                    text = "內容不可為空",
-                    color = Color.Red,
-                    fontSize = 12.sp
-                )
+                }
             }
-
+                Spacer(modifier = Modifier.height(4.dp))
+                // Content TextField
+                OutlinedTextField(
+                    value = content,
+                    onValueChange = {
+                        content = it
+                        contentError = content.isBlank()
+                    },
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.input_post_content),
+                            color = colorResource(id = R.color.gray_300)
+                        )
+                    },
+                    isError = contentError,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .border(
+                            width = 1.dp,
+                            color = colorResource(id = R.color.gray_300),
+                            shape = RoundedCornerShape(size = 4.dp)
+                        )
+                        .background(
+                            color = colorResource(id = R.color.gray_200),
+                            shape = RoundedCornerShape(size = 4.dp)
+                        ),
+                    maxLines = 5,
+                )
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -201,16 +217,10 @@ fun CreatePostScreen(
                     onClick = {
                         titleError = title.isBlank() || title.length > 30
                         contentError = content.isBlank()
-
-
-//                        if (!titleError && !contentError) {
-//                            postVM.insertPost(title = title, content = content)
-//                            navController.navigate(CmtScreenEnum.MyPostsScreen.name)
-//                        }
-
                         if (!titleError && !contentError) {
                             val pictureBytes = selectedImageUri?.let { uri ->
-                                val inputStream = navController.context.contentResolver.openInputStream(uri)
+                                val inputStream =
+                                    navController.context.contentResolver.openInputStream(uri)
                                 val bytes = inputStream?.readBytes()
                                 inputStream?.close()
                                 bytes  // 直接返回 ByteArray
@@ -258,26 +268,4 @@ fun CreatePostScreenPreview() {
         CreatePostScreen(rememberNavController())
     }
 }
-//原Button
-//                Button(
-//                    onClick = { /* 點擊加入圖片的邏輯 */ },
-//                    shape = RoundedCornerShape(size = 9.dp),
-//                    modifier = Modifier
-//                        .width(150.dp)
-//                        .height(52.dp),
-//                    colors = ButtonDefaults.buttonColors(colorResource(id = R.color.gray_100))
-//                ) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.baseline_photo_24),
-//                        contentDescription = "Add Image",
-//                        modifier = Modifier,
-//                        colorResource(id = R.color.black_200)
-//                    )
-//                    Spacer(modifier = Modifier.width(8.dp))
-//                    Text(
-//                        text = "加入圖片",
-//                        fontSize = 14.75.sp,
-//                        fontWeight = FontWeight(600),
-//                        color = colorResource(id = R.color.black_300)
-//                    )
-//                }
+
