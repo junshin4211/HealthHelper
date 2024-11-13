@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
@@ -117,6 +118,8 @@ fun PersonalPostScreen(
                             contentDescription = "User profile picture",
                             modifier = Modifier
                                 .size(48.dp)
+                                .clip(CircleShape)
+                                .padding(0.dp)
                         )
                     } ?: Image(
                         painter = painterResource(R.drawable.profile),
@@ -291,6 +294,7 @@ fun PersonalPostScreen(
                                     .padding(16.dp)
                                     .width(45.16.dp)
                                     .height(45.16.dp)
+                                    .clip(CircleShape)
                             )
                         } ?: Image(
                             painter = painterResource(R.drawable.profile),
