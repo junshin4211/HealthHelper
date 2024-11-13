@@ -102,6 +102,7 @@ fun FoodItemInfoFrame(
         topBar = {
             FoodItemTopAppBar(
                 navController = navController,
+                onClick = {navController.navigateUp()},
                 title = {
                     Text(selectedFoodItem.meal.value)
                 }
@@ -285,17 +286,8 @@ fun FoodItemInfoFrame(
         // remove data from database.
         foodItemViewModel.deleteFoodItemByDiaryIdAndFoodId(foodItemVO)
 
-        Toast.makeText(
-            context,
-            context.getString(R.string.delete_data_successfully),
-            Toast.LENGTH_LONG
-        ).show()
-        Log.e(
-            TAG,
-            "FoodItemInfoFrame function, LaunchedEffect(deleteButtonIsClicked) block was called.message:${
-                context.getString(R.string.delete_data_successfully)
-            }"
-        )
+        Toast.makeText(context, context.getString(R.string.delete_data_successfully), Toast.LENGTH_LONG).show()
+
         navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }
 
@@ -309,12 +301,7 @@ fun FoodItemInfoFrame(
         FoodItemRepository.setSelectedGrams(selectedFoodItem.grams.value)
         FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
         foodItemViewModel.updateFoodItemByDiaryIdAndFoodId(foodItemVO)
-        Toast.makeText(
-            context,
-            context.getString(R.string.save_data_successfully),
-            Toast.LENGTH_LONG
-        )
-            .show()
+        Toast.makeText(context, context.getString(R.string.save_data_successfully), Toast.LENGTH_LONG).show()
        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }
 }

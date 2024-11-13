@@ -26,7 +26,7 @@ fun SearchHintFrame(
     Scaffold(
         topBar = {
             DietAppTopBar(
-                navController = navController,
+                onClick = {navController.navigateUp()},
                 title = {
                     Text(
                         text = stringResource(R.string.diet_app_title),

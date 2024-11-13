@@ -254,7 +254,7 @@ fun DietDiaryMealFrame(
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(
-            navController = navController,
+            onClick = { navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name) },
             title = { Text(stringResource(selectedMealsOptionVO.nameResId)) },
         )
     }, content = { innerPadding ->
