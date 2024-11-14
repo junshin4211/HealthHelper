@@ -1,7 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -203,12 +202,6 @@ fun DietDiaryMainFrame(
             }
 
             if (mealsButtonIsClicked) {
-                Log.e(TAG, "!".repeat(50))
-                Log.e(
-                    TAG,
-                    "In DietDiaryMainFrame function, mealsButtonIsClicked is true. currentMealOption:${currentMealOption}"
-                )
-                Log.e(TAG, "!".repeat(50))
                 MealsOptionRepository.setSelectedData(currentMealOption)
                 navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
                 mealsButtonIsClicked = false

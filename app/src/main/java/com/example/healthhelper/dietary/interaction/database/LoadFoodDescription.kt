@@ -26,7 +26,7 @@ fun LoadFoodDescription(
         val currentMealCategoryId = currentDiaryDescriptionVO.mealCategoryID
         val targetDiaryDescriptionVO = DiaryDescriptionVO(diaryID = currentDiaryId, mealCategoryID = currentMealCategoryId)
         Log.e(TAG,"LoadFoodDescription function, LaunchedEffect(Unit) blocked was called.targetDiaryDescriptionVO:${targetDiaryDescriptionVO}")
-        val queriedDiaryDescriptionVOs = diaryDescriptionViewModel.fetchDataFromDatabase(targetDiaryDescriptionVO)
+        val queriedDiaryDescriptionVOs = diaryDescriptionViewModel.loadDiaryInfo(targetDiaryDescriptionVO)
         Log.e(TAG,"LoadFoodDescription function, LaunchedEffect(Unit) blocked was called.queriedDiaryDescriptionVOs:${queriedDiaryDescriptionVOs}")
         if(queriedDiaryDescriptionVOs.isEmpty()){ // load data failed as it is empty.
             DiaryDescriptionRepository.clearData()

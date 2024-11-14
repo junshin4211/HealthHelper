@@ -39,7 +39,6 @@ import com.example.healthhelper.dietary.repository.NutritionInfoRepository
 import com.example.healthhelper.dietary.repository.SelectedDateRepository
 import com.example.healthhelper.dietary.util.dateformatter.DateFormatterPattern
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
 import java.sql.Date
 import java.sql.Time
@@ -53,14 +52,12 @@ import java.time.format.DateTimeFormatter
 fun CustomDatePicker(
     diaryViewModel: DiaryViewModel = viewModel(),
     selectedDateViewModel: SelectedDateViewModel = viewModel(),
-    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_CustomDatePicker"
     val context = LocalContext.current
 
     val selectedDateVO by selectedDateViewModel.selectedDate.collectAsState()
     val diaryVO by diaryViewModel.data.collectAsState()
-    val selectedFoodItemVO by foodItemViewModel.selectedData.collectAsState()
 
     val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
@@ -102,10 +99,6 @@ fun CustomDatePicker(
             val queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
 
             if (queriedDiaryVOs.isEmpty()) {
-                val toastMessage = context.getString(R.string.load_diary_info_failed) +
-                        context.getString(R.string.insert_diary_id_tip_message)
-                Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
-
                 val newDiaryVO = DiaryVO()
                 newDiaryVO.userID = diaryVO.userID
                 newDiaryVO.createDate = date
@@ -121,20 +114,14 @@ fun CustomDatePicker(
 
                 NutritionInfoRepository.setNutritionInfo(newDiaryVO)
 
-                Toast.makeText(context, context.getString(R.string.insert_diary_successfully), Toast.LENGTH_LONG).show()
-
                 FoodItemRepository.setSelectedDiaryId(newDiaryVO.diaryID)
 
                 return@LaunchedEffect
             }
 
             NutritionInfoRepository.setNutritionInfo(queriedDiaryVOs[0])
-            // fetch data successfully.
-            Toast.makeText(
-                context, context.getString(R.string.fetch_diary_id_successfully),
-                Toast.LENGTH_SHORT
-            ).show()
 
+            // fetch data successfully.
             Toast.makeText(
                 context, context.getString(R.string.fetch_nutrition_info_successfully),
                 Toast.LENGTH_SHORT

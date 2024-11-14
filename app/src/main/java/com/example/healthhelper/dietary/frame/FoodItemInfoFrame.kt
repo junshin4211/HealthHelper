@@ -54,6 +54,7 @@ import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
 import com.example.healthhelper.dietary.repository.EnterStatusRepository
 import com.example.healthhelper.dietary.repository.FoodItemRepository
 import com.example.healthhelper.dietary.repository.SelectedFoodItemsRepository
+import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
@@ -67,6 +68,7 @@ fun FoodItemInfoFrame(
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
     foodItemViewModel: FoodItemViewModel = viewModel(),
     foodViewModel: FoodViewModel = viewModel(),
+    diaryViewModel: DiaryViewModel = viewModel(),
 ) {
     val TAG = "tag_FoodItemInfoFrame"
 
@@ -300,7 +302,7 @@ fun FoodItemInfoFrame(
         FoodItemRepository.setSelectedFoodId(foodId)
         FoodItemRepository.setSelectedGrams(selectedFoodItem.grams.value)
         FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
-        foodItemViewModel.updateFoodItemByDiaryIdAndFoodId(foodItemVO)
+        foodItemViewModel.updateFoodItemByDiaryIdAndFoodId(foodItemVO = foodItemVO,diaryViewModel = diaryViewModel)
         Toast.makeText(context, context.getString(R.string.save_data_successfully), Toast.LENGTH_LONG).show()
        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
     }

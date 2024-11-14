@@ -228,13 +228,8 @@ fun DietDiaryMealFrame(
                     mealCategoryID = currentMealCategoryId,
                     grams = grams,
                 )
-                foodItemViewModel.tryToInsertFoodItem(newFoodItemVO)
+                foodItemViewModel.tryToInsertFoodItem(foodItemVO = newFoodItemVO,diaryViewModel = diaryViewModel)
             }
-            Toast.makeText(
-                context,
-                context.getString(R.string.save_food_item_successfully),
-                Toast.LENGTH_LONG
-            ).show()
         }
         // save data to database about diarydescription table.
         diaryDescriptionViewModel.viewModelScope.launch {
