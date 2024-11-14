@@ -274,4 +274,5 @@
     <string name="under">剩餘</string>
     <string name="nutritionstitle">營養成分</string>
     <string name="has_no_nutrition_info_message">沒有營養相關資料可以顯示</string>
+    <string name="insert_diary_successfully">插入日記成功</string>
 </resources>

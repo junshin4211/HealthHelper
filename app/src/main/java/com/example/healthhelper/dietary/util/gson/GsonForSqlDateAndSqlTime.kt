@@ -15,5 +15,6 @@ object GsonForSqlDateAndSqlTime {
         .registerTypeAdapter(Time::class.java, JsonDeserializerForSqTime.timeDeserializer)
         .registerTypeAdapter(Date::class.java, JsonSerializerForSqlDate.dateDeserializer)
         .registerTypeAdapter(Time::class.java, JsonSerializerForSqlTime.timeDeserializer)
+        .serializeNulls()
         .create()
 }

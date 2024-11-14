@@ -42,6 +42,7 @@ import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedDateViewModel
 import java.sql.Date
+import java.sql.Time
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -88,8 +89,6 @@ fun CustomDatePicker(
 
     LaunchedEffect(selectedDate) {
         if (selectedDate != context.getString(R.string.noChoose)) {
-            Log.e(TAG, "-".repeat(50))
-            Log.e(TAG, "LaunchedEffect(selectedDate) was called,selectedDate:${selectedDate}")
 
             // get date by formatting the given String.
             val date = Date.valueOf(selectedDate)
@@ -102,17 +101,30 @@ fun CustomDatePicker(
 
             val queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
 
-            Log.e(TAG, "In LaunchedEffect(selectedDate) block,queriedDiaryVOs:${queriedDiaryVOs}")
-            Log.e(TAG, "-".repeat(50))
             if (queriedDiaryVOs.isEmpty()) {
                 val toastMessage = context.getString(R.string.load_diary_info_failed) +
                         context.getString(R.string.insert_diary_id_tip_message)
                 Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show()
-                FoodItemRepository.setSelectedDiaryId(0)
-                val affectedRows = diaryViewModel.insertDiary(diaryVO)
 
-                NutritionInfoRepository.setNutritionInfo(DiaryVO())
-                Toast.makeText(context, context.getString(R.string.insert_diary_failed), Toast.LENGTH_LONG).show()
+                val newDiaryVO = DiaryVO()
+                newDiaryVO.userID = diaryVO.userID
+                newDiaryVO.createDate = date
+                newDiaryVO.createTime = Time(0)
+                newDiaryVO.totalProtein = -1.0
+                newDiaryVO.totalCarbon = -1.0
+                newDiaryVO.totalFat = -1.0
+                newDiaryVO.totalSugar = -1.0
+                newDiaryVO.totalSodium = -1.0
+                newDiaryVO.totalFiber = -1.0
+                newDiaryVO.totalCalories = -1.0
+                val affectedRows = diaryViewModel.insertDiary(newDiaryVO)
+
+                NutritionInfoRepository.setNutritionInfo(newDiaryVO)
+
+                Toast.makeText(context, context.getString(R.string.insert_diary_successfully), Toast.LENGTH_LONG).show()
+
+                FoodItemRepository.setSelectedDiaryId(newDiaryVO.diaryID)
+
                 return@LaunchedEffect
             }
 

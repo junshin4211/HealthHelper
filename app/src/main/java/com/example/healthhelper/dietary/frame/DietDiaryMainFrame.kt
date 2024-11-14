@@ -79,10 +79,7 @@ fun DietDiaryMainFrame(
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
-
     LaunchedEffect(diaryVO) {
-        Log.e(TAG, "-".repeat(50))
-        Log.e(TAG, "LaunchedEffect(diaryVO) blocked was called,diaryVO:${diaryVO}")
         NutritionInfoRepository.setNutritionInfo(diaryVO)
         val newFoodItemVO = FoodItemVO(
             diaryID = diaryVO.diaryID,
@@ -105,7 +102,6 @@ fun DietDiaryMainFrame(
             context.getString(R.string.fetch_food_item_successfully),
             Toast.LENGTH_LONG
         ).show()
-        Log.e(TAG, "-".repeat(50))
     }
 
     Scaffold(
@@ -191,12 +187,6 @@ fun DietDiaryMainFrame(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Top,
                     ) {
-                        Log.e(TAG, "&".repeat(50))
-                        Log.e(
-                            TAG,
-                            "In DietDiaryMainFrame function. ready to enter `NutritionInfoCombo` function. nutritionInfo:${nutritionInfo}"
-                        )
-                        Log.e(TAG, "&".repeat(50))
                         NutritionInfoCombo(
                             nutritionInfoVO = nutritionInfo,
                             showTitle = true,
