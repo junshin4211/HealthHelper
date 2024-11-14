@@ -4,9 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +16,9 @@ class AlarmViewModel : ViewModel() {
     private val _alarms = MutableStateFlow<List<Calendar>>(emptyList())
     val alarms: StateFlow<List<Calendar>> = _alarms.asStateFlow()
 
+    private val _showPermissionDialog = MutableStateFlow(false)
+    val showPermissionDialog: StateFlow<Boolean> = _showPermissionDialog.asStateFlow()
+
     fun addAlarm(context: Context, alarmTime: Calendar) {
         _alarms.value += alarmTime
         setAlarm(context, alarmTime)
@@ -26,6 +27,10 @@ class AlarmViewModel : ViewModel() {
     fun removeAlarm(context: Context, alarm: Calendar) {
         _alarms.value = _alarms.value.filter { it != alarm }
         cancelAlarm(context, alarm)
+    }
+
+    fun dismissPermissionDialog() {
+        _showPermissionDialog.value = false
     }
 
     private fun cancelAlarm(context: Context, alarmTime: Calendar) {
@@ -46,17 +51,7 @@ class AlarmViewModel : ViewModel() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmManager.canScheduleExactAlarms()) {
-                Toast.makeText(
-                    context,
-                    "Please grant permission to set exact alarms",
-                    Toast.LENGTH_SHORT
-                ).show()
-                val intent = Intent(
-                    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                    Uri.parse("package:${context.packageName}")
-                )
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(intent)
+                _showPermissionDialog.value = true
                 return
             }
         }
@@ -70,7 +65,7 @@ class AlarmViewModel : ViewModel() {
             context,
             alarmTime.timeInMillis.toInt(),
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         try {
@@ -90,12 +85,7 @@ class AlarmViewModel : ViewModel() {
             )
 
         } catch (e: SecurityException) {
-            Toast.makeText(
-                context,
-                "設定鬧鐘失敗，檢查授權",
-                Toast.LENGTH_SHORT
-            ).show()
+            _showPermissionDialog.value = true
         }
     }
-
 }

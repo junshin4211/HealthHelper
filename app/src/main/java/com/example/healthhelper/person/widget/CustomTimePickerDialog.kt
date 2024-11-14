@@ -30,7 +30,8 @@ fun CustomTimePickerDialog(
     val currentTime = LocalTime.now()
     val timePickerState = rememberTimePickerState(
         initialHour = currentTime.hour,
-        initialMinute = currentTime.minute
+        initialMinute = currentTime.minute,
+        is24Hour = true
     )
 
     AlertDialog(

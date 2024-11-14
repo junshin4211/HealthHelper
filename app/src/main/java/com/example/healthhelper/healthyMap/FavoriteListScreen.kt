@@ -41,7 +41,7 @@ fun FavoriteListScreen(
 ) {
     val favorResturants by favorListViewModel.favorResturantsState.collectAsState()
     val scope = rememberCoroutineScope()
-    var selectedRestaurants by remember { mutableStateOf(setOf<String>()) }
+    var deleteFavorRestaurants by remember { mutableStateOf(setOf<String>()) }
 
     LaunchedEffect(Unit) {
         favorListViewModel.fetchFavorListByUser()
@@ -51,10 +51,10 @@ fun FavoriteListScreen(
     LaunchedEffect(currentDestination) {
         if (currentDestination?.route?.startsWith("MapSearchScreen") == true) {
             scope.launch {
-                selectedRestaurants.forEach { restaurantId ->
+                deleteFavorRestaurants.forEach { restaurantId ->
                     favorListViewModel.deleteFavor(restaurantId.toInt())
                 }
-                selectedRestaurants = emptySet()
+                deleteFavorRestaurants = emptySet()
             }
         }
     }
@@ -67,14 +67,14 @@ fun FavoriteListScreen(
                     navController.navigate("${MapScreenEnum.GoogleMapScreen.name}/${restaurant.rID}")
                 },
                 onLikeClick = { restaurant ->
-                    selectedRestaurants =
-                        if (selectedRestaurants.contains(restaurant.rID.toString())) {
-                            selectedRestaurants - restaurant.rID.toString()
+                    deleteFavorRestaurants =
+                        if (deleteFavorRestaurants.contains(restaurant.rID.toString())) {
+                            deleteFavorRestaurants - restaurant.rID.toString()
                         } else {
-                            selectedRestaurants + restaurant.rID.toString()
+                            deleteFavorRestaurants + restaurant.rID.toString()
                         }
                 },
-                selectedRestaurants = selectedRestaurants
+                selectedRestaurants = deleteFavorRestaurants
             )
         }
     }

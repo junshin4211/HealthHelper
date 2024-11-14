@@ -3,6 +3,7 @@ package com.example.healthhelper.person.screen
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,7 +53,7 @@ fun PhotoPreviewScreen(
     val cloudinary = cloudPhotoUploadVM.cloudinary
     val isLoading by userPhotoUploadVM.isloading.collectAsState()
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().background(colorResource(R.color.backgroundcolor)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

@@ -42,6 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -186,7 +187,6 @@ fun PersonScreen(
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(colorResource(R.color.primarycolor)),
                 onClick = {
-//                        LoginState.isLogin=false
                     onLogout()
                 }
             ) {
@@ -202,7 +202,8 @@ fun PhotoOptionsMenu(expanded: Boolean, onDismiss: () -> Unit, navController: Na
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { onDismiss() },
-        modifier = Modifier.background(Color.White)
+        modifier = Modifier.background(Color.White),
+        offset = DpOffset((-80).dp, 0.dp)
     ) {
         DropdownMenuItem(
             leadingIcon = {

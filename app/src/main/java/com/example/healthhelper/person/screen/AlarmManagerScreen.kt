@@ -70,16 +70,8 @@ fun AlarmManagerScreen(
     context: Context,
 ) {
     var timePickerDialogShown by remember { mutableStateOf(false) }
-    var showPermissionDialog by remember { mutableStateOf(false) }
+    val showPermissionDialog by alarmViewModel.showPermissionDialog.collectAsState()
     val alarms by alarmViewModel.alarms.collectAsState()
-
-    val hasExactAlarmPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val alarmManager =
-            context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
-        alarmManager.canScheduleExactAlarms()
-    } else {
-        false
-    }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val locationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(
@@ -165,30 +157,29 @@ fun AlarmManagerScreen(
                 if (timePickerDialogShown) {
                     CustomTimePickerDialog(
                         onConfirm = { selectedTime ->
-                            if (hasExactAlarmPermission) {
-                                val alarmTime = Calendar.getInstance().apply {
-                                    set(Calendar.HOUR_OF_DAY, selectedTime.hour)
-                                    set(Calendar.MINUTE, selectedTime.minute)
-                                    set(Calendar.SECOND, 0)
-                                    if (timeInMillis <= System.currentTimeMillis()) {
-                                        add(Calendar.DAY_OF_YEAR, 1)
-                                    }
+                            val alarmTime = Calendar.getInstance().apply {
+                                set(Calendar.HOUR_OF_DAY, selectedTime.hour)
+                                set(Calendar.MINUTE, selectedTime.minute)
+                                set(Calendar.SECOND, 0)
+                                if (timeInMillis <= System.currentTimeMillis()) {
+                                    add(Calendar.DAY_OF_YEAR, 1)
                                 }
-                                alarmViewModel.addAlarm(context, alarmTime)
-                                timePickerDialogShown = false
-                            } else {
-                                showPermissionDialog = true
                             }
+                            alarmViewModel.addAlarm(context, alarmTime)
+                            timePickerDialogShown = false
                         },
                         onDismiss = { timePickerDialogShown = false }
                     )
                 }
+
                 if (showPermissionDialog) {
                     PermissionDialog(
-                        onDismiss = { showPermissionDialog = false },
+                        onDismiss = { alarmViewModel.dismissPermissionDialog() },
                         onOpenSettings = {
-                            openAppSettings(context)
-                            showPermissionDialog = false
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                openAppSettings(context)
+                            }
+                            alarmViewModel.dismissPermissionDialog()
                         }
                     )
                 }
@@ -250,10 +241,10 @@ fun PermissionDialog(onDismiss: () -> Unit, onOpenSettings: () -> Unit) {
     }
 }
 
-
 fun openAppSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-        data = Uri.fromParts("package", context.packageName, null)
+    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+        data = Uri.parse("package:${context.packageName}")
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
     context.startActivity(intent)
 }

@@ -208,7 +208,7 @@ fun MapSearchAppBar(
                     isFavorite = false
                 }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        painter = painterResource(R.drawable.arrow_back_ios_new),
                         tint = colorResource(R.color.primarycolor),
                         contentDescription = stringResource(R.string.back_button)
                     )
