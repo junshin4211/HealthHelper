@@ -405,9 +405,8 @@ fun SignUpScreen(
                 // 取消按鈕
                 Button(
                     onClick = {
-                        onBackToLogin()
-//                        navController.navigate("LoginScreen") {
-                         //   popUpTo("LoginScreen") { inclusive = true }
+                        onRegisterSuccess()
+//
 //                        }
                     },
                     modifier = Modifier

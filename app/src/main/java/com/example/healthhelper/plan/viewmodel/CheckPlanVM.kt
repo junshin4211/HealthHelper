@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.lang.reflect.Type
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.time.*
 import java.util.Date
@@ -57,21 +58,51 @@ class CheckPlanVM: ViewModel() {
     //get specific plan request
     private suspend fun fetchSpecificPlan(
         userId: Int,
-        plan: PlanModel,
+        userDietPlanId: Int,
     ): PlanSpecificModel{
         val url = "$serverUrl/Plan/SelectPlan"
         return try {
             val gson = GsonBuilder()
                 .registerTypeAdapter(Date::class.java, DateDeserializer())
                 .create()
-            val jsonObject = JsonObject().apply {
-                addProperty("userId", userId)
-                addProperty("userDietPlanId", plan.userDietPlanId)
-            }
+//            val jsonObject = JsonObject().apply {
+//                addProperty("userId", userId)
+//                addProperty("userDietPlanId", userDietPlanId)
+//            }
+            var jsonObject = JsonObject()
+            jsonObject.addProperty("userId", userId)
+            jsonObject.addProperty("userDietPlanId", userDietPlanId)
 
             val result = httpPost(url, jsonObject.toString())
-            val collectionType = object : TypeToken<PlanSpecificModel>() {}.type
-            gson.fromJson(result, collectionType) ?: PlanSpecificModel()
+            jsonObject = gson.fromJson(result, JsonObject::class.java)
+            val planSpecificModel = PlanSpecificModel()
+            planSpecificModel.userDietPlanId = jsonObject.get("userDietPlanId").asInt
+            planSpecificModel.categoryId = jsonObject.get("categoryId").asInt
+            planSpecificModel.userId = jsonObject.get("userId").asInt
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S", Locale.getDefault())
+
+            planSpecificModel.startDateTime = if (jsonObject.has("startDatetime") && !jsonObject.get("startDatetime").isJsonNull) {
+                val dateString = jsonObject.get("startDatetime").asString
+                Timestamp(dateFormat.parse(dateString)?.time ?: 0L)
+            } else {
+                Timestamp(0)
+            }
+
+            planSpecificModel.endDateTime = if (jsonObject.has("endDatetime") && !jsonObject.get("endDatetime").isJsonNull) {
+                val dateString = jsonObject.get("endDatetime").asString
+                Timestamp(dateFormat.parse(dateString)?.time ?: 0L)
+            } else {
+                Timestamp(0)
+            }
+            planSpecificModel.finishState = jsonObject.get("finishstate").asInt
+            planSpecificModel.fatgoal = jsonObject.get("fatgoal").asFloat
+            planSpecificModel.carbongoal = jsonObject.get("carbongoal").asFloat
+            planSpecificModel.proteingoal = jsonObject.get("proteingoal").asFloat
+            planSpecificModel.Caloriesgoal = jsonObject.get("Caloriesgoal").asFloat
+            Log.d(tag, "fetchSpecificPlan: ${planSpecificModel.userDietPlanId} state: ${planSpecificModel.finishState}")
+            return planSpecificModel
+//            val collectionType = object : TypeToken<PlanSpecificModel>() {}.type
+//            gson.fromJson(result, collectionType) ?: PlanSpecificModel()
         } catch (e: Exception) {
             Log.e(tag, "Error in fetchSpecificPlan: ${e.message}")
             return PlanSpecificModel()
@@ -134,11 +165,11 @@ class CheckPlanVM: ViewModel() {
     }
 
     //get specific plan
-    fun getSpecificPlan(){
+    fun getSpecificPlan(userDietPlanId:Int){
         viewModelScope.launch {
             try {
-                val specificPlan = fetchSpecificPlan(currentuserId, selectedPlanState.value)
-                Log.d(tag, "getspecificPlan: $specificPlan")
+                val specificPlan = fetchSpecificPlan(currentuserId, userDietPlanId)
+                Log.d(tag, "getspecificPlanstate: ${specificPlan.finishState}")
                 repository.setPlanSpecificData(specificPlan)
                 Log.d(tag, "Fetched planSpecificState: ${planSpecificState.value}")
             } catch (e: Exception) {

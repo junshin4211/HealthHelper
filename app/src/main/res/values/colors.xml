@@ -17,6 +17,8 @@
     <color name="dark_green">#20A628</color>
     <color name="light_gray">#EFF1F5</color>
     <color name="yellow_300">#C2B202</color>
+    <color name="secondarycolor">#E4A86E</color>
+
     //主題一 橘色
     <color name="backgroundcolor">#FFFEED</color>
     <color name="primarycolor">#F19204</color>
@@ -63,7 +65,7 @@
 
     //white color
     <color name="white_100">#EBEBEB</color>
-
+    <color name="white_200">#FFFFFF</color>
     <color name="light_red">#F17355</color>
 
 </resources>

@@ -1,18 +1,25 @@
 package com.example.healthhelper.plan.ui
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import kotlin.math.min
 
 @Composable
@@ -21,7 +28,7 @@ fun GaugeChart(
     modifier: Modifier = Modifier,
     maxAngle: Float = 240f, // 最大角度
     startAngle: Float = 150f, // 開始角度
-    strokeWidth: Float = 20f, // 弧線寬度
+    strokeWidth: Float = 40f, // 弧線寬度
 ) {
     Canvas(modifier = modifier) {
         val canvasSize = size
@@ -60,35 +67,38 @@ fun GaugeChart(
 }
 
 @Composable
-fun GaugeChartDemo() {
-    var value by remember { mutableStateOf(50f) }
+fun AnimatedGaugeChart(
+    modifier: Modifier = Modifier,
+    maxPercentage: Float,
+    animationStep: Float = 10f, // 每次增加 10%
+    animationDuration: Long = 100 // 動畫間隔時間 (毫秒)
+) {
+    var currentPercentage by remember { mutableStateOf(0f) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        GaugeChart(
-            percentage = value,
-            modifier = Modifier.size(200.dp)
-        )
+    // 使用動畫來顯示當前百分比
+    val animatedPercentage by animateFloatAsState(
+        targetValue = currentPercentage,
+        label = "",
+    )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Slider(
-            value = value,
-            onValueChange = { value = it },
-            valueRange = 0f..100f
-        )
+    // 使用 LaunchedEffect 來增加百分比
+    LaunchedEffect(Unit) {
+        while (currentPercentage < maxPercentage) {
+            currentPercentage = (currentPercentage + animationStep).coerceAtMost(maxPercentage)
+            delay(animationDuration)
+        }
     }
+
+    GaugeChart(
+        percentage = animatedPercentage,
+        modifier = modifier
+    )
 }
 
 @Composable
 @Preview(showBackground = true)
 fun PreviewGaugeChart() {
     MaterialTheme {
-        GaugeChartDemo()
+        AnimatedGaugeChart(maxPercentage = 100f)
     }
 }

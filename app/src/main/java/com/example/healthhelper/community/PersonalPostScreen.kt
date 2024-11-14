@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
@@ -53,6 +54,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.healthhelper.R
 import com.example.healthhelper.community.components.CmtNavbarComponent
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @JvmOverloads
 @OptIn(ExperimentalMaterialApi::class)
@@ -115,6 +118,8 @@ fun PersonalPostScreen(
                             contentDescription = "User profile picture",
                             modifier = Modifier
                                 .size(48.dp)
+                                .clip(CircleShape)
+                                .padding(0.dp)
                         )
                     } ?: Image(
                         painter = painterResource(R.drawable.profile),
@@ -146,34 +151,14 @@ fun PersonalPostScreen(
                 ) {
                     Text(
                         text = post?.title ?: stringResource(id = R.string.post_title_text),
-                        fontSize = 24.sp,
+                        fontSize = 30.sp,
+                        lineHeight = 40.sp,
                         fontWeight = FontWeight(800),
                         color = colorResource(R.color.black_200)
                     )
                 }
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(10.dp))
             }
-//            post?.picture?.let { imageUrl ->
-//                item {
-//                    Row(
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp)
-//                    ) {
-//                        Image(
-//                            painter = rememberAsyncImagePainter(imageUrl),
-//                            contentDescription = "Post Image",
-//                            contentScale = ContentScale.FillBounds,
-//                            modifier = Modifier
-//                                .width(365.dp)
-//                                .height(192.dp)
-//                                .padding(8.dp)
-//                        )
-//                    }
-//                    Spacer(modifier = Modifier.height(20.dp))
-//                }
-//            }
             post?.picture?.let { base64Image ->
                 item {
                     // 將 Base64 編碼的圖片字串解碼為 ByteArray
@@ -194,12 +179,9 @@ fun PersonalPostScreen(
                                 .clip(RoundedCornerShape(10.dp))
                         )
                     }
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
-
-
-
 
             // Post content text
             item {
@@ -211,10 +193,13 @@ fun PersonalPostScreen(
                 ) {
                     Text(
                         text = post?.content ?: stringResource(id = R.string.post_content_text),
+                        fontSize = 18.sp,
+                        lineHeight = 30.sp,
+                        fontWeight = FontWeight(400),
                         color = colorResource(id = R.color.dark_blue_100)
                     )
                 }
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(20.dp))
             }
 
             // Post date row
@@ -224,9 +209,15 @@ fun PersonalPostScreen(
                         .fillMaxWidth()
                         .padding(start = 16.dp)
                 ) {
+                    val dateString = runCatching {
+                        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                        val date = LocalDateTime.parse(post?.postDate, inputFormatter)
+                        date.format(outputFormatter)
+                    }.getOrElse { post?.postDate }
                     Text(
-                        text = post?.postDate ?: "2024-08-19 08:30",
-                        fontSize = 14.sp,
+                        text = dateString ?: "2024-11-01 08:30",
+                        fontSize = 16.sp,
                         lineHeight = 22.4.sp,
                         fontWeight = FontWeight(400),
                         color = colorResource(id = R.color.gray_600),
@@ -244,7 +235,7 @@ fun PersonalPostScreen(
                 ) {
                     Text(
                         text = "共${comments.size}則留言",
-                        fontSize = 20.sp,
+                        fontSize = 25.sp,
                         fontWeight = FontWeight(600),
                         color = colorResource(id = R.color.gray_500)
                     )
@@ -272,7 +263,7 @@ fun PersonalPostScreen(
                     overlineContent = {
                         Text(
                             text = comment.userName,
-                            fontSize = 14.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight(600),
                             color = colorResource(id = R.color.black_200)
                         )
@@ -280,7 +271,7 @@ fun PersonalPostScreen(
                     headlineContent = {
                         Text(
                             text = comment.reply,
-                            fontSize = 14.sp,
+                            fontSize = 18.sp,
                             lineHeight = 22.4.sp,
                             fontWeight = FontWeight(400),
                             color = colorResource(id = R.color.black_200)
@@ -303,6 +294,7 @@ fun PersonalPostScreen(
                                     .padding(16.dp)
                                     .width(45.16.dp)
                                     .height(45.16.dp)
+                                    .clip(CircleShape)
                             )
                         } ?: Image(
                             painter = painterResource(R.drawable.profile),
@@ -314,7 +306,9 @@ fun PersonalPostScreen(
                         )
 
                     },
-                    trailingContent = { Text("B${index + 1}") }
+                    trailingContent = {
+                        Text(text = "B${index + 1}", fontSize = 16.sp)
+                    }
                 )
 
                 HorizontalDivider(color = colorResource(id = R.color.white_100))
@@ -327,24 +321,50 @@ fun PersonalPostScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            OutlinedTextField(
+//            OutlinedTextField(
+//                value = reply,
+//                onValueChange = { reply = it },
+//                placeholder = { Text(text = "留言…", color = colorResource(id = R.color.gray_500)) },
+//                modifier = Modifier
+//                    .weight(1f)
+//                    .background(colorResource(id = R.color.white))
+//                    .border(
+//                        width = 1.dp,
+//                        color = colorResource(id = R.color.gray_300),
+//                        shape = RoundedCornerShape(size = 4.dp)
+//                    )
+//                    .background(
+//                        color = colorResource(id = R.color.white),
+//                        shape = RoundedCornerShape(size = 4.dp)
+//                    ),
+//
+//                )
+
+            androidx.compose.material.OutlinedTextField(
                 value = reply,
                 onValueChange = { reply = it },
-                placeholder = { Text("留言…") },
+                placeholder = {
+                    Text(
+                        text = "留言…",
+                        color = colorResource(id = R.color.gray_500)
+                    )
+                },
                 modifier = Modifier
                     .weight(1f)
-                    .background(colorResource(id = R.color.white))
-                    .border(
-                        width = 1.dp,
-                        color = colorResource(id = R.color.gray_300),
-                        shape = RoundedCornerShape(size = 4.dp)
-                    )
-                    .background(
-                        color = colorResource(id = R.color.white),
-                        shape = RoundedCornerShape(size = 4.dp)
-                    ),
+                    .background(colorResource(id = R.color.white)),
+                colors = androidx.compose.material.TextFieldDefaults.outlinedTextFieldColors(
+                    unfocusedBorderColor = colorResource(id = R.color.gray_300),
+                    focusedBorderColor = colorResource(id = R.color.gray_300),
+                    backgroundColor = colorResource(id = R.color.white),
+                    textColor = colorResource(id = R.color.black_300),
+                    cursorColor = colorResource(id = R.color.black_200)
+                ),
+                shape = RoundedCornerShape(size = 4.dp)
+            )
 
-                )
+
+
+
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = {
                 if (postId != null) {

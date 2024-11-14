@@ -158,7 +158,7 @@ fun EditPlan(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = colorResource(id = R.color.black_300),
+                    color = colorResource(id = R.color.black),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -172,7 +172,7 @@ fun EditPlan(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
                     fontWeight = FontWeight(600),
-                    color = colorResource(id = R.color.black_300),
+                    color = colorResource(id = R.color.black),
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.2.sp
                 )
@@ -260,7 +260,7 @@ fun EditPlan(
 
             ) {
                 CustomText().TextWithDiffColor(
-                    R.color.black_300,
+                    R.color.black,
                     stringResource(R.string.calories),
                     22.sp
                 )
@@ -270,7 +270,7 @@ fun EditPlan(
                     label = stringResource(R.string.examcalorie),
                     width = 130.dp
                 )
-                CustomText().TextWithDiffColor(R.color.black_300, stringResource(R.string.cals), 16.sp)
+                CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals), 16.sp)
             }
 
             CreateDesciption(

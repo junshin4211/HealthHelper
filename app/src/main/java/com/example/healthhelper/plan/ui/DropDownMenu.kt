@@ -2,8 +2,10 @@ package com.example.healthhelper.plan.ui
 
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -17,11 +19,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.example.healthhelper.R
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
@@ -62,7 +73,8 @@ fun <T> CreateDropDownMenu(
             )
         )
 
-        ExposedDropdownMenu(
+        val configuration = LocalConfiguration.current.screenWidthDp
+        DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
@@ -70,6 +82,8 @@ fun <T> CreateDropDownMenu(
                     width = 2.dp,
                     color = colorResource(id = R.color.primarycolor)
                 )
+                .width(200.dp)
+                .height((configuration*0.5).dp),
         ) {
             options.forEach { option ->
                 DropdownMenuItem(

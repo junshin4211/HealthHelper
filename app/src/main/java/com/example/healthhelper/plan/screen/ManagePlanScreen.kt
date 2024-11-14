@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -98,7 +99,9 @@ fun ManagePlan(
                         Image(
                             painter = painterResource(id = R.drawable.protein),
                             contentDescription = "planType",
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .scale(1.5f)
                         )
                     },
                     trialingIcon = {
@@ -141,8 +144,10 @@ fun ManagePlan(
                     rightText = PlanPage.CompletedPlan.getPlanTitle(context)
                 )
 
+                val sortlist = remember(completePlanList){completePlanList.sortedBy { it.startDateTime }}
+                Log.d(tag,"into complete sortlist: $sortlist")
                 CustomList().ItemList(
-                    inputList = completePlanList,
+                    inputList = sortlist,
                     onItemClick = {
                         checkPlanVM.setSelectedPlan(it)
                         navcontroller.navigate(PlanPage.CheckPlan.name)
@@ -151,7 +156,9 @@ fun ManagePlan(
                         Image(
                             painter = painterResource(id = R.drawable.protein),
                             contentDescription = "planType",
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .scale(1.5f)
                         )
                     },
                     trialingIcon = {

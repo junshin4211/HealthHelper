@@ -65,7 +65,8 @@ class CustomIcon {
             Icon(
                 painter = painterResource(R.drawable.delete),
                 contentDescription = "delete",
-                modifier = Modifier.scale(size)
+                modifier = Modifier.scale(size),
+                tint = colorResource(R.color.black_300)
             )
         }
     }
