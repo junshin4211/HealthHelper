@@ -63,7 +63,7 @@ fun CmtNavbarComponent(navController: NavHostController, postVM: PostVM) {
             ) {
             Icon(
                 painter = painterResource(id = R.drawable.tabler_receipt),
-                contentDescription = "arrowBack",
+                contentDescription = "tabler_receipt",
                 tint = colorResource(id = R.color.primarycolor)
             )
         }
