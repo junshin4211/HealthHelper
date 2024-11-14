@@ -17,6 +17,7 @@ import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 @Composable
 fun FoodItemTopAppBar(
     navController: NavHostController,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(
@@ -28,7 +29,7 @@ fun FoodItemTopAppBar(
         colors = DefaultColorViewModel.topAppBarColors,
         title = title,
         navigationIcon = {
-            NavigateUpNavigationIcon(navController)
+            NavigateUpNavigationIcon(onClick = onClick)
         },
         actions = {
             SearchIcon(

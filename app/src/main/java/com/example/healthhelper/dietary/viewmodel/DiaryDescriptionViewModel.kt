@@ -28,7 +28,7 @@ class DiaryDescriptionViewModel: ViewModel(){
         }
     }
 
-    suspend fun fetchDataFromDatabase(
+    suspend fun loadDiaryInfo(
         diaryDescriptionVO: DiaryDescriptionVO,
     ):List<DiaryDescriptionVO>{
         val url = DietDiaryUrl.selectDiaryDescriptionUrl

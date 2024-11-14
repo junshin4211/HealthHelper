@@ -78,6 +78,10 @@ object SelectedFoodItemsRepository {
         _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.meal.value = meal}
     }
 
+    fun setGramsValue(selectedFoodItemVO:SelectedFoodItemVO, meal: String){
+        _dataFlow.value.find { it == selectedFoodItemVO }?.let{it.meal.value = meal}
+    }
+
     fun remove(selectedFoodItemVO: SelectedFoodItemVO){
         _dataFlow.value.remove(selectedFoodItemVO)
     }

@@ -15,7 +15,7 @@ fun LoadFoodItemInfo(
     context:Context,
     foodItemViewModel: FoodItemViewModel = viewModel(),
 ){
-    val TAG = "tag_LoadFoodItemInfoTest1"
+    val TAG = "tag_LoadFoodItemInfo"
 
     val selectedFoodItemVO by foodItemViewModel.selectedData.collectAsState()
     val foodItemVOs by foodItemViewModel.data.collectAsState()

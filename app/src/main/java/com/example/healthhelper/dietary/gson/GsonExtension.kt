@@ -1,9 +1,9 @@
 package com.example.healthhelper.dietary.gson
 
-import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 
-val gson = Gson()
+val gson = GsonBuilder().serializeNulls().create()
 
 val jsonObject = JsonObject()
 

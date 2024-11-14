@@ -1,5 +1,6 @@
 package com.example.healthhelper.dietary.repository
 
+import android.util.Log
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import com.example.healthhelper.R
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object NutritionInfoRepository {
+    val TAG = "tag_NutritionInfoRepository"
+
     private val _dataFlow: MutableStateFlow<NutritionInfoVO> = MutableStateFlow(fetchData())
     val dataFlow: StateFlow<NutritionInfoVO>
         get() = _dataFlow.asStateFlow()
@@ -20,49 +23,49 @@ object NutritionInfoRepository {
             fat = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.fat,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.grams,
                 )
             ),
             carbon = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.carb,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.grams,
                 )
             ),
             protein = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.protein,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.grams,
                 )
             ),
             fiber = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.fiber,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.grams,
                 )
             ),
             sugar = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.sugar,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.grams,
                 )
             ),
             sodium = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.sodium,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.milli_grams,
                 )
             ),
             calories = mutableStateOf(
                 NutritionInfoPairVO(
                     nameResId = R.string.calories,
-                    amount = mutableDoubleStateOf(1.0),
+                    amount = mutableDoubleStateOf(-1.0),
                     unitResId = R.string.kilo_cals,
                 )
             ),
@@ -79,6 +82,17 @@ object NutritionInfoRepository {
         _dataFlow.value.sugar.value.amount.value = foodDiaryVO.totalSugar
         _dataFlow.value.sodium.value.amount.value = foodDiaryVO.totalSodium
         _dataFlow.value.calories.value.amount.value = foodDiaryVO.totalCalories
+    }
 
+    fun isValidNutritionInfo(nutritionInfoVO: NutritionInfoVO): Boolean {
+        Log.e(TAG,"In NutritionInfoRepository object, isValidNutritionInfo function. nutritionInfoVO:${nutritionInfoVO}")
+        val retValue = ( nutritionInfoVO.fat.value.amount.value > 0 &&
+                nutritionInfoVO.carbon.value.amount.value > 0 &&
+                nutritionInfoVO.protein.value.amount.value > 0 &&
+                nutritionInfoVO.fiber.value.amount.value > 0 &&
+                nutritionInfoVO.sugar.value.amount.value > 0 &&
+                nutritionInfoVO.sodium.value.amount.value > 0 &&
+                nutritionInfoVO.calories.value.amount.value > 0 )
+        return retValue
     }
 }

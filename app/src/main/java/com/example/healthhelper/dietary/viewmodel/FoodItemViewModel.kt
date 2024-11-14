@@ -18,35 +18,6 @@ class FoodItemViewModel:ViewModel() {
 
     val selectedData: StateFlow<FoodItemVO> = repository.selectedDataFlow
 
-    suspend fun updateFoodItemByDiaryIdAndFoodId(
-        foodItemVO: FoodItemVO,
-    ):Int{
-        val url = DietDiaryUrl.updateFoodItemByDiaryIdAndFoodId
-        return try {
-            val result = httpPost(url, gson.toJson(foodItemVO))
-            val collectionType = object : TypeToken<Int>() {}.type
-            gson.fromJson(result, collectionType) ?: -1
-        } catch (e: Exception) {
-            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
-            -1
-        }
-    }
-
-    suspend fun tryToInsertFoodItem(
-        foodItemVO: FoodItemVO,
-    ):Int {
-        val url = DietDiaryUrl.tryToInsertFoodItemUrl
-        Log.e(TAG,"In FoodItemViewModel class, tryToInsertFoodItem method. foodItemVO:${foodItemVO}")
-        return try {
-            val result = httpPost(url, gson.toJson(foodItemVO))
-            val collectionType = object : TypeToken<Int>() {}.type
-            gson.fromJson(result, collectionType) ?: -1
-        } catch (e: Exception) {
-            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
-            -1
-        }
-    }
-
     suspend fun selectFoodItemByDiaryIdAndMealCategoryId(
         foodItemVO: FoodItemVO,
     ):List<FoodItemVO>{
@@ -73,6 +44,45 @@ class FoodItemViewModel:ViewModel() {
             Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
             emptyList()
         }
+    }
+
+    suspend fun tryToInsertFoodItem(
+        foodItemVO: FoodItemVO,
+        diaryViewModel: DiaryViewModel,
+    ):Int {
+        val url = DietDiaryUrl.tryToInsertFoodItemUrl
+        Log.e(TAG,"In FoodItemViewModel class, tryToInsertFoodItem method. foodItemVO:${foodItemVO}")
+        val retValue = try {
+            val result = httpPost(url, gson.toJson(foodItemVO))
+            val collectionType = object : TypeToken<Int>() {}.type
+            gson.fromJson(result, collectionType) ?: -1
+        } catch (e: Exception) {
+            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
+            -1
+        }
+        val targetDiaryVO = diaryViewModel.data.value
+        diaryViewModel.updateDiaryInfo(targetDiaryVO)
+        return retValue
+    }
+
+    suspend fun updateFoodItemByDiaryIdAndFoodId(
+        foodItemVO: FoodItemVO,
+        diaryViewModel: DiaryViewModel,
+    ):Int{
+        val url = DietDiaryUrl.updateFoodItemByDiaryIdAndFoodId
+        val retValue = try {
+            val result = httpPost(url, gson.toJson(foodItemVO))
+            val collectionType = object : TypeToken<Int>() {}.type
+            gson.fromJson(result, collectionType) ?: -1
+        } catch (e: Exception) {
+            Log.e("Fetch Error", "Error fetching food from ${url}: ${e.message}", e)
+            -1
+        }
+
+        //val diaryVO = diaryViewModel.data.value
+        //diaryViewModel.updateDiaryInfo(diaryVO)
+
+        return retValue
     }
 
     suspend fun deleteFoodItemByDiaryIdAndFoodId(

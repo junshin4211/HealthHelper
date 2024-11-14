@@ -58,7 +58,7 @@ fun NutritionPieChart(
                 horizontalArrangement = Arrangement.End,
             ) {
                 Text(
-                    text = "${text}:${round(entry.yValue * 100 / data.size)}%",
+                    text = "${text}:${round(entry.yValue / data.size)}%",
                     fontSize = 20.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Visible,

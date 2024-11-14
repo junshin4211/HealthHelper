@@ -10,6 +10,7 @@ fun NutritionInfoText1(
     val members = listOf(
         nutritionInfoVO.fat,
         nutritionInfoVO.carbon,
+        nutritionInfoVO.protein,
         nutritionInfoVO.sodium,
         nutritionInfoVO.fiber,
         nutritionInfoVO.sugar,

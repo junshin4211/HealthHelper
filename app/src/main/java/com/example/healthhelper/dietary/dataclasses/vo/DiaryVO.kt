@@ -18,23 +18,23 @@ data class DiaryVO(
     var createTime: Time = Time(0),
 
     @SerializedName("totalFat")
-    var totalFat: Double = -1.0,
+    var totalFat: Double = 0.0,
 
     @SerializedName("totalCarbon")
-    var totalCarbon: Double = -1.0,
+    var totalCarbon: Double = 0.0,
 
     @SerializedName("totalFiber")
-    var totalFiber: Double = -1.0,
+    var totalFiber: Double = 0.0,
 
     @SerializedName("totalSugar")
-    var totalSugar: Double = -1.0,
+    var totalSugar: Double = 0.0,
 
     @SerializedName("totalSodium")
-    var totalSodium: Double = -1.0,
+    var totalSodium: Double = 0.0,
 
     @SerializedName("totalProtein")
-    var totalProtein: Double = -1.0,
+    var totalProtein: Double = 0.0,
 
     @SerializedName("totalCalories")
-    var totalCalories: Double = -1.0,
+    var totalCalories: Double = 0.0,
 )

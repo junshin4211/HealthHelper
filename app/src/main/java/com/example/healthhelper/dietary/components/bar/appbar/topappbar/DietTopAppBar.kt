@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.example.healthhelper.R
 import com.example.healthhelper.attr.viewmodel.DefaultColorViewModel
 import com.example.healthhelper.dietary.components.iconbutton.navigationicon.NavigateUpNavigationIcon
@@ -30,7 +29,7 @@ import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DietAppTopBar(
-    navController: NavHostController,
+    onClick: ()->Unit,
     diaryViewModel: DiaryViewModel = viewModel(),
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
@@ -46,7 +45,7 @@ fun DietAppTopBar(
         colors = DefaultColorViewModel.topAppBarColors,
         title = title,
         navigationIcon = {
-            NavigateUpNavigationIcon(navController)
+            NavigateUpNavigationIcon(onClick = onClick)
         },
 
         actions = {
