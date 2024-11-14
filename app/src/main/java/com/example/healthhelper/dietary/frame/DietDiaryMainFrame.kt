@@ -1,7 +1,7 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,13 +45,12 @@ import com.example.healthhelper.dietary.components.bar.appbar.topappbar.QueryTop
 import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
-import com.example.healthhelper.dietary.dataclasses.vo.FoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
+import com.example.healthhelper.dietary.interaction.database.LoadDiaryNutritionInfo
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
 import com.example.healthhelper.dietary.repository.NutritionInfoRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
-import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
@@ -63,7 +62,6 @@ fun DietDiaryMainFrame(
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
     diaryViewModel: DiaryViewModel = viewModel(),
-    foodViewModel: FoodViewModel = viewModel(),
     foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMainFrame"
@@ -78,29 +76,14 @@ fun DietDiaryMainFrame(
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel)
+    }
+
     LaunchedEffect(diaryVO) {
         NutritionInfoRepository.setNutritionInfo(diaryVO)
-        val newFoodItemVO = FoodItemVO(
-            diaryID = diaryVO.diaryID,
-            foodID = -1,
-            grams = -1.0,
-        )
-        val queriedFoodItems = foodItemViewModel.selectFoodItemByDiaryId(newFoodItemVO)
-        if (queriedFoodItems.isEmpty()) { // fetch data failed.
-            Toast.makeText(
-                context,
-                context.getString(R.string.fetch_food_item_failed),
-                Toast.LENGTH_LONG
-            ).show()
-            return@LaunchedEffect
-        }
-
-        // fetch data successfully
-        Toast.makeText(
-            context,
-            context.getString(R.string.fetch_food_item_successfully),
-            Toast.LENGTH_LONG
-        ).show()
+        Log.e(TAG,"In DietDiaryMainFrame function, LaunchedEffect(diaryVO) block was called. diaryVO:{$diaryVO}")
+        Log.e(TAG,"In DietDiaryMainFrame function, LaunchedEffect(diaryVO) block was called. nutritionInfo:{$nutritionInfo}")
     }
 
     Scaffold(

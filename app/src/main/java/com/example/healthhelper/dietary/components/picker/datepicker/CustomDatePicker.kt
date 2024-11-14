@@ -103,13 +103,13 @@ fun CustomDatePicker(
                 newDiaryVO.userID = diaryVO.userID
                 newDiaryVO.createDate = date
                 newDiaryVO.createTime = Time(0)
-                newDiaryVO.totalProtein = -1.0
-                newDiaryVO.totalCarbon = -1.0
-                newDiaryVO.totalFat = -1.0
-                newDiaryVO.totalSugar = -1.0
-                newDiaryVO.totalSodium = -1.0
-                newDiaryVO.totalFiber = -1.0
-                newDiaryVO.totalCalories = -1.0
+                newDiaryVO.totalProtein = 0.0
+                newDiaryVO.totalCarbon = 0.0
+                newDiaryVO.totalFat = 0.0
+                newDiaryVO.totalSugar = 0.0
+                newDiaryVO.totalSodium = 0.0
+                newDiaryVO.totalFiber = 0.0
+                newDiaryVO.totalCalories = 0.0
                 val affectedRows = diaryViewModel.insertDiary(newDiaryVO)
 
                 NutritionInfoRepository.setNutritionInfo(newDiaryVO)

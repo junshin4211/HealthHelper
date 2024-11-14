@@ -75,6 +75,7 @@ import com.example.healthhelper.dietary.dataclasses.vo.MealsOptionVO
 import com.example.healthhelper.dietary.dataclasses.vo.SelectedFoodItemVO
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.enumclass.MealCategoryEnum
+import com.example.healthhelper.dietary.interaction.database.LoadDiaryNutritionInfo
 import com.example.healthhelper.dietary.interaction.database.LoadFoodDescription
 import com.example.healthhelper.dietary.interaction.database.LoadFoodItemInfo
 import com.example.healthhelper.dietary.repository.DiaryDescriptionRepository
@@ -166,6 +167,10 @@ fun DietDiaryMealFrame(
     FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
     // load food items about this diaryId from database and try to set it into repo -- FoodItemRepository if one can.
     LoadFoodItemInfo(context)
+
+    LaunchedEffect(Unit) {
+        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel)
+    }
 
     Log.e(TAG,"In DietDiaryMealFrame function, foodItemVOs:${foodItemVOs}")
     Log.e(TAG,"In DietDiaryMealFrame function, selectedFoodItemsVOs:${selectedFoodItemsVOs}")
