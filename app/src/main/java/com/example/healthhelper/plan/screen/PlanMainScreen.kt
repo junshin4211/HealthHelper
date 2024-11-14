@@ -411,14 +411,14 @@ fun CreateBar(context: Context,navcontroller: NavHostController) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (index != 5) {
-                        Divider(
-                            color = colorResource(id = R.color.primarycolor),
-                            modifier = Modifier
-                                .height(40.dp)
-                                .width(2.dp)
-                        )
-                    }
+//                    if (index != 5) {
+//                        Divider(
+//                            color = colorResource(id = R.color.primarycolor),
+//                            modifier = Modifier
+//                                .height(40.dp)
+//                                .width(2.dp)
+//                        )
+//                    }
 
                     Tab(
                         selected = tabindex == index,

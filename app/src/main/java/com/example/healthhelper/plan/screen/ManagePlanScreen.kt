@@ -144,8 +144,10 @@ fun ManagePlan(
                     rightText = PlanPage.CompletedPlan.getPlanTitle(context)
                 )
 
+                val sortlist = remember(completePlanList){completePlanList.sortedBy { it.startDateTime }}
+                Log.d(tag,"into complete sortlist: $sortlist")
                 CustomList().ItemList(
-                    inputList = completePlanList,
+                    inputList = sortlist,
                     onItemClick = {
                         checkPlanVM.setSelectedPlan(it)
                         navcontroller.navigate(PlanPage.CheckPlan.name)

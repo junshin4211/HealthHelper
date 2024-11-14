@@ -87,33 +87,43 @@ fun CheckPlan(
     val tag = "tag_CheckPlan"
 
     //get selected plan
-    val selectedPlan by checkVM.selectedPlanState.collectAsState(initial = PlanModel())
-    val planSpecific by checkVM.planSpecificState.collectAsState(initial = PlanSpecificModel())
+    val selectedPlan by checkVM.selectedPlanState.collectAsState()
+    val planSpecific by checkVM.planSpecificState.collectAsState()
     val diaryRangeList by checkVM.diaryRangeListState.collectAsState(initial = emptyList())
 
     LaunchedEffect(Unit) {
         runCatching {
-            checkVM.getSpecificPlan()
         }.onFailure {
             Log.d(tag, "CheckPlan: ${it.message}")
         }
     }
-    checkVM.getDiaryList()
+    Log.d(tag, "selectedPlan: ${selectedPlan.userDietPlanId}")
+    checkVM.getSpecificPlan(selectedPlan.userDietPlanId)
+    if(planSpecific.startDateTime!= null && planSpecific.endDateTime != null) {
+        Log.d(tag, "finishState: ${planSpecific.finishState}")
+        checkVM.getDiaryList()
+    }
 
     val size = diaryRangeList.size
+    Log.d(tag, "size: $size")
     val totalNutrition = planUCImpl.calculateTotalNutrition(diaryRangeList)
 
-    if (diaryRangeList.isNotEmpty()) {
+    if (planSpecific.userDietPlanId!= null&&diaryRangeList.isNotEmpty()) {
         isdiary = true
+        Log.d(tag,"your userDietPlanId: ${planSpecific.userDietPlanId}")
+        var carbgram = 0.0f
+        var proteingram = 0.0f
+        var fatgram = 0.0f
+        planUCImpl.percentToGram("carb",planSpecific.Caloriesgoal,planSpecific.carbongoal, onSetGram = {carbgram = it})
+        planUCImpl.percentToGram("protein",planSpecific.Caloriesgoal,planSpecific.proteingoal, onSetGram = {proteingram = it})
+        planUCImpl.percentToGram("fat",planSpecific.Caloriesgoal,planSpecific.fatgoal, onSetGram = {fatgram = it})
         when (planSpecific.finishState) {
             0 -> {
                 var count = 0
                 diaryRangeList.forEach { diary ->
-                    Log.d(tag, "finishState 0 : ${totalNutrition.totalCarbon / size}")
-                    Log.d(tag, "finishState 0 : ${diary.totalCarbon}")
-                    if (totalNutrition.totalCarbon / size >= diary.totalCarbon
-                        || totalNutrition.totalProtein / size >= diary.totalProtein
-                        || totalNutrition.totalFat / size >= diary.totalFat
+                    if (diary.totalCarbon >= carbgram
+                        && diary.totalProtein >= proteingram
+                        && diary.totalFat >= fatgram
                     ) {
                         count++
                     }
@@ -124,19 +134,19 @@ fun CheckPlan(
             1 -> {
                 var count = 0
                 diaryRangeList.forEach { diary ->
-                    if (totalNutrition.totalCarbon / size >= diary.totalCarbon
-                        || totalNutrition.totalProtein / size >= diary.totalProtein
-                        || totalNutrition.totalFat / size >= diary.totalFat
+                    if (diary.totalCarbon >= carbgram
+                        || diary.totalProtein >= proteingram
+                        || diary.totalFat >= fatgram
                     ) {
                         count++
                     }
                 }
-                finishpercent = (count.toFloat() / size)
+                finishpercent = (count.toFloat() / size)*100
                 // 檢查條件
-                if (finishpercent >= 0.60f) {
+                if (finishpercent >= 60.0f) {
                     showfinish = true
                     scope.launch {
-                        checkVM.updatePlan(planSpecific.userDietPlanId, 2)
+                        checkVM.updatePlan(planSpecific.userDietPlanId!!, 2)
                     }
 
                 }
@@ -169,16 +179,16 @@ fun CheckPlan(
 
                 var count = 0
                 diaryRangeList.forEach { diary ->
-                    if (totalNutrition.totalCarbon / days >= diary.totalCarbon
-                        && totalNutrition.totalProtein / days >= diary.totalProtein
-                        && totalNutrition.totalFat / days >= diary.totalFat
+                    if (diary.totalCarbon >= carbgram
+                        && diary.totalProtein >= proteingram
+                        && diary.totalFat >= fatgram
                     ) {
                         count++
                     }
                 }
-                finishpercent = (count.toFloat() / days)
+                finishpercent = (count.toFloat() / size)*100
                 // 檢查條件
-                if (finishpercent >= 0.60f) {
+                if (finishpercent >= 60.0f) {
                     showfinish = true
                 }
                 Log.d(tag, "finishState 2 : $finishpercent")
@@ -235,7 +245,7 @@ fun CheckPlan(
         averagesugar = totalNutrition.totalSugar / size
         averagesodium = (totalNutrition.totalSodium / size) * 0.001f
     } else {
-        if (selectedIndex != -1) {
+        if (diaryRangeList.isNotEmpty() && selectedIndex in diaryRangeList.indices) {
             val element = diaryRangeList[selectedIndex]
             totalthree = element.totalCarbon + element.totalProtein + element.totalFat
             averagecalories = element.totalCalories

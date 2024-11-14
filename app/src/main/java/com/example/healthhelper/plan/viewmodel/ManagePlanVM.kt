@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -113,15 +114,25 @@ class ManagePlanVM : ViewModel() {
     fun getCompletePlanList() {
         viewModelScope.launch {
             try {
-                val completePlanList = fetchPlanData(currentuserId, 1)
-                val completeplanachive = fetchPlanData(currentuserId,2)
-                val combinelist = completePlanList + completeplanachive
-                var sortlist = combinelist.sortedBy { it.startDateTime }
-                repository.setCompletePlanList(sortlist)
-                Log.d(tag, "Fetched completePlanState: ${completePlanListState.value}")
+                // 使用 async 並行執行兩個 suspend 函數
+                val completePlanListDeferred = async { fetchPlanData(currentuserId, 1) }
+                val completePlanArchiveDeferred = async { fetchPlanData(currentuserId, 2) }
+
+                // 等待兩個 async 都完成後再繼續
+                val completePlanList = completePlanListDeferred.await()
+                val completePlanArchive = completePlanArchiveDeferred.await()
+
+                // 合併並排序列表
+                val combinedList = (completePlanList + completePlanArchive).sortedBy { it.startDateTime }
+
+                // 存儲排序後的列表
+                repository.setCompletePlanList(combinedList)
+
+                Log.d(tag, "Fetched completePlanState: ${combinedList.size} items")
             } catch (e: Exception) {
                 Log.e(tag, "Error fetching completePlanState: ${e.message}")
             }
         }
+
     }
 }
