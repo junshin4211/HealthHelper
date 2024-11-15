@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowOverflow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,11 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -35,8 +31,6 @@ import com.himanshoe.charty.common.ChartDataCollection
 import com.himanshoe.charty.common.config.ChartDefaults
 import com.himanshoe.charty.common.config.ChartyLabelTextConfig
 import com.himanshoe.charty.common.config.StartAngle
-import com.himanshoe.charty.common.toChartDataCollection
-import com.himanshoe.charty.pie.config.PieChartDefaults
 import com.himanshoe.charty.pie.model.PieData
 import java.util.Locale
 
@@ -128,7 +122,6 @@ fun CreatePieChart(
                             color = colorResource(R.color.black_300)
                         )
                     }
-
                 }
             }
         }

@@ -169,7 +169,7 @@ fun DietDiaryMealFrame(
     LoadFoodItemInfo(context)
 
     LaunchedEffect(Unit) {
-        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel)
+        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel,nutritionInfoViewModel)
     }
 
     Log.e(TAG,"In DietDiaryMealFrame function, foodItemVOs:${foodItemVOs}")

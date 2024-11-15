@@ -21,7 +21,7 @@ import com.example.healthhelper.dietary.dataclasses.vo.NutritionInfoVO
 import com.example.healthhelper.plan.ui.CreatePieChart
 import com.himanshoe.charty.common.toChartDataCollection
 import com.himanshoe.charty.pie.model.PieData
-import kotlin.math.round
+import java.util.Locale
 
 @Composable
 fun NutritionPieChart(
@@ -51,15 +51,15 @@ fun NutritionPieChart(
         horizontalAlignment = Alignment.End,
     ) {
         items(texts.size) { index ->
+            val total = data.sumOf { it.yValue.toDouble() }
             val entry = data[index]
-            val text = texts[index]
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
             ) {
                 Text(
-                    text = "${text}:${round(entry.yValue / data.size)}%",
-                    fontSize = 20.sp,
+                    text = "${String.format(Locale.US, "%.1f", entry.yValue/total *100 )}%",
+                    fontSize = 10.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Visible,
                 )

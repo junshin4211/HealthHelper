@@ -46,7 +46,6 @@ import com.example.healthhelper.dietary.components.button.MealButton
 import com.example.healthhelper.dietary.components.combo.NutritionInfoCombo
 import com.example.healthhelper.dietary.components.picker.datepicker.CustomDatePicker
 import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
-import com.example.healthhelper.dietary.interaction.database.LoadDiaryNutritionInfo
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
 import com.example.healthhelper.dietary.repository.NutritionInfoRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
@@ -76,9 +75,12 @@ fun DietDiaryMainFrame(
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
+    Log.e(TAG,"In DietDiaryMainFrame function, diaryVO.userID:${diaryVO.userID}")
+    /*
     LaunchedEffect(Unit) {
-        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel)
+        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel,nutritionInfoViewModel)
     }
+     */
 
     LaunchedEffect(diaryVO) {
         NutritionInfoRepository.setNutritionInfo(diaryVO)
@@ -120,9 +122,7 @@ fun DietDiaryMainFrame(
                         color = colorResource(R.color.primarycolor)
                     )
 
-                    CustomDatePicker(
-                        diaryViewModel = diaryViewModel,
-                    )
+                    CustomDatePicker()
 
                     Spacer(
                         modifier = Modifier
@@ -184,10 +184,10 @@ fun DietDiaryMainFrame(
                 }
             }
 
-            if (mealsButtonIsClicked) {
+            LaunchedEffect (mealsButtonIsClicked) {
+                if(!mealsButtonIsClicked) return@LaunchedEffect
                 MealsOptionRepository.setSelectedData(currentMealOption)
                 navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
-                mealsButtonIsClicked = false
             }
         })
 }
