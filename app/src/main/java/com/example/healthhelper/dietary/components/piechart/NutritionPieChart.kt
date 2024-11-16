@@ -24,6 +24,7 @@ import com.himanshoe.charty.pie.model.PieData
 import java.math.BigDecimal
 import java.math.MathContext
 import java.math.RoundingMode
+import java.util.Locale
 
 @Composable
 fun NutritionPieChart(
@@ -56,13 +57,13 @@ fun NutritionPieChart(
             val total = data.sumOf { it.yValue.toDouble() }
             val entry = data[index]
             val number = entry.yValue/total *100
+            val roundedNumber = BigDecimal(number, MathContext(3, RoundingMode.HALF_EVEN)).toDouble()
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
             ) {
                 Text(
-                    //text = "${String.format(Locale.US, "%.1f", entry.yValue/total *100 )}%"
-                    text = "${BigDecimal(number, MathContext(4, RoundingMode.HALF_DOWN)).toDouble()}%",
+                    text = "${String.format(Locale.US,"%.1f",roundedNumber)}%",
                     fontSize = 16.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Visible,
