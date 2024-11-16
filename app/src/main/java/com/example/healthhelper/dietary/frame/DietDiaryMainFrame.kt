@@ -1,7 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,6 @@ import com.example.healthhelper.dietary.enumclass.DietDiaryScreenEnum
 import com.example.healthhelper.dietary.repository.MealsOptionRepository
 import com.example.healthhelper.dietary.repository.NutritionInfoRepository
 import com.example.healthhelper.dietary.viewmodel.DiaryViewModel
-import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.NutritionInfoViewModel
 
@@ -61,7 +59,6 @@ fun DietDiaryMainFrame(
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
     diaryViewModel: DiaryViewModel = viewModel(),
-    foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
     val TAG = "tag_DietDiaryMainFrame"
 
@@ -75,17 +72,8 @@ fun DietDiaryMainFrame(
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
-    Log.e(TAG,"In DietDiaryMainFrame function, diaryVO.userID:${diaryVO.userID}")
-    /*
-    LaunchedEffect(Unit) {
-        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel,nutritionInfoViewModel)
-    }
-     */
-
     LaunchedEffect(diaryVO) {
         NutritionInfoRepository.setNutritionInfo(diaryVO)
-        Log.e(TAG,"In DietDiaryMainFrame function, LaunchedEffect(diaryVO) block was called. diaryVO:{$diaryVO}")
-        Log.e(TAG,"In DietDiaryMainFrame function, LaunchedEffect(diaryVO) block was called. nutritionInfo:{$nutritionInfo}")
     }
 
     Scaffold(

@@ -1,6 +1,5 @@
 package com.example.healthhelper.dietary.components.picker.datepicker
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,8 +61,6 @@ fun CustomDatePicker(
     val diaryVO by diaryViewModel.data.collectAsState()
     val nutritionInfoVO by nutritionInfoViewModel.data.collectAsState()
 
-    Log.e(TAG,"In CustomDatePicker function, diaryVO.userID:${diaryVO.userID}")
-
     val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
         selectableDates = object : SelectableDates {
@@ -78,7 +75,6 @@ fun CustomDatePicker(
 
     LaunchedEffect(Unit) {
         val currentTimeMillis = System.currentTimeMillis()
-        Log.e(TAG, "currentTimeMillis:${currentTimeMillis}")
         datePickerState.selectedDateMillis = currentTimeMillis
     }
     var selectedDateMillis by remember { mutableStateOf(datePickerState.selectedDateMillis) }
@@ -89,11 +85,8 @@ fun CustomDatePicker(
             .format(DateTimeFormatter.ofPattern(DateFormatterPattern.pattern))
     } ?: stringResource(R.string.noChoose)
 
-    Log.e(TAG,"In CustomDatePicker function. nutritionInfoVO:${nutritionInfoVO}")
-
     LaunchedEffect(selectedDate) {
         if (selectedDate != context.getString(R.string.noChoose)) {
-
             // get date by formatting the given String.
             val date = Date.valueOf(selectedDate)
 
@@ -103,13 +96,7 @@ fun CustomDatePicker(
             // set data of repo so that its corresponding view model can access it.
             DiaryRepository.setCreateDate(selectedDateVO.selectedDate.value)
 
-            Log.e(TAG,"In CustomDatePicker function. LaunchedEffect(selectedDate) block was called. diaryVO:${diaryVO}")
-
             val queriedDiaryVOs = diaryViewModel.selectDiaryByUserIdAndDate(diaryVO)
-
-            Log.e(TAG,"#".repeat(50))
-            Log.e(TAG,"In CustomDatePicker function, before LaunchedEffect(selectedDate) call, nutritionInfoVO:${nutritionInfoVO}")
-            Log.e(TAG,"#".repeat(50))
 
             if (queriedDiaryVOs.isEmpty()) {
                 val newDiaryVO = DiaryVO()
@@ -125,16 +112,11 @@ fun CustomDatePicker(
                 newDiaryVO.totalCalories = 0.0
                 val affectedRows = diaryViewModel.insertDiary(newDiaryVO)
 
-                Log.e(TAG,"In CustomDatePicker function. LaunchedEffect(selectedDate) block was called. newDiaryVO:${newDiaryVO}")
-
                 NutritionInfoRepository.setNutritionInfo(newDiaryVO)
-
                 FoodItemRepository.setSelectedDiaryId(newDiaryVO.diaryID)
-
                 return@LaunchedEffect
             }
 
-            Log.e(TAG,"In CustomDatePicker function. LaunchedEffect(selectedDate) block was called. queriedDiaryVOs[0]:${queriedDiaryVOs[0]}")
             NutritionInfoRepository.setNutritionInfo(queriedDiaryVOs[0])
 
             // fetch data successfully.
@@ -149,10 +131,6 @@ fun CustomDatePicker(
         }
     }
 
-    Log.e(TAG,"#".repeat(50))
-    Log.e(TAG,"In CustomDatePicker function, after LaunchedEffect(selectedDate) call, nutritionInfoVO:${nutritionInfoVO}")
-    Log.e(TAG,"#".repeat(50))
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,7 +138,6 @@ fun CustomDatePicker(
         shape = RoundedCornerShape(15.dp),
     ) {
         DatePicker(
-
             state = datePickerState,
             showModeToggle = false,
             title = null,
