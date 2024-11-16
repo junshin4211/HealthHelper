@@ -35,12 +35,8 @@ suspend fun sendHttpRequest(
 ): String {
     val TAG = "tag_sendHttpRequest"
 
-    Log.e(TAG,"-".repeat(50))
-    Log.e(TAG,"sendHttpRequest function was called.")
-
     var dataIn = ""
     withContext(Dispatchers.IO) {
-        Log.e(TAG,"In withContext(Dispatchers.IO)")
         (URL(url).openConnection() as? HttpURLConnection)?.run {
             Log.e(TAG, "openConnection(),URL(url):${URL(url)}")
             doInput = true
@@ -62,8 +58,6 @@ suspend fun sendHttpRequest(
             }
         }
     }
-    Log.e(TAG,"sendHttpRequest function was finished called.")
-    Log.e(TAG,"-".repeat(50))
     return dataIn
 }
 

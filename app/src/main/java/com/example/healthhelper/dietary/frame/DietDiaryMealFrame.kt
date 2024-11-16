@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -165,6 +166,7 @@ fun DietDiaryMealFrame(
 
     // set the data in repo so that its corresponding view model can access it.
     FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
+
     // load food items about this diaryId from database and try to set it into repo -- FoodItemRepository if one can.
     LoadFoodItemInfo(context)
 
@@ -172,8 +174,6 @@ fun DietDiaryMealFrame(
         LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel,nutritionInfoViewModel)
     }
 
-    Log.e(TAG,"In DietDiaryMealFrame function, foodItemVOs:${foodItemVOs}")
-    Log.e(TAG,"In DietDiaryMealFrame function, selectedFoodItemsVOs:${selectedFoodItemsVOs}")
     availableFoodItems =
         if (selectedFoodItemsVOs.isNotEmpty()) {
             selectedFoodItemsVOs.filter {
@@ -273,8 +273,7 @@ fun DietDiaryMealFrame(
         ) {
             Column(
                 modifier = Modifier
-                    .weight(0.05f)
-                    .verticalScroll(verticalScrollState)
+                    .fillMaxSize(),
             ) {
                 HorizontalDivider(
                     modifier = Modifier.padding(bottom = 10.dp),
@@ -291,14 +290,14 @@ fun DietDiaryMealFrame(
                 )
 
                 Column(
-                    modifier = Modifier
-                        .weight(0.95f)
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Column(
                         modifier = Modifier
-                            .weight(0.7f),
+                            .fillMaxWidth()
+                            .height(800.dp)
+                            .verticalScroll(rememberScrollState()),
                     ) {
                         checkedFoodItems.forEach { foodItem ->
                             Box(
@@ -326,7 +325,6 @@ fun DietDiaryMealFrame(
                                             verticalArrangement = Arrangement.Center,
                                             modifier = Modifier
                                                 .fillMaxSize()
-                                                .weight(weight = 1f),
                                         ) {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
@@ -386,12 +384,11 @@ fun DietDiaryMealFrame(
                         }
                         Column(
                             modifier = Modifier
-                                .weight(0.3f),
+                                .fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth()
                                     .padding(0.dp, 16.dp),
                                 horizontalArrangement = Arrangement.Center,
                             ) {
@@ -441,8 +438,7 @@ fun DietDiaryMealFrame(
                             }
                             Column(
                                 modifier = Modifier
-                                    .padding(16.dp)
-                                    .verticalScroll(verticalScrollState),
+                                    .padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Top,
                             ) {
@@ -459,8 +455,6 @@ fun DietDiaryMealFrame(
                                         )
                                     }
                                 )
-
-                                Spacer(modifier = Modifier.height(10.dp))
 
                                 SaveButton(
                                     onClick = {
@@ -568,4 +562,12 @@ fun getMealCategoryId(
         return 0
     }
     return index + 1
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DietDiaryMealFramePreview(){
+    MaterialTheme{
+        DietDiaryMealFrame()
+    }
 }

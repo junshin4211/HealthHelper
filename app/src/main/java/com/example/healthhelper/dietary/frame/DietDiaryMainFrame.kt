@@ -1,7 +1,6 @@
 package com.example.healthhelper.dietary.frame
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -75,12 +74,8 @@ fun DietDiaryMainFrame(
 
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
-    Log.e(TAG,"In DietDiaryMainFrame function, diaryVO.userID:${diaryVO.userID}")
-
     LaunchedEffect(diaryVO) {
         NutritionInfoRepository.setNutritionInfo(diaryVO)
-        Log.e(TAG,"In DietDiaryMainFrame function, LaunchedEffect(diaryVO) block was called. diaryVO:{$diaryVO}")
-        Log.e(TAG,"In DietDiaryMainFrame function, LaunchedEffect(diaryVO) block was called. nutritionInfo:{$nutritionInfo}")
     }
 
     Scaffold(
@@ -182,7 +177,6 @@ fun DietDiaryMainFrame(
             LaunchedEffect (mealsButtonIsClicked) {
                 if(!mealsButtonIsClicked) return@LaunchedEffect
                 MealsOptionRepository.setSelectedData(currentMealOption)
-
                 navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
             }
         })

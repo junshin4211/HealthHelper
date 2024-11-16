@@ -21,7 +21,9 @@ import com.example.healthhelper.dietary.dataclasses.vo.NutritionInfoVO
 import com.example.healthhelper.plan.ui.CreatePieChart
 import com.himanshoe.charty.common.toChartDataCollection
 import com.himanshoe.charty.pie.model.PieData
-import java.util.Locale
+import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 
 @Composable
 fun NutritionPieChart(
@@ -53,13 +55,15 @@ fun NutritionPieChart(
         items(texts.size) { index ->
             val total = data.sumOf { it.yValue.toDouble() }
             val entry = data[index]
+            val number = entry.yValue/total *100
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
             ) {
                 Text(
-                    text = "${String.format(Locale.US, "%.1f", entry.yValue/total *100 )}%",
-                    fontSize = 10.sp,
+                    //text = "${String.format(Locale.US, "%.1f", entry.yValue/total *100 )}%"
+                    text = "${BigDecimal(number, MathContext(4, RoundingMode.HALF_DOWN)).toDouble()}%",
+                    fontSize = 16.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Visible,
                 )

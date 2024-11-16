@@ -133,7 +133,7 @@ object NutritionInfoRepository {
 
     fun isValidNutritionInfo(nutritionInfoVO: NutritionInfoVO): Boolean {
         Log.e(TAG,"In NutritionInfoRepository object, isValidNutritionInfo function. nutritionInfoVO:${nutritionInfoVO}")
-        val retValue = ( nutritionInfoVO.fat.value.amount.value > 0 &&
+        val retValue = ( nutritionInfoVO.fat.value.amount.value > 0 ||
                 nutritionInfoVO.carbon.value.amount.value > 0 ||
                 nutritionInfoVO.protein.value.amount.value > 0 ||
                 nutritionInfoVO.fiber.value.amount.value > 0 ||
