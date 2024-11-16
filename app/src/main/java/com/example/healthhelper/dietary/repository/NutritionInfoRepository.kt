@@ -73,23 +73,6 @@ object NutritionInfoRepository {
         )
     }
 
-    /*
-    fun setNutritionInfo(
-        foodDiaryVO: DiaryVO,
-    ) {
-
-        _dataFlow.value.fat.value.amount.value = foodDiaryVO.totalFat
-        _dataFlow.value.carbon.value.amount.value = foodDiaryVO.totalCarbon
-        _dataFlow.value.protein.value.amount.value = foodDiaryVO.totalProtein
-        _dataFlow.value.fiber.value.amount.value = foodDiaryVO.totalProtein
-        _dataFlow.value.sugar.value.amount.value = foodDiaryVO.totalSugar
-        _dataFlow.value.sodium.value.amount.value = foodDiaryVO.totalSodium
-        _dataFlow.value.calories.value.amount.value = foodDiaryVO.totalCalories
-
-    }
-
-     */
-
     fun setNutritionInfo(
         foodDiaryVO: DiaryVO,
     ){
@@ -151,11 +134,11 @@ object NutritionInfoRepository {
     fun isValidNutritionInfo(nutritionInfoVO: NutritionInfoVO): Boolean {
         Log.e(TAG,"In NutritionInfoRepository object, isValidNutritionInfo function. nutritionInfoVO:${nutritionInfoVO}")
         val retValue = ( nutritionInfoVO.fat.value.amount.value > 0 &&
-                nutritionInfoVO.carbon.value.amount.value > 0 &&
-                nutritionInfoVO.protein.value.amount.value > 0 &&
-                nutritionInfoVO.fiber.value.amount.value > 0 &&
-                nutritionInfoVO.sugar.value.amount.value > 0 &&
-                nutritionInfoVO.sodium.value.amount.value > 0 &&
+                nutritionInfoVO.carbon.value.amount.value > 0 ||
+                nutritionInfoVO.protein.value.amount.value > 0 ||
+                nutritionInfoVO.fiber.value.amount.value > 0 ||
+                nutritionInfoVO.sugar.value.amount.value > 0 ||
+                nutritionInfoVO.sodium.value.amount.value > 0 ||
                 nutritionInfoVO.calories.value.amount.value > 0 )
         return retValue
     }

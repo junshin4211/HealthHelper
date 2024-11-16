@@ -249,8 +249,14 @@ fun DietDiaryMealFrame(
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        diaryViewModel.viewModelScope.launch {
+            diaryViewModel.updateDiaryInfo(diaryVO)
+        }
+
         navController.navigate(DietDiaryScreenEnum.DietDiaryMainFrame.name)
     }
+
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         DietAppTopBar(

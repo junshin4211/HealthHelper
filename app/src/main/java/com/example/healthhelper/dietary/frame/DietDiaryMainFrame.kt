@@ -76,11 +76,6 @@ fun DietDiaryMainFrame(
     var mealsButtonIsClicked by remember { mutableStateOf(false) }
 
     Log.e(TAG,"In DietDiaryMainFrame function, diaryVO.userID:${diaryVO.userID}")
-    /*
-    LaunchedEffect(Unit) {
-        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel,nutritionInfoViewModel)
-    }
-     */
 
     LaunchedEffect(diaryVO) {
         NutritionInfoRepository.setNutritionInfo(diaryVO)
@@ -187,6 +182,7 @@ fun DietDiaryMainFrame(
             LaunchedEffect (mealsButtonIsClicked) {
                 if(!mealsButtonIsClicked) return@LaunchedEffect
                 MealsOptionRepository.setSelectedData(currentMealOption)
+
                 navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
             }
         })

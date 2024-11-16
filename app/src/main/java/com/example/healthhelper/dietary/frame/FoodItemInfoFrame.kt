@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.healthhelper.R
@@ -59,6 +61,7 @@ import com.example.healthhelper.dietary.viewmodel.FoodItemViewModel
 import com.example.healthhelper.dietary.viewmodel.FoodViewModel
 import com.example.healthhelper.dietary.viewmodel.MealsOptionViewModel
 import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +78,7 @@ fun FoodItemInfoFrame(
     val context = LocalContext.current
 
     val mealOptions by mealOptionViewModel.data.collectAsState()
+    val diaryVO by diaryViewModel.data.collectAsState()
     val foodItemVO by foodItemViewModel.selectedData.collectAsState()
 
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()
@@ -304,7 +308,20 @@ fun FoodItemInfoFrame(
         FoodItemRepository.setSelectedMealCategoryId(currentMealCategoryId)
         foodItemViewModel.updateFoodItemByDiaryIdAndFoodId(foodItemVO = foodItemVO,diaryViewModel = diaryViewModel)
         Toast.makeText(context, context.getString(R.string.save_data_successfully), Toast.LENGTH_LONG).show()
+
+        diaryViewModel.viewModelScope.launch {
+            diaryViewModel.updateDiaryInfo(diaryVO)
+        }
+
        navController.navigate(DietDiaryScreenEnum.DietDiaryMealFrame.name)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            diaryViewModel.viewModelScope.launch {
+                diaryViewModel.updateDiaryInfo(diaryVO)
+            }
+        }
     }
 }
 
