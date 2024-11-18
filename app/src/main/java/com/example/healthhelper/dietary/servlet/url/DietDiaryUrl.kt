@@ -16,8 +16,11 @@ object DietDiaryUrl {
     val selectDiaryDescriptionUrl: String
         get() = "${serverUrl}/dietDiary/diaryDescription/select/selectDiaryDescriptionByDiaryId"
 
-    val updateDiaryInfoUrl: String
-        get() = "${serverUrl}/dietDiary/diary/update/updateDietDiary"
+    val updateDiaryInfoByDiaryIdUrl: String
+        get() = "${serverUrl}/dietDiary/diary/update/byDiaryId"
+
+    val updateDiaryInfoByDiaryIdAndMealCategoryIdUrl: String
+        get() = "${serverUrl}/dietDiary/diary/update/byDiaryIdAndMealCategoryId"
 
     val updateFoodItemByDiaryIdAndFoodId: String
         get() = "${serverUrl}/dietDiary/foodItem/update/updateFoodItemByDiaryIdAndFoodId"

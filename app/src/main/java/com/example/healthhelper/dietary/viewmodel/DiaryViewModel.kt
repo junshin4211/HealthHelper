@@ -49,7 +49,7 @@ class DiaryViewModel: ViewModel() {
     suspend fun updateDiaryInfo(
         diaryVO: DiaryVO,
     ):Int{
-        val url = DietDiaryUrl.updateDiaryInfoUrl
+        val url = DietDiaryUrl.updateDiaryInfoByDiaryIdUrl
         return try {
             val gson = GsonForSqlDateAndSqlTime.gson
             val dataOut = gson.toJson(diaryVO)
