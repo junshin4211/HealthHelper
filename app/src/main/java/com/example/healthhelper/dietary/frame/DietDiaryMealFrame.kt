@@ -171,7 +171,7 @@ fun DietDiaryMealFrame(
     LoadFoodItemInfo(context)
 
     LaunchedEffect(Unit) {
-        LoadDiaryNutritionInfo(context,diaryVO, diaryViewModel,nutritionInfoViewModel)
+        LoadDiaryNutritionInfo(context, diaryVO, diaryViewModel, nutritionInfoViewModel)
     }
 
     availableFoodItems =
@@ -204,7 +204,8 @@ fun DietDiaryMealFrame(
             newFoodVO.foodID = foodId
             val foodName = foodViewModel.selectFoodNameByFoodId(newFoodVO)
             availableFoodItems.firstOrNull { it.name.value == foodName }?.grams?.value = grams
-            availableFoodItems.firstOrNull { it.name.value == foodName }?.isCheckedWhenSelection?.value = true
+            availableFoodItems.firstOrNull { it.name.value == foodName }?.isCheckedWhenSelection?.value =
+                true
             availableFoodItems.firstOrNull { it.name.value == foodName }?.meal?.value =
                 when (mealCategoryId) {
                     1 -> context.getString(MealCategoryEnum.BREAKFAST.title)
@@ -233,7 +234,10 @@ fun DietDiaryMealFrame(
                     mealCategoryID = currentMealCategoryId,
                     grams = grams,
                 )
-                foodItemViewModel.tryToInsertFoodItem(foodItemVO = newFoodItemVO,diaryViewModel = diaryViewModel)
+                foodItemViewModel.tryToInsertFoodItem(
+                    foodItemVO = newFoodItemVO,
+                    diaryViewModel = diaryViewModel
+                )
             }
         }
         // save data to database about diarydescription table.
@@ -323,10 +327,9 @@ fun DietDiaryMealFrame(
                                     ) {
                                         Column(
                                             verticalArrangement = Arrangement.Center,
-                                            modifier = Modifier
-                                                .fillMaxSize()
                                         ) {
                                             Row(
+                                                modifier = Modifier.width(300.dp),
                                                 verticalAlignment = Alignment.CenterVertically,
                                             ) {
                                                 MyCheckBox(
@@ -354,15 +357,16 @@ fun DietDiaryMealFrame(
                                                 10.dp, Alignment.Start
                                             )
                                         ) {
-                                            IconButton(onClick = {
-                                                SelectedFoodItemsRepository.setSelectedData(foodItem)
-                                                clickedFoodItemVO = foodItem
-                                                iconButtonIsClicked = true
-                                            }) {
+                                            IconButton(
+                                                onClick = {
+                                                    SelectedFoodItemsRepository.setSelectedData(foodItem)
+                                                    clickedFoodItemVO = foodItem
+                                                    iconButtonIsClicked = true
+                                                },
+                                            ) {
                                                 Icon(
                                                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                                     contentDescription = "arrow_right",
-                                                    tint = colorResource(R.color.primarycolor)
                                                 )
                                             }
                                         }
@@ -566,8 +570,8 @@ fun getMealCategoryId(
 
 @Preview(showBackground = true)
 @Composable
-fun DietDiaryMealFramePreview(){
-    MaterialTheme{
+fun DietDiaryMealFramePreview() {
+    MaterialTheme {
         DietDiaryMealFrame()
     }
 }
