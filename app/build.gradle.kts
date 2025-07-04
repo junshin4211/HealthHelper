@@ -30,11 +30,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11 // <-- 修改這裡
+        targetCompatibility = JavaVersion.VERSION_11 // <-- 修改這裡
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11" // <-- 修改這裡，確保與上面一致
     }
     buildFeatures {
         compose = true

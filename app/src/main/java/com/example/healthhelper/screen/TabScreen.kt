@@ -45,6 +45,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
 import com.example.healthhelper.dietary.screen.DietDiaryMainScreen
+import com.example.healthhelper.plan.screen.PlanMain
+import com.example.healthhelper.planpage.navigation.PlanNav
 import com.example.healthhelper.signuplogin.User
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -73,7 +75,8 @@ fun Main(tabViewModel: TabViewModel = viewModel(), onLogout: () -> Unit) {
                 0 -> MainPersonScreen(onLogout = onLogout)
                 1 -> CmtController()
                 2 -> { DietDiaryMainScreen() }
-                3 -> Plan()
+                3 -> PlanNav()
+                //3 -> Plan()
                 4 -> RequestAccessLocationPermission(onGrant = {
                     MainMapSearchScreen()
                 })
