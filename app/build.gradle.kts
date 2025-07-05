@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -51,6 +52,15 @@ android {
 }
 
 dependencies {
+
+    // Retrofit & OkHttp
+    implementation("com.squareup.retrofit2:retrofit:2.9.0") // 範例版本，請更新
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")    // 範例版本，請更新
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0") // 範例版本，請更新
+
+    // Kotlinx Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3") // 範例版本，請更新
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0") // 範例版本，請更
 
     implementation ("androidx.navigation:navigation-compose:2.7.5")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
