@@ -1,7 +1,9 @@
 package com.example.healthhelper.planpage.data.model
 
 import com.example.healthhelper.plan.model.DiaryNutritionModel
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DiaryNutritionModel(
     val diaryId: Int,
     val userId: Int,

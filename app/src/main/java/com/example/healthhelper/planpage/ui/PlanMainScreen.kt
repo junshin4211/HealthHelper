@@ -1,18 +1,23 @@
 package com.example.healthhelper.planpage.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,35 +29,76 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+import com.example.healthhelper.planpage.data.Result
+import com.example.healthhelper.planpage.data.model.PlanModel
+import com.example.healthhelper.planpage.domain.usecase.filterAndSortPlan
+import com.example.healthhelper.planpage.domain.usecase.transformDate
+import com.example.healthhelper.planpage.ui.components.LoadingIndicator
+import com.example.healthhelper.planpage.ui.viewmodel.PlanMainViewModel
+import com.example.healthhelper.planpage.ui.viewmodel.PlanViewModelFactory
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
+
 
 @Composable
 fun PlanMain(
     navController: NavHostController = rememberNavController(),
-    tabViewModel: TabViewModel = viewModel()
+    tabViewModel: TabViewModel = viewModel(),
+    planMainViewModel: PlanMainViewModel = viewModel(factory = PlanViewModelFactory())
 ) {
-    HealthHelperTheme{
+    HealthHelperTheme {
         Scaffold(
             topBar = { PlanTopBar() }
         ) { paddingValues ->
-            PlanContent(
-                modifier = Modifier.padding(paddingValues),
-                navController = navController,
-                tabViewModel = tabViewModel
-            )
+
+            val planState by planMainViewModel.planMainState.collectAsStateWithLifecycle()
+
+            //判斷是否取得資料
+            when (val state = planState) {
+                is Result.Loading -> {
+                    LoadingIndicator()
+                }
+
+                is Result.Success -> {
+                    val planList = state.data
+                    PlanContent(
+                        modifier = Modifier.padding(paddingValues),
+                        navController = navController,
+                        tabViewModel = tabViewModel,
+                        planList = planList
+                    )
+                }
+
+                is Result.Error -> {
+                    Log.d("PlanMain", "Error: ${state.message}")
+                    ErrorDisplay(message = state.message ?: "Unknown error")
+                }
+            }
+
         }
     }
+}
+
+
+@Composable
+fun ErrorDisplay(message: String) {
+    Text("Error: $message", color = MaterialTheme.colorScheme.error)
 }
 
 @Composable
 fun PlanContent(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    tabViewModel: TabViewModel
+    tabViewModel: TabViewModel,
+    planList: List<PlanModel>
 ) {
+    var planImage by remember { mutableIntStateOf(R.drawable.customimg) }
+    var planName by remember { mutableStateOf("") }
+    var planDate by remember { mutableStateOf("") }
+
     //setting bottom bar visibility
     tabViewModel.setTabVisibility(true)
 
@@ -64,12 +110,32 @@ fun PlanContent(
         DietFilterBar()
         HorizontalDivider(thickness = 2.dp)
         PlanSection(title = "我的計畫") {
-            MyPlanCard()
+            PlanCard(
+                planList = planList,
+                imageDisplay = planImage,
+                nameDisplay = planName,
+                dateDisplay = planDate,
+                isFinish = false,
+                onSetPlan = { image, name, date ->
+                    planImage = image
+                    planName = name
+                    planDate = date
+                })
         }
         Spacer(modifier = Modifier.height(16.dp))
         HorizontalDivider(thickness = 2.dp)
         PlanSection(title = "已完成") {
-            CompletedPlanCard()
+            PlanCard(
+                planList = planList,
+                imageDisplay = planImage,
+                nameDisplay = planName,
+                dateDisplay = planDate,
+                isFinish = true,
+                onSetPlan = { image, name, date ->
+                    planImage = image
+                    planName = name
+                    planDate = date
+                })
         }
     }
 }
@@ -145,7 +211,33 @@ fun PlanSection(title: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-fun MyPlanCard() {
+fun PlanCard(
+    planList: List<PlanModel> = emptyList(),
+    isFinish: Boolean,
+    imageDisplay: Int,
+    nameDisplay: String,
+    dateDisplay: String,
+    onSetPlan: (image: Int, name: String, date: String) -> Unit,
+) {
+    LaunchedEffect(planList) {
+        Log.d("PlanMain", "LaunchedEffect triggered due to planList change.")
+        if (planList.isEmpty()) {
+            onSetPlan(R.drawable.customimg, "尚無任何無計畫", "")
+        } else {
+            val firstPlan = filterAndSortPlan(planList,isFinish).first()
+            val startDate = try { transformDate(firstPlan.startDateTime) } catch (e: Exception) { "錯誤日期" }
+            val endDate = try { transformDate(firstPlan.endDateTime) } catch (e: Exception) { "錯誤日期" }
+            val imageRes = when (firstPlan.categoryId) {
+                1 -> R.drawable.highproteinimg
+                2 -> R.drawable.lowcarbimg
+                3 -> R.drawable.ketoneimg
+                4 -> R.drawable.mediterraimg
+                else -> R.drawable.customimg
+            }
+            onSetPlan(imageRes, "${firstPlan.categoryName}計畫", "$startDate ~ $endDate")
+        }
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -155,8 +247,8 @@ fun MyPlanCard() {
         Column {
             Box {
                 Image(
-                    painter = painterResource(id = R.drawable.highproteinimg),
-                    contentDescription = "高蛋白飲食",
+                    painter = painterResource(id = imageDisplay),
+                    contentDescription = "我的計畫圖片",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(180.dp),
@@ -179,56 +271,16 @@ fun MyPlanCard() {
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "高蛋白飲食",
-                    color = MaterialTheme.colorScheme.secondary, // 使用主題次要顏色
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "more...",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CompletedPlanCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column {
-            Image(
-                painter = painterResource(id = R.drawable.lowcarbimg),
-                contentDescription = "低碳水計畫",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                contentScale = ContentScale.Crop
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "低碳水計畫",
-                        color = MaterialTheme.colorScheme.secondary,
+                        text = nameDisplay,
+                        color = MaterialTheme.colorScheme.secondary, // 使用主題次要顏色
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "2024/8/1~2024/8/31",
+                        text = dateDisplay,
                         color = MaterialTheme.colorScheme.secondary,
                         fontSize = 12.sp
                     )
@@ -242,7 +294,6 @@ fun CompletedPlanCard() {
         }
     }
 }
-
 
 @Preview(showBackground = true, device = "id:pixel_5")
 @Composable

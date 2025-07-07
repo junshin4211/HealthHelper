@@ -1,15 +1,16 @@
 package com.example.healthhelper.planpage.data.model
 
-import com.example.healthhelper.plan.model.DiaryNutritionModel
 import com.example.healthhelper.plan.model.PlanSpecificModel
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PlanModel(
     val userDietPlanId: Int,
     val startDateTime: String,
     val endDateTime: String,
     val categoryId: Int,
     val categoryName: String,
-    val finishState: Int,
+    val finishstate: Int,
     val fatgoal: Float,
     val carbongoal: Float,
     val proteingoal: Float,
