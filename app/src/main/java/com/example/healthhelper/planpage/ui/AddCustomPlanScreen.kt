@@ -1,12 +1,18 @@
 package com.example.healthhelper.planpage.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,43 +21,47 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.healthhelper.ui.theme.HealthHelperTheme
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.ui.res.stringResource
-import com.example.healthhelper.R
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.healthhelper.planpage.ui.components.DonutChart
-
-// 圖表數據模型
-data class ChartData(val value: Float, val color: Color)
-
-// 圖表旁的圖例數據模型
-data class MacroInfo(val name: String, val grams: Int, val color: Color)
+import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 
 @Composable
-fun AddPlan(
-    navController: NavHostController = rememberNavController(),
-    @StringRes title: Int
+fun AddCustomPlan(
+    navController: NavHostController = rememberNavController()
 ) {
-    val appBarTitle by remember { mutableStateOf(title) }
     HealthHelperTheme {
         Scaffold(
             topBar = {
-                DietSettingsTopBar(onBackClick = { navController.navigateUp() }, title = appBarTitle)
+                DietSettingsTopBar(onBackClick = { /* TODO: 處理返回事件 */ })
             },
             // 使用我們 Theme 中定義的背景色
             containerColor = MaterialTheme.colorScheme.background
@@ -65,11 +75,11 @@ fun AddPlan(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DietSettingsTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
+private fun DietSettingsTopBar(onBackClick: () -> Unit) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(title)+"飲食計畫",
+                "自訂計畫",
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -352,11 +362,4 @@ private fun MacroDetailItem(
             }
         }
     }
-}
-
-
-@Preview(showBackground = true, device = "id:pixel_6")
-@Composable
-fun AddPlanPreview() {
-    AddPlan(title = R.string.add_plan_default_title)
 }
