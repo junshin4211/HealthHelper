@@ -31,9 +31,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
+import com.example.healthhelper.plan.DateRange
+import com.example.healthhelper.planpage.domain.usecase.formatMillisToDateString
+import com.example.healthhelper.planpage.ui.components.CreateDropDownMenu
+import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
 import com.example.healthhelper.planpage.ui.components.DonutChart
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter.ofLocalizedDate
+import java.time.format.FormatStyle
 
 // 圖表數據模型
 data class ChartData(val value: Float, val color: Color)
@@ -101,14 +112,50 @@ private fun DietSettingsContent(modifier: Modifier = Modifier) {
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val defaultChooseText = stringResource(R.string.noChoose)
+
+        var selectedStartDate by remember { mutableStateOf("") }
+        var selectedEndDate by remember { mutableStateOf("") }
+
+        // 新增狀態來保存選中的日期毫Số (Long?)，用於傳遞回 DateRangePickerDialog
+        var savedSelectedStartDateMillis by remember { mutableStateOf<Long?>(null) }
+        var savedSelectedEndDateMillis by remember { mutableStateOf<Long?>(null) }
+
+        var showDateRangePicker by remember { mutableStateOf(false) }
+
         // 設定週期
-        SectionTitle(title = "設定你的週期", modifier = Modifier.align(Alignment.Start))
+        SectionTitle(title = stringResource(R.string.set_plan_time_title), modifier = Modifier.align(Alignment.Start))
         Spacer(modifier = Modifier.height(8.dp))
         PeriodDropdown()
+
+        if (showDateRangePicker){
+            DateRangePickerDialog(
+                initialSelectedStartDateMillis = savedSelectedStartDateMillis,
+                initialSelectedEndDateMillis = savedSelectedEndDateMillis,
+                onConfirm ={ pair ->
+                    savedSelectedStartDateMillis = pair.first
+                    savedSelectedEndDateMillis = pair.second
+
+                    selectedStartDate = pair.first?.let {
+                        formatMillisToDateString(it)
+                    } ?: defaultChooseText
+                    selectedEndDate = pair.second?.let {
+                        formatMillisToDateString(it)
+                    } ?: defaultChooseText
+                    showDateRangePicker = false
+                },
+                onDismiss = {
+                    showDateRangePicker = false
+                })
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
-        DateSelector(label = "開始日期", date = "2024/10/08") { /* TODO: 開啟日期選擇器 */ }
+        // 或自行設定日期範圍
+        DateSelector(label = "開始日期", date = selectedStartDate) {
+            showDateRangePicker = true
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        DateSelector(label = "結束日期", date = "2024/10/15") { /* TODO: 開啟日期選擇器 */ }
+        DateSelector(label = "結束日期", date = selectedEndDate) { /* TODO: 開啟日期選擇器 */ }
         Spacer(modifier = Modifier.height(24.dp))
 
         // 營養素圖表
@@ -183,31 +230,23 @@ private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun PeriodDropdown() {
-    OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("選擇週期", color = Color.Gray)
-            Icon(
-                imageVector = Icons.Default.ExpandMore,
-                contentDescription = "展開",
-                tint = Color.Gray
-            )
-        }
-    }
+    var currentSelect by remember { mutableStateOf<DateRange?>(DateRange.entries.firstOrNull()) }
+    CreateDropDownMenu(
+        options = DateRange.entries,
+        selectedOption = currentSelect,
+        onOptionSelected = { selectedOption ->
+            currentSelect = selectedOption
+            // TODO Handle option selection
+        },
+        getDisplayText = { options -> stringResource(id = options.title) }
+    )
 }
 
 @Composable
-private fun DateSelector(label: String, date: String, onClick: () -> Unit) {
+private fun DateSelector(
+    label: String,
+    date: String,
+    onClick: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -219,9 +258,9 @@ private fun DateSelector(label: String, date: String, onClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
+            border = BorderStroke(0.5.dp, Color.DarkGray)
         ) {
             Row(
                 modifier = Modifier
@@ -306,7 +345,7 @@ private fun CalorieInput() {
             value = text,
             onValueChange = { text = it },
             placeholder = { Text("e.g. 1500") },
-            modifier = Modifier.width(150.dp),
+            modifier = Modifier.weight(1f),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(12.dp),

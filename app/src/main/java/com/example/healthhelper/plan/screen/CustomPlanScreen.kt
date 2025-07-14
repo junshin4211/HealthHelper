@@ -47,8 +47,6 @@ import com.example.healthhelper.plan.ui.CustomTextField
 import com.example.healthhelper.plan.ui.createSliders
 import com.example.healthhelper.plan.usecase.PlanUCImpl
 import com.example.healthhelper.plan.viewmodel.EditPlanVM
-import com.example.healthhelper.plan.viewmodel.ManagePlanVM
-import com.example.healthhelper.plan.viewmodel.PlanVM
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.signuplogin.UserManager
 import com.example.healthhelper.ui.theme.HealthHelperTheme
@@ -136,7 +134,7 @@ fun CustomEditPlan(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
-                text = stringResource(R.string.setplantime),
+                text = stringResource(R.string.set_plan_time_title),
                 style = TextStyle(
                     fontSize = 26.sp,
                     fontFamily = FontFamily.Default,

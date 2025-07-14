@@ -134,7 +134,7 @@ fun EditPlan(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
-                text = stringResource(R.string.setplantime),
+                text = stringResource(R.string.set_plan_time_title),
                 style = TextStyle(
                     fontSize = 26.sp,
                     fontFamily = FontFamily.Default,

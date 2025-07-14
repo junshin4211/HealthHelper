@@ -1,7 +1,8 @@
-package com.example.healthhelper.plan.ui
+package com.example.healthhelper.planpage.ui.components
 
-
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +10,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -19,21 +23,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import com.example.healthhelper.R
+import com.example.healthhelper.plan.DateRange
+import com.example.healthhelper.plan.ui.CustomIcon
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,68 +41,64 @@ fun <T> CreateDropDownMenu(
     options: List<T>,
     selectedOption: T?,
     onOptionSelected: (T) -> Unit,
-    getDisplayText: (T) -> String
+    getDisplayText: @Composable (option: T) -> String
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(if (selectedOption != null) getDisplayText(selectedOption) else "")}
+
+    var selectedText = selectedOption?.let { getDisplayText(it) } ?: ""
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
-        TextField(
+        OutlinedTextField( // <--- 改用 OutlinedTextField
             readOnly = true,
             value = selectedText,
-            onValueChange = {  },
-            singleLine = true,
+            onValueChange = { /* 通常 readOnly TextField不需要 */ },
             label = { Text(text = stringResource(R.string.pickdaterange)) },
-            trailingIcon = { if (expanded) CustomIcon().CreateArrow() else CustomIcon().CreateArrow(true) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            shape = if (expanded) { // 設置 TextField 的形狀
+                RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
+            } else {
+                RoundedCornerShape(20.dp)
+            },
             modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
-                .border(
-                    width = 2.dp,
-                    color = Color.Gray,
-                    if (expanded) {RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)} else {RoundedCornerShape(20.dp)})
-                .width(200.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent
-            )
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true) // menuAnchor 仍然需要
+                .fillMaxWidth() // 設置寬度
         )
 
-        val configuration = LocalConfiguration.current.screenWidthDp
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            containerColor = MaterialTheme.colorScheme.background,
             modifier = Modifier
-                .border(
-                    width = 2.dp,
-                    color = colorResource(id = R.color.primarycolor)
-                )
-                .width(200.dp)
-                .height((configuration*0.5).dp),
+                .exposedDropdownSize(matchTextFieldWidth = true)
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(getDisplayText(option)) },
                     onClick = {
-                        selectedText = getDisplayText(option)
                         onOptionSelected(option)
                         expanded = false
                     },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )
             }
         }
     }
 }
 
-
-@Preview(locale = "zh-rTW")
+@Preview(locale = "zh-rTW", showBackground = true)
 @Composable
 fun EditPlanPreview() {
     HealthHelperTheme {
-        //CreateDropDownMenu()
+        CreateDropDownMenu(
+            options = DateRange.entries,
+            selectedOption = null,
+            onOptionSelected = { },
+            getDisplayText = { it.title.toString() })
+
     }
 }

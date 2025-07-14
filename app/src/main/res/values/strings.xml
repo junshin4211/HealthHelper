@@ -47,7 +47,7 @@
     <string name="custom">自訂</string>
     <string name="manageplan">計劃管理</string>
     <string name="checkplan">查看計畫</string>
-    <string name="setplantime">設定你的週期</string>
+    <string name="set_plan_time_title">設定你的週期</string>
     <string name="pickdaterange">選擇週期</string>
     <string name="aweek">一周</string>
     <string name="halfmonth">半個月</string>
@@ -277,6 +277,6 @@
     <string name="has_no_nutrition_info_message">沒有營養相關資料可以顯示</string>
     <string name="insert_diary_successfully">插入日記成功</string>
     <string name="load_diary_info_successfully">載入日記資訊成功</string>
-    <string name="add_plan_default_title">新增計畫</string>
+    <string name="add_plan_default_title">新增</string>
     <!-- ... 其他字符串 ... -->
 </resources>
