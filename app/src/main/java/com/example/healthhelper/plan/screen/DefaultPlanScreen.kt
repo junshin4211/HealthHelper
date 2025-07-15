@@ -153,7 +153,7 @@ fun EditPlan(
             )
 
             Text(
-                text = stringResource(R.string.startdate),
+                text = stringResource(R.string.startDate),
                 style = TextStyle(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
@@ -453,33 +453,33 @@ fun setDescription(
     val (titleResId, descriptionResId) = when (type) {
         R.string.carb -> {
             when (planname) {
-                PlanPage.LowCarb -> R.string.lowcarb_carb_title to R.string.lowcarb_carb_description
-                PlanPage.HighProtein -> R.string.highpro_carb_title to R.string.highpro_carb_description
+                PlanPage.LowCarb -> R.string.lowCarbHydrate_carb_title to R.string.lowCarbHydrate_carb_description
+                PlanPage.HighProtein -> R.string.highPro_carb_title to R.string.highPro_carb_description
                 PlanPage.Ketone -> R.string.ketone_carb_title to R.string.ketone_carb_description
                 PlanPage.Mediterra -> R.string.mediterra_carb_title to R.string.mediterra_carb_description
-                else -> R.string.defaulttitle to R.string.defaultdescription
+                else -> R.string.defaultTitle to R.string.defaultDescription
 
             }
         }
         R.string.protein -> {
             when (planname) {
-                PlanPage.LowCarb -> R.string.lowcarb_pro_title to R.string.lowcarb_pro_description
-                PlanPage.HighProtein -> R.string.highpro_pro_title to R.string.highpro_pro_description
+                PlanPage.LowCarb -> R.string.lowCarbHydrate_pro_title to R.string.lowCarbHydrate_pro_description
+                PlanPage.HighProtein -> R.string.highPro_pro_title to R.string.highPro_pro_description
                 PlanPage.Ketone -> R.string.ketone_pro_title to R.string.ketone_pro_description
                 PlanPage.Mediterra -> R.string.mediterra_pro_title to R.string.mediterra_pro_description
-                else -> R.string.defaulttitle to R.string.defaultdescription
+                else -> R.string.defaultTitle to R.string.defaultDescription
             }
         }
         R.string.fat -> {
             when (planname) {
-                PlanPage.LowCarb -> R.string.lowcarb_fat_title to R.string.lowcarb_fat_descipt
-                PlanPage.HighProtein -> R.string.highpro_fat_title to R.string.highpro_fat_description
+                PlanPage.LowCarb -> R.string.lowCarbHydrate_fat_title to R.string.lowCarbHydrate_fat_description
+                PlanPage.HighProtein -> R.string.highPro_fat_title to R.string.highPro_fat_description
                 PlanPage.Ketone -> R.string.ketone_fat_title to R.string.ketone_fat_description
                 PlanPage.Mediterra -> R.string.meditera_fat_title to R.string.mediterra_fat_description
-                else -> R.string.defaulttitle to R.string.defaultdescription
+                else -> R.string.defaultTitle to R.string.defaultDescription
             }
         }
-        else -> R.string.defaulttitle to R.string.defaultdescription
+        else -> R.string.defaultTitle to R.string.defaultDescription
     }
 
     // 設置 title 和 description

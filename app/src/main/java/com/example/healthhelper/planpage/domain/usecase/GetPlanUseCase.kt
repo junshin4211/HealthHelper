@@ -3,7 +3,9 @@ package com.example.healthhelper.planpage.domain.usecase
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.healthhelper.planpage.data.model.PlanModel
+import com.example.healthhelper.planpage.ui.DateRangeTitle
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -48,14 +50,6 @@ fun transformDate(dateString: String):String{
         }
     }
     return formattedDate
-}
-
-fun formatMillisToDateString(millis: Long?, zoneId: ZoneId = ZoneId.systemDefault()): String {
-    if (millis == null) return ""
-    return Instant.ofEpochMilli(millis)
-        .atZone(zoneId)
-        .toLocalDate()
-        .format(DateTimeFormatter.ISO_LOCAL_DATE)
 }
 
 //fun formatSpecificDateString(inputDateString: String): String? {

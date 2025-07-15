@@ -99,7 +99,7 @@ fun DateRangePickerDialog(
         ){
         DateRangePicker(
             state = dateRangePickerState,
-            title = { Text(stringResource(R.string.pickdaterange)) },
+            title = { Text(stringResource(R.string.pickDateRange)) },
             showModeToggle = true,
             headline = {
                 val startDateMillis = dateRangePickerState.selectedStartDateMillis

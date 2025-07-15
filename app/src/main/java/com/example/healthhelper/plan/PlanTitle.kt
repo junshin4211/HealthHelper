@@ -8,12 +8,12 @@ enum class PlanPage(
     @StringRes val title: Int,
 ){
     DietPlan(title = R.string.plan),
-    MyPlan(title = R.string.myplan),
-    CompletedPlan(title = R.string.completedplan),
-    ManagePlan(title = R.string.manageplan),
-    CheckPlan(title = R.string.checkplan),
-    HighProtein(title = R.string.highprotein),
-    LowCarb(title = R.string.lowcarb),
+    MyPlan(title = R.string.myPlan),
+    CompletedPlan(title = R.string.completedPlan),
+    ManagePlan(title = R.string.managePlan),
+    CheckPlan(title = R.string.checkPlan),
+    HighProtein(title = R.string.highProtein),
+    LowCarb(title = R.string.lowCarbHydrate),
     Ketone(title = R.string.ketone),
     Mediterra(title = R.string.mediterra),
     Custom(title = R.string.custom);
@@ -52,11 +52,11 @@ object CateGoryId{
 }
 
 enum class DateRange(@StringRes val title: Int){
-    AWeek(title = R.string.aweek),
-    HalfMonth(title = R.string.halfmonth),
-    AMonth(title = R.string.amonth),
-    ThreeMonth(title = R.string.threemonth),
-    SixMonth(title = R.string.sixmonth);
+    AWeek(title = R.string.AWeek),
+    HalfMonth(title = R.string.halfMonth),
+    AMonth(title = R.string.AMonth),
+    ThreeMonth(title = R.string.threeMonth),
+    SixMonth(title = R.string.sixMonth);
 
 }
 

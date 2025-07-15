@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.planpage.data.Result
 import com.example.healthhelper.planpage.data.model.PlanModel
+import com.example.healthhelper.planpage.domain.model.DietPlanType
 import com.example.healthhelper.planpage.domain.usecase.filterAndSortPlan
 import com.example.healthhelper.planpage.domain.usecase.transformDate
 import com.example.healthhelper.planpage.navigation.Screen
@@ -181,24 +182,24 @@ fun DietFilterBar(navController: NavHostController) {
     ) {
         FilterItem(
             painter = painterResource(id = R.drawable.protein),
-            label = R.string.highprotein,
+            label = DietPlanType.HIGH_PROTEIN,
             navController = navController,
             )
         FilterItem(
             painter = painterResource(id = R.drawable.lowcarb),
-            label = R.string.lowcarb,
+            label = DietPlanType.LOW_CARB_HYDRATE,
             navController = navController)
         FilterItem(
             painter = painterResource(id = R.drawable.ketone),
-            label = R.string.ketone,
+            label = DietPlanType.KETONE,
             navController = navController)
         FilterItem(
             painter = painterResource(id = R.drawable.mediterra),
-            label = R.string.mediterra,
+            label = DietPlanType.MEDITERRA,
             navController = navController)
         FilterItem(
             painter = painterResource(id = R.drawable.custom),
-            label = R.string.custom,
+            label = DietPlanType.CUSTOM,
             isCustom = true,
             navController = navController)
     }
@@ -206,7 +207,7 @@ fun DietFilterBar(navController: NavHostController) {
 
 @Composable
 fun FilterItem(painter: Painter,
-               @StringRes label: Int,
+               label: DietPlanType,
                isCustom: Boolean = false,
                navController: NavHostController)
 {
@@ -214,9 +215,9 @@ fun FilterItem(painter: Painter,
         modifier = Modifier.clickable {
             if (!isCustom)
             {
-                navController.navigate(Screen.AddPlan.createRoute(label))
+                navController.navigate(Screen.AddPlan.createRoute(label.displayNameRes))
             }else{
-                navController.navigate(Screen.AddCustomPlan.createRoute(label))
+                navController.navigate(Screen.AddCustomPlan.createRoute(label.displayNameRes))
             }
         },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -224,12 +225,12 @@ fun FilterItem(painter: Painter,
     ) {
         Icon(
             painter = painter,
-            contentDescription = stringResource(label),
+            contentDescription = stringResource(label.displayNameRes),
             tint = MaterialTheme.colorScheme.primary, // 使用主題顏色
             modifier = Modifier.size(28.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = stringResource(label), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+        Text(text = stringResource(label.displayNameRes), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
     }
 }
 

@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.healthhelper.planpage.domain.model.ChartData
+import com.example.healthhelper.planpage.domain.model.MacroInfo
 import com.example.healthhelper.planpage.ui.components.DonutChart
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
@@ -254,9 +256,9 @@ private fun DateSelector(label: String, date: String, onClick: () -> Unit) {
 private fun NutritionChartSection() {
     // 數據的單一來源 (Single Source of Truth)
     val macroInfo = listOf(
-        MacroInfo("碳水化合物", 75, Color(0xFF304FFE)), // 藍色
-        MacroInfo("蛋白質", 75, Color(0xFFD50000)),  // 紅色
-        MacroInfo("脂肪", 150, Color(0xFF00C853)) // 綠色 - 為了符合20/20/60的比例，這裡改成150克
+        MacroInfo("碳水化合物", 75.toFloat(), Color(0xFF304FFE)), // 藍色
+        MacroInfo("蛋白質", 75.toFloat(), Color(0xFFD50000)),  // 紅色
+        MacroInfo("脂肪", 150.toFloat(), Color(0xFF00C853)) // 綠色 - 為了符合20/20/60的比例，這裡改成150克
     )
 
     // 從 macroInfo 動態生成圖表數據

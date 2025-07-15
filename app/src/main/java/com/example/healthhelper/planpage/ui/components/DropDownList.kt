@@ -55,7 +55,7 @@ fun <T> CreateDropDownMenu(
             readOnly = true,
             value = selectedText,
             onValueChange = { /* 通常 readOnly TextField不需要 */ },
-            label = { Text(text = stringResource(R.string.pickdaterange)) },
+            label = { Text(text = stringResource(R.string.pickDateRange)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             },

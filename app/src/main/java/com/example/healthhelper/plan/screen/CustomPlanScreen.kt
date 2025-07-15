@@ -153,7 +153,7 @@ fun CustomEditPlan(
             )
 
             Text(
-                text = stringResource(R.string.startdate),
+                text = stringResource(R.string.startDate),
                 style = TextStyle(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
