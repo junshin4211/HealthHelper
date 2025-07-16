@@ -1,5 +1,7 @@
 package com.example.healthhelper.planpage.data // 與您專案中的路徑一致
 
+import com.example.healthhelper.planpage.data.model.AddPlanModel
+import com.example.healthhelper.planpage.data.model.GenericApiResponse
 import com.example.healthhelper.planpage.data.model.PlanModel
 import kotlinx.coroutines.flow.Flow
 import com.example.healthhelper.planpage.data.Result as ApiResult // 使用別名
@@ -10,6 +12,8 @@ interface PlanRepository {
 
     // 或者，一個一次性的獲取函式
     suspend fun fetchUserPlans(userId: Int): ApiResult<List<PlanModel>>
+
+    suspend fun addPlan(addPlanData: AddPlanModel): ApiResult<GenericApiResponse>
 
     // TODO... 其他 Repository interface方法
 }

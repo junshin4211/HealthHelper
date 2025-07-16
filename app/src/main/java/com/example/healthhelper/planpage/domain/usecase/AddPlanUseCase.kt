@@ -1,7 +1,9 @@
 package com.example.healthhelper.planpage.domain.usecase
 
+import android.util.Log
 import androidx.annotation.StringRes
 import com.example.healthhelper.R
+import com.example.healthhelper.planpage.domain.model.NutritionType
 import com.example.healthhelper.planpage.ui.DateRangeTitle
 import java.time.Instant
 import java.time.LocalDate
@@ -53,12 +55,12 @@ fun calculateNutritionGrams(
     calories: Float,
     @StringRes plan: Int,
     onSetNutritionGram: (fatGram: Float, carbGram: Float, proteinGram: Float) -> Unit
-){
+) {
     val goals = NutritionGoal.getGoals(plan)
 
-    if(goals != null){
+    if (goals != null) {
 
-        val (fatGoal, carbGoal, proteinGoal) =goals
+        val (fatGoal, carbGoal, proteinGoal) = goals
         val fatGram = calories * fatGoal
         val carbGram = calories * carbGoal
         val proteinGram = calories * proteinGoal
@@ -69,13 +71,13 @@ fun calculateNutritionGrams(
 
 fun calculateNutritionGoals(
     @StringRes plan: Int,
-    @StringRes nutrition: Int,
-):Float?{
+    nutritionType: NutritionType,
+): Int? {
     val goals = NutritionGoal.getGoals(plan) ?: return null
 
-    return when(nutrition){
-        R.string.fat -> goals.first
-        R.string.carb -> goals.second
-        R.string.protein -> goals.third
-        else -> null}
+    return when (nutritionType) {
+        NutritionType.FAT -> (goals.first * 100).toInt()
+        NutritionType.CARBOHYDRATE -> (goals.second * 100).toInt()
+        NutritionType.PROTEIN -> (goals.third * 100).toInt()
+    }
 }

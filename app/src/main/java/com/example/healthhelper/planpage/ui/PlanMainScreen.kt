@@ -2,7 +2,6 @@ package com.example.healthhelper.planpage.ui
 
 import android.content.res.Configuration
 import android.util.Log
-import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController

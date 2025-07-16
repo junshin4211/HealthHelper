@@ -21,6 +21,9 @@ class PlanViewModelFactory : ViewModelProvider.Factory {
         if (modelClass.isAssignableFrom(PlanMainViewModel::class.java)) {
             return PlanMainViewModel(providePlanRepository()) as T
         }
+        if (modelClass.isAssignableFrom(AddPlanViewModel::class.java)) {
+            return AddPlanViewModel(providePlanRepository()) as T
+        }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

@@ -48,7 +48,7 @@ import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
 import com.example.healthhelper.planpage.ui.components.DonutChart
 import java.util.Locale
 
-enum class DateRangeTitle(@StringRes val title: Int){
+enum class DateRangeTitle(@StringRes val title: Int) {
     AWeek(title = R.string.AWeek),
     HalfMonth(title = R.string.halfMonth),
     AMonth(title = R.string.AMonth),
@@ -66,7 +66,10 @@ fun AddPlan(
     HealthHelperTheme {
         Scaffold(
             topBar = {
-                DietSettingsTopBar(onBackClick = { navController.navigateUp() }, title = appBarTitle)
+                DietSettingsTopBar(
+                    onBackClick = { navController.navigateUp() },
+                    title = appBarTitle
+                )
             },
             // 使用我們 Theme 中定義的背景色
             containerColor = MaterialTheme.colorScheme.background
@@ -85,7 +88,7 @@ private fun DietSettingsTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(title)+"飲食計畫",
+                text = stringResource(title) + "飲食計畫",
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -112,7 +115,7 @@ private fun DietSettingsTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
 private fun DietSettingsContent(
     modifier: Modifier = Modifier,
     @StringRes title: Int
-    ) {
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -132,7 +135,12 @@ private fun DietSettingsContent(
         // 顯示日期選擇
         var showDateRangePicker by remember { mutableStateOf(false) }
 
-        var inputCalories by remember { mutableStateOf(1500) }
+        var inputCalories by remember { mutableIntStateOf(1500) }
+
+        // 新增狀態來保存計算出的各種宏指令的克數
+        var calculatedCarbGram by remember { mutableFloatStateOf(0f) }
+        var calculatedProteinGram by remember { mutableFloatStateOf(0f) }
+        var calculatedFatGram by remember { mutableFloatStateOf(0f) }
 
         val selectedPlanName: DietPlanType? = DietPlanType.fromResId(title)
 
@@ -141,30 +149,56 @@ private fun DietSettingsContent(
             savedSelectedStartDateMillis = startMillis
             savedSelectedEndDateMillis = endMillis
 
-            selectedStartDate = startMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
+            selectedStartDate =
+                startMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
             selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
         }
 
+
+        // 當 inputCalories 或 currentPlanType 改變時，重新計算克數
+        // 使用 LaunchedEffect 是合適的，因為 calculateNutritionGrams 是掛起函數
+        LaunchedEffect(inputCalories, title) {
+            Log.d(
+                "DietSettingsContent",
+                "Recalculating grams for calories: $inputCalories, plan: ${title}"
+            )
+            calculateNutritionGrams(
+                calories = inputCalories.toFloat(),
+                plan = title, // 傳遞計劃的資源ID
+                onSetNutritionGram = { fatGrams, carbGrams, proteinGrams ->
+                    Log.d(
+                        "DietSettingsContent",
+                        "Grams calculated: F=$fatGrams, C=$carbGrams, P=$proteinGrams"
+                    )
+                    calculatedFatGram = fatGrams
+                    calculatedCarbGram = carbGrams
+                    calculatedProteinGram = proteinGrams
+                }
+            )
+        }
+
         // 設定週期
-        SectionTitle(title = stringResource(R.string.set_plan_time_title), modifier = Modifier.align(Alignment.Start))
+        SectionTitle(
+            title = stringResource(R.string.set_plan_time_title),
+            modifier = Modifier.align(Alignment.Start)
+        )
         Spacer(modifier = Modifier.height(8.dp))
         PeriodDropdown(
             onDateRangeSelected = { title ->
                 val datePair = calculateDateMillisRange(title)
-                if (datePair != null)
-                {
+                if (datePair != null) {
                     updateDateStates(datePair.first, datePair.second)
-                }else{
+                } else {
                     updateDateStates(null, null)
                 }
             }
         )
         // 顯示日期選擇
-        if (showDateRangePicker){
+        if (showDateRangePicker) {
             DateRangePickerDialog(
                 initialSelectedStartDateMillis = savedSelectedStartDateMillis,
                 initialSelectedEndDateMillis = savedSelectedEndDateMillis,
-                onConfirm ={ pair ->
+                onConfirm = { pair ->
                     updateDateStates(pair.first, pair.second)
                     showDateRangePicker = false
                 },
@@ -187,8 +221,10 @@ private fun DietSettingsContent(
 
         // 營養素圖表
         NutritionChartSection(
-            calories = inputCalories,
-            planTitle = title
+            planTitle = title,
+            carbGramText = calculatedCarbGram,
+            proteinGramText = calculatedProteinGram,
+            fatGramText = calculatedFatGram
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -203,16 +239,24 @@ private fun DietSettingsContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         // 詳細說明
-        NutritionType.entries.forEach{type ->
+        NutritionType.entries.forEach { type ->
 //            val planname = DietPlanType.entries.find { it.displayNameRes == title }
             if (selectedPlanName != null) {
-                DietPlanRegistry.getNutritionDetail(selectedPlanName,type)?.let { content ->
-                    val percentage = calculateNutritionGoals(selectedPlanName.displayNameRes, type.displayNameRes)?.toInt() ?: 0
+
+                DietPlanRegistry.getNutritionDetail(selectedPlanName, type)?.let { content ->
+                    val percentage =
+                        calculateNutritionGoals(selectedPlanName.displayNameRes, type) ?: 0
+
+                    val currentMacroGram = when (type) {
+                        NutritionType.CARBOHYDRATE -> calculatedCarbGram
+                        NutritionType.PROTEIN -> calculatedProteinGram
+                        NutritionType.FAT -> calculatedFatGram
+                    }
 
                     MacroDetailItem(
                         name = stringResource(id = type.displayNameRes),
                         percentage = percentage,
-                        grams = 0f,
+                        grams = currentMacroGram,
                         title = content.getTitle(),
                         details = content.getDescriptionPoints().joinToString("")
                     )
@@ -228,9 +272,9 @@ private fun DietSettingsContent(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             // 使用 Material 3 預設的藍色按鈕
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF))
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Text("儲存", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -247,7 +291,7 @@ private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PeriodDropdown(onDateRangeSelected:(DateRangeTitle) -> Unit) {
+private fun PeriodDropdown(onDateRangeSelected: (DateRangeTitle) -> Unit) {
     var currentSelect by remember { mutableStateOf<DateRangeTitle?>(DateRangeTitle.entries.firstOrNull()) }
     CreateDropDownMenu(
         options = DateRangeTitle.entries,
@@ -264,7 +308,8 @@ private fun PeriodDropdown(onDateRangeSelected:(DateRangeTitle) -> Unit) {
 private fun DateSelector(
     label: String,
     date: String,
-    onClick: () -> Unit) {
+    onClick: () -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -299,36 +344,19 @@ private fun DateSelector(
 
 @Composable
 private fun NutritionChartSection(
-    calories: Int,
-    @StringRes planTitle: Int
+    @StringRes planTitle: Int,
+    carbGramText: Float,
+    proteinGramText: Float,
+    fatGramText: Float
 ) {
-    var fatGramText by remember { mutableFloatStateOf(0f)  }
-    var carbGramText by remember { mutableFloatStateOf(0f) }
-    var proteinGramText by remember { mutableFloatStateOf(0f) }
-
-    Log.d("AddPlan_NutritionChartSection", "Recomposing calories: $calories")
-
-    LaunchedEffect(calories) {
-        Log.d("AddPlan_NutritionChartSection", "LaunchedEffect calories: $calories")
-        calculateNutritionGrams(
-            calories = calories.toFloat(),
-            plan = planTitle,
-            onSetNutritionGram = { fatGram, carbGram, proteinGram ->
-                Log.d("AddPlan_NutritionChartSection", "LaunchedEffect set fatGram: $fatGram carbGram: $carbGram proteinGram: $proteinGram")
-                fatGramText = fatGram
-                carbGramText = carbGram
-                proteinGramText = proteinGram
-            }
+    // 數據的單一來源 (Single Source of Truth)
+    val macroInfo = remember(carbGramText, proteinGramText, fatGramText) {
+        listOf(
+            MacroInfo("碳水化合物", carbGramText, Color(0xFF304FFE)), // 藍色
+            MacroInfo("蛋白質", proteinGramText, Color(0xFFD50000)),  // 紅色
+            MacroInfo("脂肪", fatGramText, Color(0xFF00C853)) // 綠色
         )
     }
-
-    // 數據的單一來源 (Single Source of Truth)
-    val macroInfo = remember(carbGramText, proteinGramText, fatGramText){
-        listOf(
-        MacroInfo("碳水化合物", carbGramText, Color(0xFF304FFE)), // 藍色
-        MacroInfo("蛋白質", proteinGramText, Color(0xFFD50000)),  // 紅色
-        MacroInfo("脂肪", fatGramText, Color(0xFF00C853)) // 綠色
-    ) }
 
 //    // 從 macroInfo 動態生成圖表數據
 //    val chartData = remember(macroInfo) { macroInfo.map {
@@ -390,8 +418,8 @@ private fun CalorieInput(
         )
         OutlinedTextField(
             value = calorie.toString(),
-            onValueChange = {newValue ->
-                val newCalorie = newValue.toIntOrNull() ?:0
+            onValueChange = { newValue ->
+                val newCalorie = newValue.toIntOrNull() ?: 0
                 Log.d("AddPlan_CalorieInput", "Recomposing calories: $newCalorie")
                 onSetCalorie(newCalorie)
             },
@@ -423,26 +451,27 @@ private fun MacroDetailItem(
     details: String
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
+        val combineText =
+            "$name $percentage% (" + String.format(Locale.US, "%.2f克", grams) + "公克)"
         Text(
-            text = "$name ${percentage}% (${grams}公克)",
-            style = MaterialTheme.typography.titleLarge,
+            text = combineText,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = Color.Gray
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = details,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             color = Color.Gray
         )
     }
 }
-
 
 
 @Preview(showBackground = true, device = "id:pixel_6")

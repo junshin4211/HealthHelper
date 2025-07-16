@@ -1,5 +1,9 @@
 package com.example.healthhelper.planpage.data
 
+import android.util.Log
+import com.example.healthhelper.planpage.data.Result
+import com.example.healthhelper.planpage.data.model.AddPlanModel
+import com.example.healthhelper.planpage.data.model.GenericApiResponse
 import com.example.healthhelper.planpage.data.model.PlanModel
 import com.example.healthhelper.planpage.data.remote.PlanApiService
 import com.example.healthhelper.planpage.data.remote.UserId
@@ -17,6 +21,7 @@ class PlanRepositoryImpl(
     private val planApiService: PlanApiService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PlanRepository {
+    private val tag = "tag_PlanRepo"
 
     override fun observeUserPlans(userId: Int): Flow<ApiResult<List<PlanModel>>> = flow {
         emit(ApiResult.Loading) // 開始時發送載入狀態
@@ -83,6 +88,44 @@ class PlanRepositoryImpl(
             }
         }
     }
+
+    override suspend fun addPlan(addPlanData: AddPlanModel): Result<GenericApiResponse> {
+        return withContext(ioDispatcher){
+            try {
+                val response = planApiService.createPlan(addPlanData)
+                if(response.isSuccessful){
+                    val apiResponse = response.body()
+                    if(apiResponse != null){
+                        if (apiResponse.result){
+                            // Http 請求成功(200)
+                            Log.d(tag,"新增計畫成功: $apiResponse")
+                            Result.Success(apiResponse)
+                        }else{
+                            // Http 請求成功,但是後端返回的 result 為 false
+                            val errorMessage = apiResponse.errMsg ?: "未知錯誤"
+                            Log.d(tag,"新增計畫失敗: $errorMessage")
+                            Result.Error(Exception("新增計畫失敗"),errorMessage)
+                        }
+                    }else{
+                        Log.d(tag,"Http 請求成功 但Body為空")
+                        Result.Error(Exception("Http 請求成功 但Body為空"),"伺服器回應無效")
+                    }
+                }else{
+                    // HTTP 請求本身失敗 (例如 4xx, 5xx 錯誤)
+                    val errorMessage = "創建計劃失敗: HTTP ${response.code()}"
+                    Log.d(tag,errorMessage)
+                    Result.Error(Exception(errorMessage),errorMessage)
+                }
+            }catch (e:IOException){
+                Log.d(tag,"網路連線異常: ${e.message}")
+                Result.Error(e,"網路連線異常")
+            }catch (e: Exception) { // 捕獲其他所有類型的異常，例如序列化異常
+                Log.e(tag, "新增計畫失敗 (未知錯誤): ${e.message}", e)
+                Result.Error(e, "發生未知錯誤: ${e.message}") // <--- 返回 Result.Error
+            }
+        }
+    }
+
 
     // TODO... 其他 Repository 方法的實現
 }
