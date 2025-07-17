@@ -33,6 +33,20 @@ enum class NutritionType(@StringRes val displayNameRes: Int) { // 為宏指令�
     FAT(R.string.fat)
 }
 
+object CategoryID {
+    private val cateMap = mapOf(
+        R.string.highProtein to 1,
+        R.string.lowCarbHydrate to 2,
+        R.string.ketone to 3,
+        R.string.mediterra to 4,
+        R.string.custom to 5,
+    )
+
+    fun getCateId(cateName: Int):Int?{
+        return cateMap[cateName]
+    }
+}
+
 data class NutritionDetail(
     @StringRes val titleResId: Int,
     @StringRes val descriptionResId: Int

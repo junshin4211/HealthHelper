@@ -285,5 +285,12 @@
     <string name="insert_diary_successfully">插入日記成功</string>
     <string name="load_diary_info_successfully">載入日記資訊成功</string>
     <string name="add_plan_default_title">新增</string>
+    <string name="invalidUserId">無法獲取使用者資訊</string>
+    <string name="invalidDateTime">請選擇開始和結束日期</string>
+    <string name="invalidCategoryId">不正確的計畫ID</string>
+    <string name="invalidFinishState">不正確的完成狀態</string>
+    <string name="invalidNutritionGoal">不正確的營養目標</string>
+    <string name="invalidDateTime2">結束日期必須晚於開始日期</string>
+    <string name="invalidCaloriesGoal">錯誤的卡路里數值</string>
     <!-- ... 其他字符串 ... -->
 </resources>

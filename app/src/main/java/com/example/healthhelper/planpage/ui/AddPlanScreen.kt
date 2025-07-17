@@ -33,19 +33,33 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
+import com.example.healthhelper.planpage.data.model.AddPlanModel
+import com.example.healthhelper.planpage.data.remote.DependencyProvider
+import com.example.healthhelper.planpage.domain.model.CategoryID
 import com.example.healthhelper.planpage.domain.model.DietPlanRegistry
 import com.example.healthhelper.planpage.domain.model.DietPlanType
 import com.example.healthhelper.planpage.domain.model.MacroInfo
 import com.example.healthhelper.planpage.domain.model.NutritionType
+import com.example.healthhelper.planpage.domain.usecase.NutritionGoal
 import com.example.healthhelper.planpage.domain.usecase.calculateDateMillisRange
 import com.example.healthhelper.planpage.domain.usecase.calculateNutritionGoals
 import com.example.healthhelper.planpage.domain.usecase.calculateNutritionGrams
 import com.example.healthhelper.planpage.domain.usecase.formatMillisToDateString
+import com.example.healthhelper.planpage.domain.usecase.formatMillisToISO
+import com.example.healthhelper.planpage.domain.usecase.validationPlanMessage
 import com.example.healthhelper.planpage.ui.components.CreateDropDownMenu
 import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
 import com.example.healthhelper.planpage.ui.components.DonutChart
+import com.example.healthhelper.planpage.ui.viewmodel.AddPlanUiState
+import com.example.healthhelper.planpage.ui.viewmodel.AddPlanViewModel
+import com.example.healthhelper.planpage.ui.viewmodel.AppViewModelFactory
+import com.example.healthhelper.signuplogin.UserManager
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 enum class DateRangeTitle(@StringRes val title: Int) {
@@ -56,15 +70,47 @@ enum class DateRangeTitle(@StringRes val title: Int) {
     SixMonth(title = R.string.sixMonth);
 }
 
-// TODO 從把GRAM remember移到外面開始
 @Composable
 fun AddPlan(
     navController: NavHostController = rememberNavController(),
     @StringRes title: Int
 ) {
     val appBarTitle by remember { mutableStateOf(title) }
+    val planRepository = DependencyProvider.planRepository
+    val viewModelFactory = remember { AppViewModelFactory(planRepository) }
+    val viewModel: AddPlanViewModel = viewModel(factory = viewModelFactory)
+    val uiState by viewModel.addPlanState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is AddPlanUiState.Success -> {
+                snackbarHostState.showSnackbar("計劃已成功儲存！")
+                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
+                viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
+                // 可選: navController.popBackStack() // 導航回去
+            }
+
+            is AddPlanUiState.Error -> {
+                snackbarHostState.showSnackbar("錯誤: ${state.message}")
+                Log.e("AddPlanScreen", "Plan creation error from ViewModel: ${state.message}")
+                viewModel.refreshAddPlanState()
+            }
+
+            is AddPlanUiState.Loading -> {
+
+                Log.d("AddPlanScreen", "Plan creation in progress...")
+                // UI 可以在按鈕或其他地方顯示加載指示
+            }
+
+            AddPlanUiState.Idle -> { /* 初始或已重置狀態 */
+            }
+        }
+    }
+
     HealthHelperTheme {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 DietSettingsTopBar(
                     onBackClick = { navController.navigateUp() },
@@ -76,7 +122,13 @@ fun AddPlan(
         ) { paddingValues ->
             DietSettingsContent(
                 modifier = Modifier.padding(paddingValues),
-                title = title
+                title = title,
+                snackBarHostState = snackbarHostState,
+                isSaving = uiState is AddPlanUiState.Loading,
+                uiState = uiState,
+                onSaveClick = { addPlanData ->
+                    viewModel.submitPlan(addPlanData)
+                }
             )
         }
     }
@@ -114,7 +166,11 @@ private fun DietSettingsTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
 @Composable
 private fun DietSettingsContent(
     modifier: Modifier = Modifier,
-    @StringRes title: Int
+    @StringRes title: Int,
+    snackBarHostState: SnackbarHostState,
+    uiState: AddPlanUiState,
+    isSaving: Boolean,
+    onSaveClick: (AddPlanModel) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -123,19 +179,24 @@ private fun DietSettingsContent(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+
+        val currentUserId = UserManager.getUser().userId // userId
+
         val defaultChooseText = stringResource(R.string.noChoose)
 
         var selectedStartDate by remember { mutableStateOf("") }
         var selectedEndDate by remember { mutableStateOf("") }
 
         // 新增狀態來保存選中的日期毫Số (Long?)，用於傳遞回 DateRangePickerDialog
-        var savedSelectedStartDateMillis by remember { mutableStateOf<Long?>(null) }
-        var savedSelectedEndDateMillis by remember { mutableStateOf<Long?>(null) }
+        var savedSelectedStartDateMillis by remember { mutableStateOf<Long?>(null) } // startDateTime
+        var savedSelectedEndDateMillis by remember { mutableStateOf<Long?>(null) } // endDateTime
 
         // 顯示日期選擇
         var showDateRangePicker by remember { mutableStateOf(false) }
 
-        var inputCalories by remember { mutableIntStateOf(1500) }
+        var inputCalories by remember { mutableIntStateOf(1500) } // Caloriegoal
 
         // 新增狀態來保存計算出的各種宏指令的克數
         var calculatedCarbGram by remember { mutableFloatStateOf(0f) }
@@ -266,7 +327,61 @@ private fun DietSettingsContent(
 
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = { /* TODO: 處理儲存邏輯 */ },
+            onClick = {
+                val goals = NutritionGoal.getGoals(title)
+                val categoryId = CategoryID.getCateId(title)
+
+                if (goals == null || categoryId == null) {
+                    scope.launch {
+                        snackBarHostState.showSnackbar("無效計畫名稱")
+                    }
+                    return@Button
+                }
+
+                val isValid = validationPlanMessage(
+                    userId = currentUserId,
+                    startDateTime = savedSelectedStartDateMillis,
+                    endDateTime = savedSelectedEndDateMillis,
+                    categoryId = categoryId,
+                    finishstate = 0,
+                    fatgoal = goals.first,
+                    carbongoal = goals.second,
+                    proteingoal = goals.third,
+                    Caloriesgoal = inputCalories.toFloat()
+                )
+
+                if (isValid != null) {
+                    val errorMessage = context.getString(isValid)
+                    scope.launch {
+                        snackBarHostState.showSnackbar(errorMessage)
+                    }
+                    return@Button
+                }
+
+                val startDate = formatMillisToISO(savedSelectedStartDateMillis)
+                val endDate = formatMillisToISO(savedSelectedEndDateMillis)
+
+                if (startDate == null || endDate == null) {
+                    Log.e("AddPlanScreen", "日期轉換錯誤")
+                    scope.launch {
+                        snackBarHostState.showSnackbar("日期轉換錯誤")
+                    }
+                    return@Button // 阻止繼續執行
+                }
+
+                val addPlanData = AddPlanModel(
+                    userId = currentUserId,
+                    startDateTime = startDate,
+                    endDateTime = endDate,
+                    categoryId = categoryId,
+                    finishstate = 0,
+                    fatgoal = goals.first,
+                    carbongoal = goals.second,
+                    proteingoal = goals.third,
+                    Caloriesgoal = inputCalories.toFloat()
+                )
+                onSaveClick(addPlanData)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -274,7 +389,14 @@ private fun DietSettingsContent(
             // 使用 Material 3 預設的藍色按鈕
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            if (isSaving) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            } else {
+                Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -297,6 +419,7 @@ private fun PeriodDropdown(onDateRangeSelected: (DateRangeTitle) -> Unit) {
         options = DateRangeTitle.entries,
         selectedOption = currentSelect,
         onOptionSelected = { selectedOption ->
+            currentSelect = selectedOption
             onDateRangeSelected(selectedOption)
             // TODO Handle option selection
         },

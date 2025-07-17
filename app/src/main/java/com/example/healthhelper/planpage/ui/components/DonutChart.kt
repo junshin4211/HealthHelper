@@ -1,5 +1,6 @@
 package com.example.healthhelper.planpage.ui.components
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -29,6 +30,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun DonutChart(
     data: List<ChartData>,

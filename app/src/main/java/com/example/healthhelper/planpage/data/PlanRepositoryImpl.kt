@@ -92,6 +92,7 @@ class PlanRepositoryImpl(
     override suspend fun addPlan(addPlanData: AddPlanModel): Result<GenericApiResponse> {
         return withContext(ioDispatcher){
             try {
+                Result.Loading
                 val response = planApiService.createPlan(addPlanData)
                 if(response.isSuccessful){
                     val apiResponse = response.body()

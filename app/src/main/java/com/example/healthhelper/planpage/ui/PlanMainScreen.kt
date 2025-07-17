@@ -38,13 +38,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.healthhelper.R
 import com.example.healthhelper.planpage.data.Result
 import com.example.healthhelper.planpage.data.model.PlanModel
+import com.example.healthhelper.planpage.data.remote.DependencyProvider
 import com.example.healthhelper.planpage.domain.model.DietPlanType
 import com.example.healthhelper.planpage.domain.usecase.filterAndSortPlan
 import com.example.healthhelper.planpage.domain.usecase.transformDate
 import com.example.healthhelper.planpage.navigation.Screen
 import com.example.healthhelper.planpage.ui.components.LoadingIndicator
+import com.example.healthhelper.planpage.ui.viewmodel.AppViewModelFactory
 import com.example.healthhelper.planpage.ui.viewmodel.PlanMainViewModel
-import com.example.healthhelper.planpage.ui.viewmodel.PlanViewModelFactory
 import com.example.healthhelper.screen.TabViewModel
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
@@ -53,14 +54,15 @@ import com.example.healthhelper.ui.theme.HealthHelperTheme
 fun PlanMain(
     navController: NavHostController = rememberNavController(),
     tabViewModel: TabViewModel = viewModel(),
-    planMainViewModel: PlanMainViewModel = viewModel(factory = PlanViewModelFactory())
 ) {
     HealthHelperTheme {
         Scaffold(
             topBar = { PlanTopBar() }
         ) { paddingValues ->
-
-            val planState by planMainViewModel.planMainState.collectAsStateWithLifecycle()
+            val planRepository = DependencyProvider.planRepository
+            val viewModelFactory = remember { AppViewModelFactory(planRepository) }
+            val viewModel: PlanMainViewModel = viewModel(factory = viewModelFactory)
+            val planState by viewModel.planMainState.collectAsStateWithLifecycle()
 
             //判斷是否取得資料
             when (val state = planState) {
