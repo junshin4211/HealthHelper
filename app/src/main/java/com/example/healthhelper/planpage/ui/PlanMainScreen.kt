@@ -59,9 +59,12 @@ fun PlanMain(
         Scaffold(
             topBar = { PlanTopBar() }
         ) { paddingValues ->
+            // 獲取repository,載入viewModel
             val planRepository = DependencyProvider.planRepository
             val viewModelFactory = remember { AppViewModelFactory(planRepository) }
             val viewModel: PlanMainViewModel = viewModel(factory = viewModelFactory)
+
+            // 取得 使用者Plan計畫
             val planState by viewModel.planMainState.collectAsStateWithLifecycle()
 
             //判斷是否取得資料

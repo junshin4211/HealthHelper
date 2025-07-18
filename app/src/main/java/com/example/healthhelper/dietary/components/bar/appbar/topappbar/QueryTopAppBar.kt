@@ -24,7 +24,7 @@ fun QueryTopAppBar(
         rememberTopAppBarState()
     ),
 ) {
-    val TAG = "tag_QueryTopAppBar"
+    "tag_QueryTopAppBar"
 
     CenterAlignedTopAppBar(
         modifier = modifier,

@@ -27,9 +27,7 @@ fun DietDiaryMainScreen(
     foodViewModel: FoodViewModel = viewModel(),
     mealsOptionViewModel: MealsOptionViewModel = viewModel(),
 ) {
-    val TAG = "tag_DietDiaryMainScreen"
-
-    val selectedMealOption by mealsOptionViewModel.selectedData.collectAsState()
+    "tag_DietDiaryMainScreen"
 
     Scaffold(
         modifier = Modifier

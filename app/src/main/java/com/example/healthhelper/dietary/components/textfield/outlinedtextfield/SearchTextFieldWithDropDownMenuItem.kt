@@ -22,7 +22,7 @@ fun SearchTextFieldWithDropDownMenuItem(
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
     label: @Composable () -> Unit,
 ) {
-    val TAG = "tag_SearchTextFieldWithDropDownMenuItem"
+    "tag_SearchTextFieldWithDropDownMenuItem"
 
     val availableFoodItems by selectedFoodItemsViewModel.data.collectAsState()
 

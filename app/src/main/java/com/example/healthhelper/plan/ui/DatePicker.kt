@@ -38,8 +38,8 @@ fun CreateDatePicker(
 ) {
     val tag = "tag_CreateDatePicker"
     var showDatePicker by remember { mutableStateOf(false) }
-    val dateFormatter = PlanUCImpl()::dateTimeFormat;
-    val stringDateFormatter = PlanUCImpl()::stringToTimeStamp;
+    val dateFormatter = PlanUCImpl()::dateTimeFormat
+    val stringDateFormatter = PlanUCImpl()::stringToTimeStamp
     var getdate by remember { mutableStateOf("") }
 //    val todayByZone = ZonedDateTime.now(ZoneId.of("Asia/Taipei"))
     val todayByZone = LocalDateTime.now(ZoneId.of("Asia/Taipei"))

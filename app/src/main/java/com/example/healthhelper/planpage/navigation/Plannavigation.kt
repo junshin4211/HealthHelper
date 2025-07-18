@@ -1,7 +1,9 @@
 package com.example.healthhelper.planpage.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -39,8 +41,9 @@ sealed class Screen(val route: String) {
 @Composable
 fun PlanNav(
     navController: NavHostController = rememberNavController(),
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
-    val tag = "tag_PlanNav"
+    "tag_PlanNav"
     val backStackEntry by navController.currentBackStackEntryAsState()
 
     NavHost(
@@ -63,7 +66,7 @@ fun PlanNav(
 
             AddPlan(
                 navController = navController,
-                title = categoryId
+                title = categoryId,
             )
         }
 

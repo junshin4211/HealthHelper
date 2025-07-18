@@ -13,23 +13,9 @@ import com.example.healthhelper.planpage.data.Result as ApiResult // 使用別�
 
 class PlanMainViewModel(
     private val planRepository: PlanRepository,
-    // 如果 userId 是動態的 (例如從導航參數獲取)，可以使用 SavedStateHandle
-    // private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    // 假設有一個固定的 userId 用於演示，實際中可能來自登入資訊或導航參數
-    private val currentUserId = UserManager.getUser().userId // ***示例 User ID，請替換為實際邏輯***
-
-    // 使用 StateFlow 暴露計畫列表
-//    val userPlans: StateFlow<ApiResult<List<PlanModel>>> =
-//        planRepository.observeUserPlans(currentUserId) // 傳入 userId
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(5000L),
-//                initialValue = ApiResult.Loading
-//            )
-
-    // 或者，如果使用一次性獲取：
+    private val currentUserId = UserManager.getUser().userId
     private val _planMainState = MutableStateFlow<ApiResult<List<PlanModel>>>(ApiResult.Loading)
     val planMainState: StateFlow<ApiResult<List<PlanModel>>> = _planMainState.asStateFlow()
 
@@ -48,5 +34,4 @@ class PlanMainViewModel(
         loadUserPlansOnce(currentUserId)
     }
 
-    // ... 其他 ViewModel 邏輯，例如添加、修改、刪除計畫
 }

@@ -35,6 +35,11 @@ import com.example.healthhelper.plan.DateRange
 import com.example.healthhelper.plan.ui.CustomIcon
 import com.example.healthhelper.ui.theme.HealthHelperTheme
 
+/** 自訂下拉式選單
+ * @param options 可選項列表
+ * @param selectedOption 目前選擇的選項
+ * @param onOptionSelected 選擇選項時調用的回調函數
+ * @param getDisplayText 根據選項獲取顯示的文字*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> CreateDropDownMenu(
@@ -45,16 +50,16 @@ fun <T> CreateDropDownMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    var selectedText = selectedOption?.let { getDisplayText(it) } ?: ""
+    val selectedText = selectedOption?.let { getDisplayText(it) } ?: ""
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { expanded = it }
     ) {
-        OutlinedTextField( // <--- 改用 OutlinedTextField
+        OutlinedTextField(
             readOnly = true,
             value = selectedText,
-            onValueChange = { /* 通常 readOnly TextField不需要 */ },
+            onValueChange = { },
             label = { Text(text = stringResource(R.string.pickDateRange)) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
@@ -65,7 +70,7 @@ fun <T> CreateDropDownMenu(
                 RoundedCornerShape(20.dp)
             },
             modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryEditable, true) // menuAnchor 仍然需要
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 .fillMaxWidth() // 設置寬度
         )
 

@@ -25,7 +25,7 @@ fun SavingFile(
 
     var canDownloadFile by remember { mutableStateOf(true) }
 
-    val directoryFile = Environment.getExternalStoragePublicDirectory(type)
+    val directoryFile = getExternalStoragePublicDirectory(type)
 
     val fullFile = File(directoryFile,filename)
     directoryFile?.let{

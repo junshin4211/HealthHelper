@@ -9,6 +9,6 @@ import androidx.navigation.compose.rememberNavController
 fun ManagePlan(
     navcontroller: NavHostController = rememberNavController(),
 ){
-    val tag = "tag_ManagePlan"
+    "tag_ManagePlan"
     Text("計劃管理葉面")
 }

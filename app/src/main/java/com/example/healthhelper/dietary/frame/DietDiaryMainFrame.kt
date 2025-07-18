@@ -62,9 +62,9 @@ fun DietDiaryMainFrame(
     diaryViewModel: DiaryViewModel = viewModel(),
     foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
-    val TAG = "tag_DietDiaryMainFrame"
+    "tag_DietDiaryMainFrame"
 
-    val context = LocalContext.current
+    LocalContext.current
 
     val mealsOptions by mealsOptionViewModel.data.collectAsState()
     val nutritionInfo by nutritionInfoViewModel.data.collectAsState()
@@ -186,5 +186,5 @@ fun DietDiaryMainFrame(
 @Composable
 fun DietDiaryMainFramePreview() {
     val navController = rememberNavController()
-    DietDiaryMainFrame(navController);
+    DietDiaryMainFrame(navController)
 }

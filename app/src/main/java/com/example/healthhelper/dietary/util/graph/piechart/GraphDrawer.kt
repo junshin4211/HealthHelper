@@ -12,7 +12,7 @@ object GraphDrawer {
         entries: List<PieChartEntry>,
         numberOfEntries: Int,
     ): List<Double> {
-        val TAG = "tag_calculateStartAngles"
+        "tag_calculateStartAngles"
         var totalPercentage = 0.0
         return entries.map { entry ->
             val startAngle = totalPercentage * 360.0
@@ -27,7 +27,7 @@ object GraphDrawer {
         numberOfEntries: Int,
         size: UInt,
     ) {
-        val TAG = "tag_drawPieChart"
+        "tag_drawPieChart"
         val startAngles = calculateStartAngles(
             entries,
             numberOfEntries,

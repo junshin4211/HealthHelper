@@ -75,7 +75,7 @@ fun CheckPlan(
 ) {
     tabVM.setTabVisibility(false)
     val planUCImpl = PlanUCImpl()
-    val formatter = PlanUCImpl()::dateTimeFormat;
+    val formatter = PlanUCImpl()::dateTimeFormat
     var showdatepick by remember { mutableStateOf(false) }
     var showfinish by remember { mutableStateOf(false) }
     var selectedIndex by remember { mutableIntStateOf(-1) }
@@ -83,7 +83,7 @@ fun CheckPlan(
     var finishpercent by remember { mutableFloatStateOf(0f) }
     val scrollstate = rememberScrollState()
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    LocalContext.current
     val tag = "tag_CheckPlan"
 
     //get selected plan
@@ -561,7 +561,7 @@ fun ShowNutritionList(
     averagesugar: Float,
     averagesodium: Float,
 ) {
-    val tag = "tag_ShowNutritionList"
+    "tag_ShowNutritionList"
     val fibergoal = 30f
     val sugargoal = (planSpecificModel.Caloriesgoal) * 0.1f
     val sodiumgoal = 2.4f

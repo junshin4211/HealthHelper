@@ -1,8 +1,7 @@
 package com.example.healthhelper.planpage.ui.components
 
-import android.util.Log
+
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -10,7 +9,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
@@ -22,12 +20,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.healthhelper.R
 import com.example.healthhelper.planpage.domain.usecase.formatMillisToDateString
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
-import java.time.YearMonth
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
+/** 彈出式日期選擇(範圍)
+ * @param initialSelectedStartDateMillis 初始開始日期
+ * @param initialSelectedEndDateMillis 初始結束日期
+ * @param onConfirm 回傳lambda Pair(開始,結束)*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangePickerDialog(
@@ -35,22 +37,21 @@ fun DateRangePickerDialog(
     onDismiss: () -> Unit,
     initialSelectedStartDateMillis: Long? = null,
     initialSelectedEndDateMillis: Long? = null
-){
+) {
     val today = LocalDate.now()
 
-    // 計算今天的開始時間的 UTC 毫秒數
+    // 計算今天開始時間的 UTC 毫秒數
     val todayMillis = today
         .atStartOfDay(ZoneId.systemDefault()) // 獲取本地時區下，今天的開始時間 (ZonedDateTime)
-        .toInstant()                           // 轉換為 UTC Instant
-        .toEpochMilli()                        // 轉換為 UTC 毫秒數
+        .toInstant()
+        .toEpochMilli()
 
     val dateRangePickerState = rememberDateRangePickerState(
-        // 關鍵：設置初始選中的開始和結束日期
+        // 設置初始選中的開始和結束日期
         initialSelectedStartDateMillis = initialSelectedStartDateMillis,
         initialSelectedEndDateMillis = initialSelectedEndDateMillis,
 
         // 初始顯示月份仍然可以設置為今天所在的月份，或者基於 initialSelectedStartDateMillis
-        // 如果 initialSelectedStartDateMillis 有值，DatePicker 會嘗試顯示那個日期所在的月份
         initialDisplayedMonthMillis = initialSelectedStartDateMillis ?: todayMillis,
 
         // SelectableDates介面用來限制可選擇的日期與年
@@ -83,12 +84,41 @@ fun DateRangePickerDialog(
         },
         confirmButton = {
             Button(onClick = {
-                onConfirm(
-                    Pair(
-                        dateRangePickerState.selectedStartDateMillis,
-                        dateRangePickerState.selectedEndDateMillis
+                val startDateMillis = dateRangePickerState.selectedStartDateMillis
+                val endDateMillis = dateRangePickerState.selectedEndDateMillis
+
+                // 取得當前系統時區時間(時,分,秒)
+                val currentTime = LocalTime.now(ZoneId.systemDefault())
+
+                // 取得系統日期午夜時間(00:00:00)轉換成當前日期時間
+                val startDate = startDateMillis?.let { midnightMills ->
+                    val selectDate = Instant.ofEpochMilli(midnightMills)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                    ZonedDateTime.of(
+                        selectDate,
+                        currentTime,
+                        ZoneId.systemDefault()
                     )
-                )
+                        .toInstant()
+                        .toEpochMilli()
+                }
+
+                // 結束日期取當日的(23:59:59)
+                val endDate = endDateMillis?.let { midnightMills ->
+                    val selectDate = Instant.ofEpochMilli(midnightMills)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                    ZonedDateTime.of(
+                        selectDate,
+                        LocalTime.of(23, 59, 59),
+                        ZoneId.systemDefault()
+                    )
+                        .toInstant()
+                        .toEpochMilli()
+                }
+
+                onConfirm(Pair(startDate, endDate))
             }) {
                 Text(stringResource(R.string.confirm))
             }
@@ -96,7 +126,7 @@ fun DateRangePickerDialog(
         colors = DatePickerDefaults.colors(
             containerColor = Color.Black
         )
-        ){
+    ) {
         DateRangePicker(
             state = dateRangePickerState,
             title = { Text(stringResource(R.string.pickDateRange)) },
@@ -105,20 +135,20 @@ fun DateRangePickerDialog(
                 val startDateMillis = dateRangePickerState.selectedStartDateMillis
                 val endDateMillis = dateRangePickerState.selectedEndDateMillis
 
+                // 轉成特定格式顯示
                 val startDateString = formatMillisToDateString(startDateMillis)
                 val endDateString = formatMillisToDateString(endDateMillis)
 
+                // Dialog標題
                 val headlineText = when {
                     startDateMillis != null && endDateMillis != null -> {
-                        if (startDateString == endDateString) {
-                            startDateString
-                        } else {
-                            "$startDateString - $endDateString"
-                        }
+                        "$startDateString - $endDateString"
                     }
+
                     startDateMillis != null -> {
                         startDateString
                     }
+
                     else -> {
                         "請選擇日期範圍"
                     }
@@ -147,9 +177,6 @@ fun DateRangePickerDialog(
                 todayContentColor = MaterialTheme.colorScheme.primary, // “今天”日期指示器的顏色 (如果與選中顏色不同)
                 todayDateBorderColor = MaterialTheme.colorScheme.primary, // “今天”日期邊框的顏色
                 dayInSelectionRangeContentColor = Color.Black, // 範圍內日期的文本顏色
-                dayInSelectionRangeContainerColor = MaterialTheme.colorScheme.secondaryContainer // 範圍內日期的背景顏色
-                // ... 您可以根據需要調整更多顏色
-                // subheadContentColor = Color.Black // 子標題顏色 (例如月份和年份選擇器)
             )
         )
     }

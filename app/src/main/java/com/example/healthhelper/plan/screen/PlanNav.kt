@@ -55,7 +55,7 @@ fun Plan(
     EditPlanVM: EditPlanVM = viewModel(),
     checkPlanVM: CheckPlanVM = viewModel()
 ) {
-    val tag = "tag_PlanNav"
+    "tag_PlanNav"
     val context = LocalContext.current
     val backStackEntry by navController.currentBackStackEntryAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())

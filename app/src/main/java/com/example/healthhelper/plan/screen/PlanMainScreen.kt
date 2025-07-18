@@ -76,7 +76,7 @@ fun PlanMain(context: Context = LocalContext.current,
 ) {
     val tag = "tag_PlanMain"
     tabVM.setTabVisibility(true)
-    val formatter = PlanUCImpl()::dateTimeFormat;
+    val formatter = PlanUCImpl()::dateTimeFormat
     val planUCImpl = PlanUCImpl()
     val scope = rememberCoroutineScope()
     val scrollstate = rememberScrollState()

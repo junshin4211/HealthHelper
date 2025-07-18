@@ -15,7 +15,7 @@ object DateUtil {
     fun isValidDate(dateStr:String):Boolean{
         try {
             val formatter = SimpleDateFormat(DateFormatterPattern.pattern, Locale.getDefault())
-            val date = formatter.parse(dateStr)
+            formatter.parse(dateStr)
             return true
         }catch (ex:Exception){
             return false

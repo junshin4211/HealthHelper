@@ -12,7 +12,7 @@ import com.example.healthhelper.dietary.viewmodel.SelectedFoodItemsViewModel
 fun InitializeRepository(
     selectedFoodItemsViewModel: SelectedFoodItemsViewModel = viewModel(),
 ){
-    val TAG = "tag_InitializeRepository"
+    "tag_InitializeRepository"
 
     LaunchedEffect(Unit) {
         // Fetch data from database and set it to stateflow in SelectedFoodItemsRepository.

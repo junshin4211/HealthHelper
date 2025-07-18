@@ -56,7 +56,7 @@ fun MyExposedDropDownMenuWithCheckBox(
     readOnly: Boolean = true,
 ) {
     val context = LocalContext.current
-    val TAG="tag_MyExposedDropDownMenuWithCheckBox"
+    "tag_MyExposedDropDownMenuWithCheckBox"
 
     var expanded by remember { mutableStateOf(false) }
 

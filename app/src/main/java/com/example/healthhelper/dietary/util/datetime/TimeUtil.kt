@@ -15,7 +15,7 @@ object TimeUtil {
     fun isValidTime(dateStr:String):Boolean{
         try {
             val formatter = SimpleDateFormat("hh:MM:ss", Locale.getDefault())
-            val time = formatter.parse(dateStr)
+            formatter.parse(dateStr)
             return true
         }catch (ex:Exception){
             return false

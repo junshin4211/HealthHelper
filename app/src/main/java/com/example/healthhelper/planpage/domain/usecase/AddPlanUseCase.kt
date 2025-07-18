@@ -9,7 +9,9 @@ import com.example.healthhelper.planpage.ui.DateRangeTitle
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -30,11 +32,10 @@ fun formatMillisToDateString(millis: Long?, zoneId: ZoneId = ZoneId.systemDefaul
  */
 fun formatMillisToISO(millis: Long?): String? {
     if (millis == null) return null
-    val date = Date(millis)
-    // 確保與後端期望的格式一致
-    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
-    sdf.timeZone = TimeZone.getTimeZone("UTC")
-    return sdf.format(date)
+    val zoneId = ZoneId.systemDefault()
+    return Instant.ofEpochMilli(millis)
+        .atZone(zoneId)
+        .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 }
 
 /** 根據 DateRangeTitle 轉換成天數
@@ -45,12 +46,13 @@ fun calculateDateMillisRange(
     dateRange: DateRangeTitle,
     startDateReference: LocalDate = LocalDate.now()
 ): Pair<Long, Long>? { // 返回 Pair<StartMillis, EndMillis>?
-    val startMillis = startDateReference
-        .atStartOfDay(ZoneId.systemDefault())
+    val currentTime = LocalTime.now(ZoneId.systemDefault())
+
+    val startMillis = ZonedDateTime.of(startDateReference,currentTime, ZoneId.systemDefault())
         .toInstant()
         .toEpochMilli()
 
-    val endDate: LocalDate = when (dateRange) {
+    val endDateReference: LocalDate = when (dateRange) {
         DateRangeTitle.AWeek -> startDateReference.plusWeeks(1).minusDays(1) // 一周後的前一天
         DateRangeTitle.HalfMonth -> startDateReference.plusDays(14) // 大約半個月
         DateRangeTitle.AMonth -> startDateReference.plusMonths(1).minusDays(1)
@@ -60,10 +62,9 @@ fun calculateDateMillisRange(
         // 添加其他 case
     }
 
-    val endMillis = endDate
-        //.atStartOfDay(ZoneId.systemDefault())
-        .atTime(23, 59, 59)
-        .atZone(ZoneId.systemDefault())
+    val endMillis = ZonedDateTime.of(endDateReference,
+        LocalTime.of(23, 59, 59),
+        ZoneId.systemDefault())
         .toInstant()
         .toEpochMilli()
 

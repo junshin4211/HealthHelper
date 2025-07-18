@@ -6,7 +6,7 @@ import com.example.healthhelper.dietary.repository.DiaryRepository
 
 @Composable
 fun EmulateInitializeRepository(){
-    val TAG = "tag_EmulateInitializeRepository"
+    "tag_EmulateInitializeRepository"
 
     LaunchedEffect(Unit) {
         setUserId(2)

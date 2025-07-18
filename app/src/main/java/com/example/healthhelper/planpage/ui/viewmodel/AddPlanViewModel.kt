@@ -24,52 +24,52 @@ sealed class AddPlanUiState {
 class AddPlanViewModel(
     private val planRepository: PlanRepository,
 ):ViewModel(){
-//    private val currentUserId = UserManager.getUser().userId
-    private val _addPlanState = MutableStateFlow<AddPlanUiState>(AddPlanUiState.Idle)
+
+    private val _addPlanState = MutableStateFlow<AddPlanUiState>(Idle)
     val addPlanState: StateFlow<AddPlanUiState> = _addPlanState.asStateFlow()
 
     fun submitPlan(addPlanData: AddPlanModel){
         viewModelScope.launch {
-            _addPlanState.value = AddPlanUiState.Loading
+            _addPlanState.value = Loading
 
             // 開始檢查資料
             if (addPlanData.userId < 0){
-                _addPlanState.value = AddPlanUiState.Error("使用者ID錯誤")
+                _addPlanState.value = Error("使用者ID錯誤")
                 return@launch
             }
             if (addPlanData.categoryId <= 0 ){
-                _addPlanState.value = AddPlanUiState.Error("計畫ID錯誤")
+                _addPlanState.value = Error("計畫ID錯誤")
                 return@launch
             }
             if(addPlanData.finishstate != 0){
-                _addPlanState.value = AddPlanUiState.Error("完成狀態錯誤")
+                _addPlanState.value = Error("完成狀態錯誤")
                 return@launch
             }
             if (addPlanData.fatgoal < 0){
-                _addPlanState.value = AddPlanUiState.Error("脂訪目標錯誤")
+                _addPlanState.value = Error("脂訪目標錯誤")
                 return@launch
             }
             if (addPlanData.carbongoal < 0){
-                _addPlanState.value = AddPlanUiState.Error("碳水化合物目標錯誤")
+                _addPlanState.value = Error("碳水化合物目標錯誤")
                 return@launch
             }
             if (addPlanData.proteingoal < 0){
-                _addPlanState.value = AddPlanUiState.Error("蛋白質目標錯誤")
+                _addPlanState.value = Error("蛋白質目標錯誤")
                 return@launch
             }
-            if ((addPlanData.fatgoal + addPlanData.carbongoal + addPlanData.proteingoal).toDouble() != 1.0){
-                _addPlanState.value = AddPlanUiState.Error("目標比例錯誤")
+            if ((addPlanData.fatgoal + addPlanData.carbongoal + addPlanData.proteingoal).toInt() != 100){
+                _addPlanState.value = Error("目標比例錯誤")
                 return@launch
             }
             if (addPlanData.Caloriesgoal <= 0){
-                _addPlanState.value = AddPlanUiState.Error("卡路里目標錯誤")
+                _addPlanState.value = Error("卡路里目標錯誤")
                 return@launch
             }
 
             when(val result = planRepository.addPlan(addPlanData)){
                 is Result.Success -> {
                     if (result.data.result){
-                        _addPlanState.value = AddPlanUiState.Success
+                        _addPlanState.value = Success
                     }else{
                         _addPlanState.value = Error(result.data.errMsg ?: "新增計劃失敗，但未收到後端錯誤訊息")
                     }
@@ -79,14 +79,14 @@ class AddPlanViewModel(
                 }
 
                 is Result.Loading -> {
-                    _addPlanState.value = AddPlanUiState.Loading
+                    _addPlanState.value = Loading
                 }
             }
         }
     }
 
     fun refreshAddPlanState(){
-        _addPlanState.value = AddPlanUiState.Idle
+        _addPlanState.value = Idle
     }
 
 }

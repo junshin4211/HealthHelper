@@ -133,7 +133,7 @@ class UpdateInfoVM : ViewModel() {
                     addProperty("birthday", _uiState.value.formState.birthDate)
                 }
 
-                Log.d("UpdateInfoVM", "Prepared JSON Data (with account): ${jsonObject.toString()}")
+                Log.d("UpdateInfoVM", "Prepared JSON Data (with account): $jsonObject")
                 Log.d("UpdateInfoVM", "Sending update request to: $serverUrl/user/update")
 
                 val response = httpPost(

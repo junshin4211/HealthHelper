@@ -14,7 +14,7 @@ fun NutritionInfoText(
     showTitle : Boolean,
 ){
     val infos = NutritionInfoText1(nutritionInfoVO)
-    Column() {
+    Column {
         if(showTitle){
             title()
         }

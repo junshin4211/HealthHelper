@@ -53,6 +53,7 @@ import com.example.healthhelper.planpage.domain.usecase.formatMillisToDateString
 import com.example.healthhelper.planpage.domain.usecase.formatMillisToISO
 import com.example.healthhelper.planpage.domain.usecase.validationPlanMessage
 import com.example.healthhelper.planpage.ui.components.CreateDropDownMenu
+import com.example.healthhelper.planpage.ui.components.CustomAlertDialog
 import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
 import com.example.healthhelper.planpage.ui.components.DonutChart
 import com.example.healthhelper.planpage.ui.viewmodel.AddPlanUiState
@@ -73,7 +74,7 @@ enum class DateRangeTitle(@StringRes val title: Int) {
 @Composable
 fun AddPlan(
     navController: NavHostController = rememberNavController(),
-    @StringRes title: Int
+    @StringRes title: Int,
 ) {
     val appBarTitle by remember { mutableStateOf(title) }
     val planRepository = DependencyProvider.planRepository
@@ -85,14 +86,20 @@ fun AddPlan(
     LaunchedEffect(uiState) {
         when (val state = uiState) {
             is AddPlanUiState.Success -> {
-                snackbarHostState.showSnackbar("計劃已成功儲存！")
                 Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
                 viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
-                // 可選: navController.popBackStack() // 導航回去
+                navController.popBackStack() // 導航回去
+                snackbarHostState.showSnackbar(
+                    "計劃已成功儲存！",
+                    duration = SnackbarDuration.Short
+                )
             }
 
             is AddPlanUiState.Error -> {
-                snackbarHostState.showSnackbar("錯誤: ${state.message}")
+                snackbarHostState.showSnackbar(
+                    "錯誤: ${state.message}",
+                    duration = SnackbarDuration.Short
+                )
                 Log.e("AddPlanScreen", "Plan creation error from ViewModel: ${state.message}")
                 viewModel.refreshAddPlanState()
             }
@@ -195,6 +202,8 @@ private fun DietSettingsContent(
 
         // 顯示日期選擇
         var showDateRangePicker by remember { mutableStateOf(false) }
+
+        var showCofirm by remember { mutableStateOf(false) }
 
         var inputCalories by remember { mutableIntStateOf(1500) } // Caloriegoal
 
@@ -328,60 +337,27 @@ private fun DietSettingsContent(
         Spacer(modifier = Modifier.height(32.dp))
         Button(
             onClick = {
-                val goals = NutritionGoal.getGoals(title)
-                val categoryId = CategoryID.getCateId(title)
+                val isValidDate =
+                    savedSelectedStartDateMillis != null && savedSelectedEndDateMillis != null
+                val isValidCalories = inputCalories > 0
 
-                if (goals == null || categoryId == null) {
-                    scope.launch {
-                        snackBarHostState.showSnackbar("無效計畫名稱")
+                if (isValidDate && isValidCalories) {
+                    showCofirm = true
+                }else{
+                    val errorMessage = when {
+                        !isValidDate -> context.getString(R.string.invalidDateTime) // 使用你已有的字符串資源
+                        !isValidCalories -> context.getString(R.string.invalidCaloriesGoal) // 使用你已有的字符串資源
+                        else -> "未知錯誤"
                     }
-                    return@Button
-                }
-
-                val isValid = validationPlanMessage(
-                    userId = currentUserId,
-                    startDateTime = savedSelectedStartDateMillis,
-                    endDateTime = savedSelectedEndDateMillis,
-                    categoryId = categoryId,
-                    finishstate = 0,
-                    fatgoal = goals.first,
-                    carbongoal = goals.second,
-                    proteingoal = goals.third,
-                    Caloriesgoal = inputCalories.toFloat()
-                )
-
-                if (isValid != null) {
-                    val errorMessage = context.getString(isValid)
                     scope.launch {
-                        snackBarHostState.showSnackbar(errorMessage)
+                        snackBarHostState.showSnackbar(
+                            errorMessage,
+                            duration = SnackbarDuration.Short
+                        )
                     }
-                    return@Button
                 }
-
-                val startDate = formatMillisToISO(savedSelectedStartDateMillis)
-                val endDate = formatMillisToISO(savedSelectedEndDateMillis)
-
-                if (startDate == null || endDate == null) {
-                    Log.e("AddPlanScreen", "日期轉換錯誤")
-                    scope.launch {
-                        snackBarHostState.showSnackbar("日期轉換錯誤")
-                    }
-                    return@Button // 阻止繼續執行
-                }
-
-                val addPlanData = AddPlanModel(
-                    userId = currentUserId,
-                    startDateTime = startDate,
-                    endDateTime = endDate,
-                    categoryId = categoryId,
-                    finishstate = 0,
-                    fatgoal = goals.first,
-                    carbongoal = goals.second,
-                    proteingoal = goals.third,
-                    Caloriesgoal = inputCalories.toFloat()
-                )
-                onSaveClick(addPlanData)
             },
+            enabled = !isSaving,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -397,6 +373,92 @@ private fun DietSettingsContent(
             } else {
                 Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
+        }
+
+        if (showCofirm) {
+            CustomAlertDialog(
+                onDismissRequest = { showCofirm = false },
+                title = {
+                    Text(
+                        text = stringResource(R.string.savePlan_alert_title),
+                        color = Color.Red
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.savePlan_alert_text),
+                        color = Color.Red
+                    )
+                },
+                onConfirm = {
+                    val goals = NutritionGoal.getGoals(title)
+                    val categoryId = CategoryID.getCateId(title)
+
+                    if (goals == null || categoryId == null) {
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                "無效計畫名稱",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        showCofirm = false
+                        return@CustomAlertDialog
+                    }
+
+                    val isValid = validationPlanMessage(
+                        userId = currentUserId,
+                        startDateTime = savedSelectedStartDateMillis,
+                        endDateTime = savedSelectedEndDateMillis,
+                        categoryId = categoryId,
+                        finishstate = 0,
+                        fatgoal = goals.first,
+                        carbongoal = goals.second,
+                        proteingoal = goals.third,
+                        Caloriesgoal = inputCalories.toFloat()
+                    )
+
+                    if (isValid != null) {
+                        val errorMessage = context.getString(isValid)
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                errorMessage,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        showCofirm = false
+                        return@CustomAlertDialog
+                    }
+
+                    val startDate = formatMillisToISO(savedSelectedStartDateMillis)
+                    val endDate = formatMillisToISO(savedSelectedEndDateMillis)
+
+                    if (startDate == null || endDate == null) {
+                        Log.e("AddPlanScreen", "日期轉換錯誤")
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                "日期轉換錯誤",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        showCofirm = false
+                        return@CustomAlertDialog // 阻止繼續執行
+                    }
+
+                    val addPlanData = AddPlanModel(
+                        userId = currentUserId,
+                        startDateTime = startDate,
+                        endDateTime = endDate,
+                        categoryId = categoryId,
+                        finishstate = 0,
+                        fatgoal = (goals.first) * 100,
+                        carbongoal = (goals.second) * 100,
+                        proteingoal = (goals.third) * 100,
+                        Caloriesgoal = inputCalories.toFloat()
+                    )
+                    onSaveClick(addPlanData)
+                    showCofirm = false
+                }
+            )
         }
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -600,5 +662,6 @@ private fun MacroDetailItem(
 @Preview(showBackground = true, device = "id:pixel_6")
 @Composable
 fun AddPlanPreview() {
+    val snackBarHostState = remember { SnackbarHostState() }
     AddPlan(title = R.string.add_plan_default_title)
 }

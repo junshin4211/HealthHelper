@@ -106,11 +106,11 @@ fun DietDiaryMealFrame(
     diaryViewModel: DiaryViewModel = viewModel(),
     foodItemViewModel: FoodItemViewModel = viewModel(),
 ) {
-    val TAG = "tag_DietDiaryMealFrame"
+    "tag_DietDiaryMealFrame"
 
     val context = LocalContext.current
 
-    val verticalScrollState = rememberScrollState()
+    rememberScrollState()
 
     val selectedFoodItemsVOs by selectedFoodItemsViewModel.data.collectAsState()
     val selectedFoodItem by selectedFoodItemsViewModel.selectedData.collectAsState()

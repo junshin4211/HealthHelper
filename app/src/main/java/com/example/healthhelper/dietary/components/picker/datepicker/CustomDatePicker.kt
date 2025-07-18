@@ -54,12 +54,11 @@ fun CustomDatePicker(
     selectedDateViewModel: SelectedDateViewModel = viewModel(),
     nutritionInfoViewModel: NutritionInfoViewModel = viewModel(),
 ) {
-    val TAG = "tag_CustomDatePicker"
+    "tag_CustomDatePicker"
     val context = LocalContext.current
 
     val selectedDateVO by selectedDateViewModel.selectedDate.collectAsState()
     val diaryVO by diaryViewModel.data.collectAsState()
-    val nutritionInfoVO by nutritionInfoViewModel.data.collectAsState()
 
     val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
@@ -110,7 +109,7 @@ fun CustomDatePicker(
                 newDiaryVO.totalSodium = 0.0
                 newDiaryVO.totalFiber = 0.0
                 newDiaryVO.totalCalories = 0.0
-                val affectedRows = diaryViewModel.insertDiary(newDiaryVO)
+                diaryViewModel.insertDiary(newDiaryVO)
 
                 NutritionInfoRepository.setNutritionInfo(newDiaryVO)
                 FoodItemRepository.setSelectedDiaryId(newDiaryVO.diaryID)

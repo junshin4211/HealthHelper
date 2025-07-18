@@ -121,7 +121,7 @@ fun FoodItemInfoFrame(
                     .padding(innerPadding)
                     .background(color = colorResource(R.color.backgroundcolor)),
             ) {
-                Column() {
+                Column {
                     Spacer(
                         modifier = Modifier
                             .height(10.dp)

@@ -29,7 +29,10 @@ import com.example.healthhelper.planpage.domain.model.ChartData
 import kotlin.math.cos
 import kotlin.math.sin
 
-
+/** 自訂圓餅圖
+ * @param data List 資料
+ * @param strokeWidth 繪製粗度
+ * @param chartPadding*/
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun DonutChart(
@@ -42,7 +45,6 @@ fun DonutChart(
     if (data.isEmpty()) return
 
     val totalValue = data.sumOf { it.value.toDouble() }.toFloat()
-//    if (totalValue == 0f) return
 
     val density = LocalDensity.current
 
@@ -85,7 +87,6 @@ fun DonutChart(
             data.forEach { item ->
                 val percentage = (item.value / totalValue) * 100
 
-                // --- 錯誤修正 2: 在這裡重新計算 sweepAngle ---
                 val sweepAngle = (item.value / totalValue) * 360f
 
                 if (percentage > 1.0f) {
@@ -115,6 +116,7 @@ fun DonutChart(
     }
 }
 
+/** 用於預設計畫的Chart 不需要*/
 @Composable
 fun DonutChart(
     @StringRes planTitle: Int,
@@ -156,7 +158,7 @@ fun DonutChart(
         }
     }
 
-    // 調用您已有的、接收 List<ChartData> 的 DonutChart
+    // 現有的、接收 List<ChartData> 的 DonutChart
     DonutChart(
         data = chartDataList,
         modifier = modifier,

@@ -6,6 +6,4 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.sql.Date
 
-object DiaryInfoUpdatorRepository {
-
-}
+object DiaryInfoUpdatorRepository

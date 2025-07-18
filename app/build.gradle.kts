@@ -28,6 +28,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk.debugSymbolLevel = "FULL"
         }
     }
     compileOptions {
@@ -49,6 +50,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    ndkVersion = "29.0.13599879 rc2"
 }
 
 dependencies {
@@ -107,7 +109,8 @@ dependencies {
 //    implementation(libs.compose.theme.adapter)
 
     implementation(libs.material)
-    implementation(libs.cloudinary.android)
+//    implementation(libs.cloudinary.android)
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
     implementation( "com.google.guava:guava:31.0.1-android")
     implementation(libs.androidx.security.crypto.ktx)
 

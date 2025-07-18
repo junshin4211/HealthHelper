@@ -9,13 +9,6 @@ class AppViewModelFactory(
     private val planRepository: PlanRepository,
 ) : ViewModelProvider.Factory {
 
-    //    private fun providePlanRepository(): PlanRepository {
-//        return PlanRepositoryImpl(
-//            planApiService = NetworkClient.planApiService,
-//            ioDispatcher = Dispatchers.IO
-//        )
-//    }
-
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when {

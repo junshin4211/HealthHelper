@@ -37,7 +37,7 @@ fun CreateToggleButton(
     barWidth: Dp = 280.dp,
     topPadding: Dp = 15.dp
 ) {
-    val size = barWidth/2
+    barWidth/2
     Row(
         modifier = Modifier
             .padding(topPadding)
