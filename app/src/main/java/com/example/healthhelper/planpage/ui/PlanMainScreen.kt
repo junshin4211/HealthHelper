@@ -9,10 +9,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,11 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +44,7 @@ import com.example.healthhelper.planpage.domain.usecase.filterAndSortPlan
 import com.example.healthhelper.planpage.domain.usecase.transformDate
 import com.example.healthhelper.planpage.navigation.Screen
 import com.example.healthhelper.planpage.ui.components.LoadingIndicator
+import com.example.healthhelper.planpage.ui.components.Title
 import com.example.healthhelper.planpage.ui.viewmodel.AppViewModelFactory
 import com.example.healthhelper.planpage.ui.viewmodel.PlanMainViewModel
 import com.example.healthhelper.screen.TabViewModel
@@ -99,6 +100,7 @@ fun ErrorDisplay(message: String) {
     Text("Error: $message", color = MaterialTheme.colorScheme.error)
 }
 
+// 計畫內容
 @Composable
 fun PlanContent(
     modifier: Modifier = Modifier,
@@ -106,10 +108,12 @@ fun PlanContent(
     tabViewModel: TabViewModel,
     planList: List<PlanModel>
 ) {
+    // 我的計畫參數
     var onGoingPlanImage by remember { mutableIntStateOf(R.drawable.customimg) }
     var onGoingPlanName by remember { mutableStateOf("") }
     var onGoingPlanDate by remember { mutableStateOf("") }
 
+    // 已完成計畫參數
     var completedPlanImage by remember { mutableIntStateOf(R.drawable.customimg) }
     var completedPlanName by remember { mutableStateOf("") }
     var completedPlanDate by remember { mutableStateOf("") }
@@ -122,9 +126,12 @@ fun PlanContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background) // 使用主題背景色
     ) {
+
         DietFilterBar(navController = navController)
+
         HorizontalDivider(thickness = 2.dp)
-        PlanSection(title = "我的計畫",navController = navController) {
+
+        PlanSection(title = stringResource(R.string.myPlan), navController = navController) {
             PlanCard(
                 navController = navController,
                 planList = planList,
@@ -138,9 +145,10 @@ fun PlanContent(
                     onGoingPlanDate = date
                 })
         }
-//        Spacer(modifier = Modifier.height(16.dp))
+
         HorizontalDivider(thickness = 2.dp)
-        PlanSection(title = "已完成",navController = navController) {
+
+        PlanSection(title = stringResource(R.string.completedPlan), navController = navController) {
             PlanCard(
                 navController = navController,
                 planList = planList,
@@ -175,6 +183,7 @@ fun PlanTopBar() {
     )
 }
 
+// 上排計畫列表
 @Composable
 fun DietFilterBar(navController: NavHostController) {
     Row(
@@ -188,39 +197,44 @@ fun DietFilterBar(navController: NavHostController) {
             painter = painterResource(id = R.drawable.protein),
             label = DietPlanType.HIGH_PROTEIN,
             navController = navController,
-            )
+        )
         FilterItem(
             painter = painterResource(id = R.drawable.lowcarb),
             label = DietPlanType.LOW_CARB_HYDRATE,
-            navController = navController)
+            navController = navController
+        )
         FilterItem(
             painter = painterResource(id = R.drawable.ketone),
             label = DietPlanType.KETONE,
-            navController = navController)
+            navController = navController
+        )
         FilterItem(
             painter = painterResource(id = R.drawable.mediterra),
             label = DietPlanType.MEDITERRA,
-            navController = navController)
+            navController = navController
+        )
         FilterItem(
             painter = painterResource(id = R.drawable.custom),
             label = DietPlanType.CUSTOM,
             isCustom = true,
-            navController = navController)
+            navController = navController
+        )
     }
 }
 
+// 單個計畫項目
 @Composable
-fun FilterItem(painter: Painter,
-               label: DietPlanType,
-               isCustom: Boolean = false,
-               navController: NavHostController)
-{
+fun FilterItem(
+    painter: Painter,
+    label: DietPlanType,
+    isCustom: Boolean = false,
+    navController: NavHostController
+) {
     Column(
         modifier = Modifier.clickable {
-            if (!isCustom)
-            {
-                navController.navigate(Screen.AddPlan.createRoute(label.displayNameRes))
-            }else{
+            if (!isCustom) {
+                navController.navigate(Screen.AddPlan.createRoute(label.displayNameRes)) // 傳遞計畫名稱
+            } else {
                 navController.navigate(Screen.AddCustomPlan.createRoute(label.displayNameRes))
             }
         },
@@ -234,43 +248,61 @@ fun FilterItem(painter: Painter,
             modifier = Modifier.size(28.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = stringResource(label.displayNameRes), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+        Text(
+            text = stringResource(label.displayNameRes),
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 12.sp
+        )
     }
 }
 
+// 主頁計畫顯示區
 @Composable
-fun PlanSection(title: String,
-                navController: NavHostController,
-                content: @Composable () -> Unit) {
+fun PlanSection(
+    title: String,
+    navController: NavHostController,
+    content: @Composable () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-            //.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground // 使用主題文字顏色
-        )
+
+        Title(title = title)
+
         Spacer(modifier = Modifier.height(8.dp))
-        content()
-        TextButton(
-            onClick = {navController.navigate(Screen.ManagePlan.route)},
+
+
+        content() // 你的 PlanCard 等內容
+
+        Row(
             modifier = Modifier
-                .align(Alignment.End)
-                .scale(0.8f)
+                .align(alignment = Alignment.End)
+                .padding(top = 5.dp, bottom = 5.dp)
+                .clickable { navController.navigate(Screen.ManagePlan.route) },
+            verticalAlignment = Alignment.CenterVertically
         ) {
+
             Text(
-                text = "more...",
-                color = colorResource(id = R.color.blue01),
-                fontSize = 20.sp
+                text = stringResource(R.string.more),
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontSize = 14.sp
             )
+
+            Icon(
+                imageVector = Icons.Filled.MoreHoriz,
+                contentDescription = stringResource(R.string.more),
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(25.dp) // 圖標大小
+            )
+
         }
+
     }
 }
 
+// 計畫顯示內容
 @Composable
 fun PlanCard(
     navController: NavHostController,
@@ -281,30 +313,49 @@ fun PlanCard(
     dateDisplay: String,
     onSetPlan: (image: Int, name: String, date: String) -> Unit,
 ) {
-    LaunchedEffect(planList,isFinish) {
+
+    LaunchedEffect(planList, isFinish) {
+
         Log.d("PlanMain", "LaunchedEffect triggered due to planList change.")
         if (planList.isEmpty()) {
-            onSetPlan(R.drawable.customimg, "尚無任何無計畫", "")
+            onSetPlan(R.drawable.customimg, "尚無任何無計畫", "2999/99/99")
         } else {
-            val firstPlan = filterAndSortPlan(planList,isFinish).first()
-            val startDate = try { transformDate(firstPlan.startDateTime) } catch (e: Exception) { "錯誤日期" }
-            val endDate = try { transformDate(firstPlan.endDateTime) } catch (e: Exception) { "錯誤日期" }
-            val imageRes = when (firstPlan.categoryId) {
+            val getFirstPlan = filterAndSortPlan(planList, isFinish).first() // 計劃列表按日期排序並取得第一個計劃顯示
+
+            val startDate = try {
+                transformDate(getFirstPlan.startDateTime) // 將日期轉換格式
+            } catch (e: Exception) {
+                "錯誤日期"
+            }
+
+            val endDate = try {
+                transformDate(getFirstPlan.endDateTime)
+            } catch (e: Exception) {
+                "錯誤日期"
+            }
+
+            val imageRes = when (getFirstPlan.categoryId) {
                 1 -> R.drawable.highproteinimg
                 2 -> R.drawable.lowcarbimg
                 3 -> R.drawable.ketoneimg
                 4 -> R.drawable.mediterraimg
                 else -> R.drawable.customimg
             }
-            Log.d("PlanMain", "firstPlan: $firstPlan finishstate: ${firstPlan.finishstate}")
-            onSetPlan(imageRes, "${firstPlan.categoryName}計畫", "$startDate ~ $endDate")
+            Log.d("PlanMain", "firstPlan: $getFirstPlan finishstate: ${getFirstPlan.finishstate}")
+
+            onSetPlan(imageRes, "${getFirstPlan.categoryName}計畫", "$startDate ~ $endDate")
         }
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {navController.navigate(Screen.PlanDetail.route)},
+            .clickable {
+                // 只有在實際有計畫時才導航，或者導航到一個可以處理空狀態的詳細頁面
+                if (nameDisplay != "尚無任何計畫" && !nameDisplay.contains("尚無")) { // 根據你的默認消息調整
+                    navController.navigate(Screen.PlanDetail.route) // 你可能需要傳遞計劃ID
+                }
+            },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -313,44 +364,44 @@ fun PlanCard(
             Box {
                 Image(
                     painter = painterResource(id = imageDisplay),
-                    contentDescription = "我的計畫圖片",
+                    contentDescription = stringResource(R.string.planImage),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(180.dp),
                     contentScale = ContentScale.Crop
                 )
-                if (isFinish)
-                {
-                Icon(
-                    imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = "Current Plan",
-                    tint = Color(0xFF4CAF50),
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(12.dp)
-                        .size(32.dp)
-                        .background(Color.White, CircleShape)
-                )
+                if (isFinish) {
+                    Icon(
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = stringResource(R.string.checkIcon),
+                        tint = Color(0xFF4CAF50),
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(12.dp)
+                            .size(32.dp)
+                            .background(Color.White, CircleShape)
+                    )
                 }
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
 
-                    Text(
-                        text = nameDisplay,
-                        color = MaterialTheme.colorScheme.secondary, // 使用主題次要顏色
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = dateDisplay,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontSize = 12.sp
-                    )
+                Text(
+                    text = nameDisplay,
+                    color = MaterialTheme.colorScheme.secondary, // 使用主題次要顏色
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = dateDisplay,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 12.sp
+                )
 
             }
         }

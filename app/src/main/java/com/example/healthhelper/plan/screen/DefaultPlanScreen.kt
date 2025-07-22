@@ -167,7 +167,7 @@ fun EditPlan(
             CreateDatePicker(dateSelected = selectedDate, EditPlanVM = EditPlanVM)
 
             Text(
-                text = stringResource(R.string.enddate),
+                text = stringResource(R.string.endDate),
                 style = TextStyle(
                     fontSize = 22.sp,
                     fontFamily = FontFamily.Default,
@@ -246,7 +246,7 @@ fun EditPlan(
             ) {
                 CustomText().TextWithDiffColor(
                     R.color.primarycolor,
-                    stringResource(R.string.dailygoal),
+                    stringResource(R.string.dailyGoal),
                     26.sp
                 )
             }
@@ -267,7 +267,7 @@ fun EditPlan(
                 CustomTextField().TextFieldWithBorder(
                     value = calorie,
                     onValueChange = { newvalue -> calorie = newvalue },
-                    label = stringResource(R.string.examcalorie),
+                    label = stringResource(R.string.examCalorie),
                     width = 130.dp
                 )
                 CustomText().TextWithDiffColor(R.color.black, stringResource(R.string.cals), 16.sp)

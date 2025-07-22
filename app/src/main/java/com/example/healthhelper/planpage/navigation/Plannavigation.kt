@@ -71,9 +71,15 @@ fun PlanNav(
         }
 
         //to the add custom plan page
-        composable(route = Screen.AddCustomPlan.route) {
+        composable(
+            route = Screen.AddCustomPlan.route,
+            arguments = listOf(navArgument("categoryId") { type = NavType.IntType })
+            ) {
+            val categoryId = backStackEntry?.arguments?.getInt("categoryId") ?: R.string.add_plan_default_title
+
             AddCustomPlan(
-                navController = navController
+                navController = navController,
+                title = categoryId,
             )
         }
 

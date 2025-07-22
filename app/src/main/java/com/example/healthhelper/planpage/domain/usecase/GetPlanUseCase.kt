@@ -3,7 +3,7 @@ package com.example.healthhelper.planpage.domain.usecase
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.healthhelper.planpage.data.model.PlanModel
-import com.example.healthhelper.planpage.ui.DateRangeTitle
+import com.example.healthhelper.planpage.domain.model.DateRangeTitle
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -51,37 +51,3 @@ fun transformDate(dateString: String):String{
     }
     return formattedDate
 }
-
-//fun formatSpecificDateString(inputDateString: String): String? {
-//    val inputFormatter = try {
-//        DateTimeFormatter.ofPattern("MMM d, uuuu, h:mm:ss a", Locale.ENGLISH)
-//    } catch (e: IllegalArgumentException) {
-//        // Log.e("dateFormat", "Invalid input pattern", e) // 日誌記錄
-//        return null // 如果模式本身有問題
-//    }
-//
-//    // 定義目標輸出日期字符串的格式
-//    val outputFormatter = try {
-//        DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
-//    } catch (e: IllegalArgumentException) {
-//        // Log.e("dateFormat", "Invalid output pattern", e) // 日誌記錄
-//        return null
-//    }
-//
-//    return try {
-//        // 1. 解析輸入字符串為 LocalDateTime 對象
-//        val localDateTime = LocalDateTime.parse(inputDateString, inputFormatter)
-//        // 2. 將 LocalDateTime 對象格式化為目標字符串
-//        localDateTime.format(outputFormatter)
-//    } catch (e: DateTimeParseException) {
-//        // 如果輸入字符串無法被 inputFormatter 解析，則會拋出此異常
-//        println("Error parsing date string: '$inputDateString'. ${e.message}")
-//        // Log.e("dateFormat", "Error parsing date string: '$inputDateString'", e) // 日誌記錄
-//        null // 或者可以拋出異常，或者返回一個錯誤提示字符串
-//    } catch (e: Exception) {
-//        // 其他潛在異常
-//        println("An unexpected error occurred during date formatting: ${e.message}")
-//        // Log.e("dateFormat", "Unexpected error: '$inputDateString'", e)
-//        null
-//    }
-//}

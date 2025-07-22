@@ -4,8 +4,8 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import com.example.healthhelper.R
 import com.example.healthhelper.planpage.data.model.AddPlanModel
+import com.example.healthhelper.planpage.domain.model.DateRangeTitle
 import com.example.healthhelper.planpage.domain.model.NutritionType
-import com.example.healthhelper.planpage.ui.DateRangeTitle
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate

@@ -47,6 +47,14 @@ object CategoryID {
     }
 }
 
+enum class DateRangeTitle(@StringRes val title: Int) {
+    AWeek(title = R.string.AWeek),
+    HalfMonth(title = R.string.halfMonth),
+    AMonth(title = R.string.AMonth),
+    ThreeMonth(title = R.string.threeMonth),
+    SixMonth(title = R.string.sixMonth);
+}
+
 data class NutritionDetail(
     @StringRes val titleResId: Int,
     @StringRes val descriptionResId: Int

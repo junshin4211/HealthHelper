@@ -1,18 +1,13 @@
 package com.example.healthhelper.planpage.ui
 
+import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,56 +15,127 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.example.healthhelper.planpage.domain.model.ChartData
-import com.example.healthhelper.planpage.domain.model.MacroInfo
-import com.example.healthhelper.planpage.ui.components.DonutChart
 import com.example.healthhelper.ui.theme.HealthHelperTheme
-
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.healthhelper.R
+import com.example.healthhelper.planpage.data.model.AddPlanModel
+import com.example.healthhelper.planpage.data.remote.DependencyProvider
+import com.example.healthhelper.planpage.domain.model.CategoryID
+import com.example.healthhelper.planpage.domain.model.DateRangeTitle
+import com.example.healthhelper.planpage.domain.model.DietPlanRegistry
+import com.example.healthhelper.planpage.domain.model.DietPlanType
+import com.example.healthhelper.planpage.domain.model.MacroInfo
+import com.example.healthhelper.planpage.domain.model.NutritionType
+import com.example.healthhelper.planpage.domain.usecase.NutritionGoal
+import com.example.healthhelper.planpage.domain.usecase.calculateDateMillisRange
+import com.example.healthhelper.planpage.domain.usecase.calculateNutritionGoals
+import com.example.healthhelper.planpage.domain.usecase.calculateNutritionGrams
+import com.example.healthhelper.planpage.domain.usecase.formatMillisToDateString
+import com.example.healthhelper.planpage.domain.usecase.formatMillisToISO
+import com.example.healthhelper.planpage.domain.usecase.validationPlanMessage
+import com.example.healthhelper.planpage.ui.components.Button_Plan
+import com.example.healthhelper.planpage.ui.components.CreateDropDownMenu
+import com.example.healthhelper.planpage.ui.components.CustomAlertDialog
+import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
+import com.example.healthhelper.planpage.ui.components.DonutChart
+import com.example.healthhelper.planpage.ui.components.Title
+import com.example.healthhelper.planpage.ui.viewmodel.AddPlanUiState
+import com.example.healthhelper.planpage.ui.viewmodel.AddPlanViewModel
+import com.example.healthhelper.planpage.ui.viewmodel.AppViewModelFactory
+import com.example.healthhelper.signuplogin.UserManager
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 @Composable
 fun AddCustomPlan(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    @StringRes title: Int,
 ) {
+    // 獲取repository,載入viewModel
+    val planRepository = DependencyProvider.planRepository
+    val viewModelFactory = remember { AppViewModelFactory(planRepository) }
+    val viewModel: AddPlanViewModel = viewModel(factory = viewModelFactory)
+
+    // 取得新增狀態
+    val uiState by viewModel.addPlanState.collectAsStateWithLifecycle()
+
+    val snackBarHostState = remember { SnackbarHostState() }
+    val appBarTitle by remember { mutableIntStateOf(title) }
+
+    // 根据uiState狀態來判斷是否新增計畫成功
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is AddPlanUiState.Success -> {
+                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
+                viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
+                navController.popBackStack() // 導航回去
+                snackBarHostState.showSnackbar(
+                    "計劃已成功儲存！",
+                    duration = SnackbarDuration.Short
+                )
+            }
+
+            is AddPlanUiState.Error -> {
+                snackBarHostState.showSnackbar(
+                    "錯誤: ${state.message}",
+                    duration = SnackbarDuration.Short
+                )
+                Log.e("AddPlanScreen", "Plan creation error from ViewModel: ${state.message}")
+                viewModel.refreshAddPlanState()
+            }
+
+            is AddPlanUiState.Loading -> {
+
+                Log.d("AddPlanScreen", "Plan creation in progress...")
+                // UI 可以在按鈕或其他地方顯示加載指示
+            }
+
+            AddPlanUiState.Idle -> { /* 初始或已重置狀態 */
+            }
+        }
+    }
+
     HealthHelperTheme {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackBarHostState) },
             topBar = {
-                DietSettingsTopBar(onBackClick = { /* TODO: 處理返回事件 */ })
+                AddPlanTopBar(
+                    onBackClick = { navController.popBackStack() },
+                    title = appBarTitle
+                )
             },
-            // 使用我們 Theme 中定義的背景色
             containerColor = MaterialTheme.colorScheme.background
         ) { paddingValues ->
+
             DietSettingsContent(
-                modifier = Modifier.padding(paddingValues)
+                modifier = Modifier.padding(paddingValues),
+                title = title,
+                snackBarHostState = snackBarHostState,
+                isSaving = uiState is AddPlanUiState.Loading,
+                uiState = uiState,
+                onSaveClick = { addPlanData ->
+                    viewModel.submitPlan(addPlanData)
+                }
             )
         }
     }
@@ -77,11 +143,11 @@ fun AddCustomPlan(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DietSettingsTopBar(onBackClick: () -> Unit) {
+private fun AddPlanTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
     TopAppBar(
         title = {
             Text(
-                "自訂計畫",
+                text = stringResource(title) + stringResource(R.string.plan),
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -92,12 +158,12 @@ private fun DietSettingsTopBar(onBackClick: () -> Unit) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     modifier = Modifier.scale(2.0f),
-                    contentDescription = "返回"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent, // 讓 TopAppBar 背景與主畫面融合
+            containerColor = Color.Transparent,
             titleContentColor = MaterialTheme.colorScheme.onBackground,
             navigationIconContentColor = MaterialTheme.colorScheme.onBackground
         )
@@ -105,7 +171,14 @@ private fun DietSettingsTopBar(onBackClick: () -> Unit) {
 }
 
 @Composable
-private fun DietSettingsContent(modifier: Modifier = Modifier) {
+private fun DietSettingsContent(
+    modifier: Modifier = Modifier,
+    @StringRes title: Int,
+    snackBarHostState: SnackbarHostState,
+    uiState: AddPlanUiState,
+    isSaving: Boolean,
+    onSaveClick: (AddPlanModel) -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -113,113 +186,306 @@ private fun DietSettingsContent(modifier: Modifier = Modifier) {
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 設定週期
-        SectionTitle(title = "設定你的週期", modifier = Modifier.align(Alignment.Start))
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+
+        val currentUserId = UserManager.getUser().userId // userId
+
+        // 沒選擇日期
+        val defaultChooseText = stringResource(R.string.noChoose)
+
+        // 開始結束日期文字顯示
+        var selectedStartDate by remember { mutableStateOf("") }
+        var selectedEndDate by remember { mutableStateOf("") }
+
+        // 新增狀態來保存選中的日期，用於傳遞回 DateRangePickerDialog
+        var savedSelectedStartDateMillis by remember { mutableStateOf<Long?>(null) } // startDateTime
+        var savedSelectedEndDateMillis by remember { mutableStateOf<Long?>(null) } // endDateTime
+
+        // 顯示日期選擇
+        var showDateRangePicker by remember { mutableStateOf(false) }
+
+        // 顯示確認Dialog
+        var showCofirm by remember { mutableStateOf(false) }
+
+        var inputCalories by remember { mutableIntStateOf(1500) } // Caloriegoal
+
+        // 營養公克數
+        var calculatedCarbGram by remember { mutableFloatStateOf(0f) }
+        var calculatedProteinGram by remember { mutableFloatStateOf(0f) }
+        var calculatedFatGram by remember { mutableFloatStateOf(0f) }
+
+        // 將 title 轉換為 DietPlanType
+        val selectedPlanName: DietPlanType? = DietPlanType.fromResId(title)
+
+        // 更新日期函數
+        fun updateDateStates(startMillis: Long?, endMillis: Long?) {
+            savedSelectedStartDateMillis = startMillis
+            savedSelectedEndDateMillis = endMillis
+
+            selectedStartDate =
+                startMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
+            selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
+        }
+
+        // 當 inputCalories 或 currentPlanType 改變時，重新計算克數
+        LaunchedEffect(inputCalories, title) {
+            Log.d(
+                "DietSettingsContent",
+                "Recalculating grams for calories: $inputCalories, plan: ${title}"
+            )
+            calculateNutritionGrams(
+                calories = inputCalories.toFloat(),
+                plan = title, // 傳遞計劃的資源ID
+                onSetNutritionGram = { fatGrams, carbGrams, proteinGrams ->
+                    Log.d(
+                        "DietSettingsContent",
+                        "Grams calculated: F=$fatGrams, C=$carbGrams, P=$proteinGrams"
+                    )
+                    calculatedFatGram = fatGrams
+                    calculatedCarbGram = carbGrams
+                    calculatedProteinGram = proteinGrams
+                }
+            )
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
-        PeriodDropdown()
+        // 週期選單
+        PeriodDropdownSection(
+            title = stringResource(R.string.set_plan_time_title),
+            onDateRangeSelected = { title ->
+                val datePair = calculateDateMillisRange(title)
+                if (datePair != null) {
+                    updateDateStates(datePair.first, datePair.second)
+                } else {
+                    updateDateStates(null, null)
+                }
+            }
+        )
+        // 顯示日期選擇
+        if (showDateRangePicker) {
+            DateRangePickerDialog(
+                initialSelectedStartDateMillis = savedSelectedStartDateMillis,
+                initialSelectedEndDateMillis = savedSelectedEndDateMillis,
+                onConfirm = { pair ->
+                    updateDateStates(pair.first, pair.second)
+                    showDateRangePicker = false
+                },
+                onDismiss = {
+                    showDateRangePicker = false
+                })
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
-        DateSelector(label = "開始日期", date = "2024/10/08") { /* TODO: 開啟日期選擇器 */ }
+        // 開始
+        DateSelector(label = stringResource(R.string.startDate), date = selectedStartDate) {
+            showDateRangePicker = true
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        DateSelector(label = "結束日期", date = "2024/10/15") { /* TODO: 開啟日期選擇器 */ }
+        // 結束
+        DateSelector(label = stringResource(R.string.endDate), date = selectedEndDate) {
+            showDateRangePicker = true
+        }
         Spacer(modifier = Modifier.height(24.dp))
 
         // 營養素圖表
-        NutritionChartSection()
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // 每日目標
-        SectionTitle(title = "每日目標", modifier = Modifier.align(Alignment.Start))
+        NutritionChartSection(
+            planTitle = title,
+            carbGramText = calculatedCarbGram,
+            proteinGramText = calculatedProteinGram,
+            fatGramText = calculatedFatGram
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        CalorieInput()
+
+        // 卡路里輸入
+        CalorieInputSection(
+            title = stringResource(R.string.dailyGoal),
+            calorie = inputCalories,
+            onSetCalorie = { inputCalories = it }
+        )
         Spacer(modifier = Modifier.height(24.dp))
 
         // 詳細說明
-        MacroDetailItem(
-            name = "碳水化合物",
-            percentage = 20,
-            grams = 75,
-            recommendation = "10-20%",
-            details = listOf(
-                "主要來自蔬菜、少量水果和堅果等高纖維低升糖食物。",
-                "儘量避免精製穀物、糖和澱粉類食物（如麵包、米飯、馬鈴薯）。"
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        MacroDetailItem(
-            name = "蛋白質",
-            percentage = 20,
-            grams = 75,
-            recommendation = "20-30%",
-            details = listOf(
-                "來自瘦肉、家禽、魚類、蛋類和乳製品等高品質的蛋白質來源。",
-                "蛋白質有助於維持肌肉質量並增加飽腹感。"
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        MacroDetailItem(
-            name = "脂肪",
-            percentage = 60,
-            grams = 100,
-            recommendation = "60-70%",
-            details = listOf(
-                "健康的脂肪來源包括：橄欖油、椰子油、酪梨、堅果和種子、脂肪魚（如鮭魚和鯖魚）等。",
-                "脂肪提供持續的能量並幫助減少對碳水的依賴。"
-            )
-        )
+        NutritionType.entries.forEach { type ->
+            if (selectedPlanName != null) {
+                DietPlanRegistry.getNutritionDetail(selectedPlanName, type)?.let { content ->
+                    val percentage =
+                        calculateNutritionGoals(selectedPlanName.displayNameRes, type) ?: 0
+
+                    val currentMacroGram = when (type) {
+                        NutritionType.CARBOHYDRATE -> calculatedCarbGram
+                        NutritionType.PROTEIN -> calculatedProteinGram
+                        NutritionType.FAT -> calculatedFatGram
+                    }
+
+                    NutritionDetailSection(
+                        name = stringResource(id = type.displayNameRes),
+                        percentage = percentage,
+                        grams = currentMacroGram,
+                        title = content.getTitle(),
+                        details = content.getDescriptionPoints().joinToString("")
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            onClick = { /* TODO: 處理儲存邏輯 */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(12.dp),
-            // 使用 Material 3 預設的藍色按鈕
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF))
+        // 儲存
+        Button_Plan(
+            onClick = {
+                // 檢查日期和卡路里是否有輸入
+                val isValidDate =
+                    savedSelectedStartDateMillis != null && savedSelectedEndDateMillis != null
+                val isValidCalories = inputCalories > 0
+
+                if (isValidDate && isValidCalories) {
+                    showCofirm = true
+                } else {
+                    val errorMessage = when {
+                        !isValidDate -> context.getString(R.string.invalidDateTime)
+                        !isValidCalories -> context.getString(R.string.invalidCaloriesGoal)
+                        else -> "未知錯誤"
+                    }
+                    scope.launch {
+                        snackBarHostState.showSnackbar(
+                            errorMessage,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            }
         ) {
-            Text("儲存", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            if (isSaving) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            } else {
+                Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        // 點擊儲存後顯示確認對話
+        if (showCofirm) {
+            CustomAlertDialog(
+                onDismissRequest = { showCofirm = false },
+                title = {
+                    Text(
+                        text = stringResource(R.string.savePlan_alert_title),
+                        color = Color.Red
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.savePlan_alert_text),
+                        color = Color.Red
+                    )
+                },
+                onConfirm = {
+                    // 檢查營養目標和計畫類別ID轉換正確
+                    val goals = NutritionGoal.getGoals(title)
+                    val categoryId = CategoryID.getCateId(title)
+
+                    if (goals == null || categoryId == null) {
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                "無效計畫名稱",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        showCofirm = false
+                        return@CustomAlertDialog
+                    }
+
+                    // 檢查全部資料
+                    val isValid = validationPlanMessage(
+                        userId = currentUserId,
+                        startDateTime = savedSelectedStartDateMillis,
+                        endDateTime = savedSelectedEndDateMillis,
+                        categoryId = categoryId,
+                        finishstate = 0,
+                        fatgoal = goals.first,
+                        carbongoal = goals.second,
+                        proteingoal = goals.third,
+                        Caloriesgoal = inputCalories.toFloat()
+                    )
+
+                    if (isValid != null) {
+                        val errorMessage = context.getString(isValid)
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                errorMessage,
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        showCofirm = false
+                        return@CustomAlertDialog
+                    }
+
+                    // 轉換日期為後端格式
+                    val startDate = formatMillisToISO(savedSelectedStartDateMillis)
+                    val endDate = formatMillisToISO(savedSelectedEndDateMillis)
+
+                    if (startDate == null || endDate == null) {
+                        Log.e("AddPlanScreen", "日期轉換錯誤")
+                        scope.launch {
+                            snackBarHostState.showSnackbar(
+                                "日期轉換錯誤",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        showCofirm = false
+                        return@CustomAlertDialog // 阻止繼續執行
+                    }
+
+                    val addPlanData = AddPlanModel(
+                        userId = currentUserId,
+                        startDateTime = startDate,
+                        endDateTime = endDate,
+                        categoryId = categoryId,
+                        finishstate = 0,
+                        fatgoal = (goals.first) * 100,
+                        carbongoal = (goals.second) * 100,
+                        proteingoal = (goals.third) * 100,
+                        Caloriesgoal = inputCalories.toFloat()
+                    )
+                    onSaveClick(addPlanData)
+                    showCofirm = false
+                }
+            )
         }
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
+// 週期下拉式選單
 @Composable
-private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-    )
-}
+private fun PeriodDropdownSection(onDateRangeSelected: (DateRangeTitle) -> Unit, title: String) {
+    var currentSelect by remember { mutableStateOf<DateRangeTitle?>(DateRangeTitle.entries.firstOrNull()) }
+    Column (
+        modifier = Modifier.fillMaxWidth()
+    ){
+        Title(modifier = Modifier.align(Alignment.Start), title = title)
 
-@Composable
-private fun PeriodDropdown() {
-    OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("選擇週期", color = Color.Gray)
-            Icon(
-                imageVector = Icons.Default.ExpandMore,
-                contentDescription = "展開",
-                tint = Color.Gray
-            )
-        }
+        CreateDropDownMenu(
+            options = DateRangeTitle.entries,
+            selectedOption = currentSelect,
+            onOptionSelected = { selectedOption ->
+                currentSelect = selectedOption
+                onDateRangeSelected(selectedOption)
+            },
+            getDisplayText = { options -> stringResource(id = options.title) }
+        )
     }
 }
 
+// 日期選擇內容
 @Composable
-private fun DateSelector(label: String, date: String, onClick: () -> Unit) {
+private fun DateSelector(
+    label: String,
+    date: String,
+    onClick: () -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = label,
@@ -231,9 +497,9 @@ private fun DateSelector(label: String, date: String, onClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
+            border = BorderStroke(0.5.dp, Color.DarkGray)
         ) {
             Row(
                 modifier = Modifier
@@ -252,19 +518,21 @@ private fun DateSelector(label: String, date: String, onClick: () -> Unit) {
     }
 }
 
+// 圖表
 @Composable
-private fun NutritionChartSection() {
-    // 數據的單一來源 (Single Source of Truth)
-    val macroInfo = listOf(
-        MacroInfo("碳水化合物", 75.toFloat(), Color(0xFF304FFE)), // 藍色
-        MacroInfo("蛋白質", 75.toFloat(), Color(0xFFD50000)),  // 紅色
-        MacroInfo("脂肪", 150.toFloat(), Color(0xFF00C853)) // 綠色 - 為了符合20/20/60的比例，這裡改成150克
-    )
+private fun NutritionChartSection(
+    @StringRes planTitle: Int,
+    carbGramText: Float,
+    proteinGramText: Float,
+    fatGramText: Float
+) {
 
-    // 從 macroInfo 動態生成圖表數據
-    // ChartData 的 value 現在是實際的克數
-    val chartData = macroInfo.map {
-        ChartData(value = it.grams.toFloat(), color = it.color)
+    val nutritioninfo = remember(carbGramText, proteinGramText, fatGramText) {
+        listOf(
+            MacroInfo("碳水化合物", carbGramText, Color(0xFF304FFE)), // 藍色
+            MacroInfo("蛋白質", proteinGramText, Color(0xFFD50000)),  // 紅色
+            MacroInfo("脂肪", fatGramText, Color(0xFF00C853)) // 綠色
+        )
     }
 
     Row(
@@ -272,9 +540,9 @@ private fun NutritionChartSection() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // 左側圖例 (保持不變)
+
         Column(modifier = Modifier.weight(1f)) {
-            macroInfo.forEach { info ->
+            nutritioninfo.forEach { info ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "${info.name} ",
@@ -282,7 +550,7 @@ private fun NutritionChartSection() {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${info.grams}克",
+                        text = String.format(Locale.US, "%.2f克", info.grams),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
@@ -290,78 +558,105 @@ private fun NutritionChartSection() {
             }
         }
 
-        // 右側環圈圖
+        // 右側圓圈圖
         Box(
-            modifier = Modifier.size(160.dp), // 稍微增大尺寸以容納百分比文字
+            modifier = Modifier.size(160.dp),
             contentAlignment = Alignment.Center
         ) {
-            DonutChart(data = chartData, modifier = Modifier.fillMaxSize()) // 傳遞動態生成的數據
+            DonutChart(
+                planTitle = planTitle,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
 
+// 卡路里
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CalorieInput() {
-    var text by remember { mutableStateOf("") }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "卡路里",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold
-        )
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            placeholder = { Text("e.g. 1500") },
-            modifier = Modifier.width(150.dp),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                // 背景色
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                // 邊框顏色
-                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
+private fun CalorieInputSection(
+    title: String,
+    calorie: Int,
+    onSetCalorie: (Int) -> Unit
+) {
+    Column (
+        modifier = Modifier.fillMaxWidth()
+    ){
+
+        Title(modifier = Modifier.align(Alignment.Start), title = title)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(R.string.calories),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
             )
-        )
-        Text(text = "大卡", style = MaterialTheme.typography.bodyLarge)
+            OutlinedTextField(
+                value = calorie.toString(),
+                onValueChange = { newValue ->
+                    val newCalorie = newValue.toIntOrNull() ?: 0  //不能為負
+                    Log.d("AddPlan_CalorieInput", "Recomposing calories: $newCalorie")
+                    onSetCalorie(newCalorie)
+                },
+                placeholder = { Text(stringResource(R.string.examCalorie)) },
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    // 背景色
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
+                    // 邊框顏色
+                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                )
+            )
+            Text(text = "大卡", style = MaterialTheme.typography.bodyLarge)
+        }
     }
 }
 
+// 營養說明
 @Composable
-private fun MacroDetailItem(
+private fun NutritionDetailSection(
     name: String,
     percentage: Int,
-    grams: Int,
-    recommendation: String,
-    details: List<String>
+    grams: Float,
+    title: String,
+    details: String
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "$name ${percentage}% (${grams}公克)",
+    Column(modifier = Modifier.fillMaxWidth()
+        .padding(bottom = 5.dp)) {
+        val combineText =
+            "$name $percentage% (" + String.format(Locale.US, "%.2f", grams) + "公克)"
+        Title(
+            title = combineText,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "建議每日攝取比例：$recommendation",
-            style = MaterialTheme.typography.bodyMedium,
+            text = title,
+            style = MaterialTheme.typography.bodySmall,
             color = Color.Gray
         )
         Spacer(modifier = Modifier.height(8.dp))
-        details.forEach { detail ->
-            Row(modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)) {
-                Text(text = "• ", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-                Text(text = detail, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-            }
-        }
+        Text(
+            text = details,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
     }
+}
+
+
+@Preview(showBackground = true, device = "id:pixel_6")
+@Composable
+fun AddCustomPlanPreview() {
+    AddCustomPlan(title = R.string.custom)
 }

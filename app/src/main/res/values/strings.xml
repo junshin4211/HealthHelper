@@ -96,7 +96,7 @@
     <string name="editPhoto">編輯頭相照片</string>
     <string name="takePicture">拍攝照片</string>
     <string name="choosePicture">選擇照片</string>
-    <string name="enddate">結束日期</string>
+    <string name="endDate">結束日期</string>
     <string name="save">儲存</string>
     <string name="historyRecord">歷史紀錄</string>
 
@@ -126,9 +126,9 @@
     <string name="carb">碳水化合物</string>
     <string name="protein">蛋白質</string>
     <string name="fat">脂肪</string>
-    <string name="dailygoal">每日目標</string>
+    <string name="dailyGoal">每日目標</string>
     <string name="calories">卡路里</string>
-    <string name="examcalorie">e.g.1500</string>
+    <string name="examCalorie">e.g.1500</string>
     <string name="cals">大卡</string>
     <string name="setting">設定</string>
     <string name="exampercent">e.g.20</string>
@@ -294,5 +294,9 @@
     <string name="invalidCaloriesGoal">錯誤的卡路里數值</string>
     <string name="savePlan_alert_title">確定儲存</string>
     <string name="savePlan_alert_text">確定儲存計畫嗎?</string>
+    <string name="more">查看更多</string>
+    <string name="back">返回</string>
+    <string name="planImage">計劃圖片</string>
+    <string name="checkIcon">完成圖標</string>
     <!-- ... 其他字符串 ... -->
 </resources>
