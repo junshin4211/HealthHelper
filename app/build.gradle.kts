@@ -65,16 +65,15 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0") // 範例版本，請更
 
     implementation ("androidx.navigation:navigation-compose:2.7.5")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("androidx.compose.material3:material3:1.0.0-alpha10")
     implementation("androidx.compose.runtime:runtime-livedata:1.0.0")
    // implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("mysql:mysql-connector-java:8.0.33")
-    implementation("androidx.compose.ui:ui:1.5.1")
-    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.ui:ui:1.8.3")
+    implementation("androidx.compose.material3:material3:1.3.2")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.8.3") // 示例版本
     implementation("androidx.compose.material:material:1.5.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
 
@@ -84,7 +83,6 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.common.ktx)

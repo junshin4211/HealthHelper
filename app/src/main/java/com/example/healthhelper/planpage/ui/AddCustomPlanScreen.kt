@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,14 +42,13 @@ import com.example.healthhelper.R
 import com.example.healthhelper.planpage.data.model.AddPlanModel
 import com.example.healthhelper.planpage.data.remote.DependencyProvider
 import com.example.healthhelper.planpage.domain.model.CategoryID
+import com.example.healthhelper.planpage.domain.model.ChartData
 import com.example.healthhelper.planpage.domain.model.DateRangeTitle
-import com.example.healthhelper.planpage.domain.model.DietPlanRegistry
 import com.example.healthhelper.planpage.domain.model.DietPlanType
 import com.example.healthhelper.planpage.domain.model.MacroInfo
 import com.example.healthhelper.planpage.domain.model.NutritionType
-import com.example.healthhelper.planpage.domain.usecase.NutritionGoal
 import com.example.healthhelper.planpage.domain.usecase.calculateDateMillisRange
-import com.example.healthhelper.planpage.domain.usecase.calculateNutritionGoals
+import com.example.healthhelper.planpage.domain.usecase.calculateNutrition
 import com.example.healthhelper.planpage.domain.usecase.calculateNutritionGrams
 import com.example.healthhelper.planpage.domain.usecase.formatMillisToDateString
 import com.example.healthhelper.planpage.domain.usecase.formatMillisToISO
@@ -58,6 +58,8 @@ import com.example.healthhelper.planpage.ui.components.CreateDropDownMenu
 import com.example.healthhelper.planpage.ui.components.CustomAlertDialog
 import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
 import com.example.healthhelper.planpage.ui.components.DonutChart
+import com.example.healthhelper.planpage.ui.components.NutritionSlider
+import com.example.healthhelper.planpage.ui.components.OutlinedTextField_Plan
 import com.example.healthhelper.planpage.ui.components.Title
 import com.example.healthhelper.planpage.ui.viewmodel.AddPlanUiState
 import com.example.healthhelper.planpage.ui.viewmodel.AddPlanViewModel
@@ -86,13 +88,13 @@ fun AddCustomPlan(
     LaunchedEffect(uiState) {
         when (val state = uiState) {
             is AddPlanUiState.Success -> {
-                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
-                viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
-                navController.popBackStack() // 導航回去
                 snackBarHostState.showSnackbar(
                     "計劃已成功儲存！",
                     duration = SnackbarDuration.Short
                 )
+                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
+                viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
+                navController.popBackStack() // 導航回去
             }
 
             is AddPlanUiState.Error -> {
@@ -191,9 +193,6 @@ private fun DietSettingsContent(
 
         val currentUserId = UserManager.getUser().userId // userId
 
-        // 沒選擇日期
-        val defaultChooseText = stringResource(R.string.noChoose)
-
         // 開始結束日期文字顯示
         var selectedStartDate by remember { mutableStateOf("") }
         var selectedEndDate by remember { mutableStateOf("") }
@@ -206,17 +205,19 @@ private fun DietSettingsContent(
         var showDateRangePicker by remember { mutableStateOf(false) }
 
         // 顯示確認Dialog
-        var showCofirm by remember { mutableStateOf(false) }
+        var showConfirm by remember { mutableStateOf(false) }
 
         var inputCalories by remember { mutableIntStateOf(1500) } // Caloriegoal
 
         // 營養公克數
-        var calculatedCarbGram by remember { mutableFloatStateOf(0f) }
-        var calculatedProteinGram by remember { mutableFloatStateOf(0f) }
-        var calculatedFatGram by remember { mutableFloatStateOf(0f) }
+        var calculatedCarbGram by remember { mutableFloatStateOf(187.50f) }
+        var calculatedProteinGram by remember { mutableFloatStateOf(112.50f) }
+        var calculatedFatGram by remember { mutableFloatStateOf(33.33f) }
 
-        // 將 title 轉換為 DietPlanType
-        val selectedPlanName: DietPlanType? = DietPlanType.fromResId(title)
+        // 營養比例
+        var calculatedCarbPercent by remember { mutableFloatStateOf(50f) }
+        var calculatedProteinPercent by remember { mutableFloatStateOf(30f) }
+        var calculatedFatPercent by remember { mutableFloatStateOf(20f) }
 
         // 更新日期函數
         fun updateDateStates(startMillis: Long?, endMillis: Long?) {
@@ -224,34 +225,30 @@ private fun DietSettingsContent(
             savedSelectedEndDateMillis = endMillis
 
             selectedStartDate =
-                startMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
-            selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
+                startMillis?.let { formatMillisToDateString(it) } ?: ""
+            selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: ""
         }
 
-        // 當 inputCalories 或 currentPlanType 改變時，重新計算克數
-        LaunchedEffect(inputCalories, title) {
-            Log.d(
-                "DietSettingsContent",
-                "Recalculating grams for calories: $inputCalories, plan: ${title}"
-            )
-            calculateNutritionGrams(
-                calories = inputCalories.toFloat(),
-                plan = title, // 傳遞計劃的資源ID
-                onSetNutritionGram = { fatGrams, carbGrams, proteinGrams ->
-                    Log.d(
-                        "DietSettingsContent",
-                        "Grams calculated: F=$fatGrams, C=$carbGrams, P=$proteinGrams"
-                    )
-                    calculatedFatGram = fatGrams
-                    calculatedCarbGram = carbGrams
-                    calculatedProteinGram = proteinGrams
-                }
-            )
-        }
+//        // 當 inputCalories 或 currentPlanType 改變時，重新計算克數
+//        LaunchedEffect(inputCalories, title) {
+//            Log.d(
+//                "DietSettingsContent",
+//                "Recalculating grams for calories: $inputCalories, plan: ${title}"
+//            )
+//            calculateNutritionGrams(
+//                calories = inputCalories.toFloat(),
+//                plan = title, // 傳遞計劃的資源ID
+//                onSetNutritionGram = { fatGrams, carbGrams, proteinGrams ->
+//                    calculatedFatGram = fatGrams
+//                    calculatedCarbGram = carbGrams
+//                    calculatedProteinGram = proteinGrams
+//                }
+//            )
+//        }
 
         Spacer(modifier = Modifier.height(8.dp))
         // 週期選單
-        PeriodDropdownSection(
+        PeriodDropdown(
             title = stringResource(R.string.set_plan_time_title),
             onDateRangeSelected = { title ->
                 val datePair = calculateDateMillisRange(title)
@@ -285,12 +282,18 @@ private fun DietSettingsContent(
         // 結束
         DateSelector(label = stringResource(R.string.endDate), date = selectedEndDate) {
             showDateRangePicker = true
+            Log.d(
+                "DateSelector_Click",
+                "DateSelector for StartDate clicked, showDateRangePicker = $showDateRangePicker"
+            )
         }
         Spacer(modifier = Modifier.height(24.dp))
 
         // 營養素圖表
         NutritionChartSection(
-            planTitle = title,
+            carbGoal = calculatedCarbPercent,
+            proteinGoal = calculatedProteinPercent,
+            fatGoal = calculatedFatPercent,
             carbGramText = calculatedCarbGram,
             proteinGramText = calculatedProteinGram,
             fatGramText = calculatedFatGram
@@ -305,45 +308,47 @@ private fun DietSettingsContent(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 詳細說明
-        NutritionType.entries.forEach { type ->
-            if (selectedPlanName != null) {
-                DietPlanRegistry.getNutritionDetail(selectedPlanName, type)?.let { content ->
-                    val percentage =
-                        calculateNutritionGoals(selectedPlanName.displayNameRes, type) ?: 0
-
-                    val currentMacroGram = when (type) {
-                        NutritionType.CARBOHYDRATE -> calculatedCarbGram
-                        NutritionType.PROTEIN -> calculatedProteinGram
-                        NutritionType.FAT -> calculatedFatGram
-                    }
-
-                    NutritionDetailSection(
-                        name = stringResource(id = type.displayNameRes),
-                        percentage = percentage,
-                        grams = currentMacroGram,
-                        title = content.getTitle(),
-                        details = content.getDescriptionPoints().joinToString("")
-                    )
-                }
+        // 營養滑桿
+        NutritionSliderSection(
+            inputCalories = inputCalories,
+            currentCarbGram = calculatedCarbGram,
+            currentFatGram = calculatedFatGram,
+            currentProteinGram = calculatedProteinGram,
+            currentCarbPercent = calculatedCarbPercent,
+            currentFatPercent = calculatedFatPercent,
+            currentProteinPercent = calculatedProteinPercent,
+            onSetGram = { fat, carb, pro ->
+                calculatedFatGram = fat
+                calculatedCarbGram = carb
+                calculatedProteinGram = pro
             }
+        ) { fat, carb, pro ->
+            Log.d("AddCustomPlan", "NutritionSliderSection set goal : F:$fat, C:$carb, P:$pro")
+            calculatedCarbPercent = carb
+            calculatedProteinPercent = pro
+            calculatedFatPercent = fat
         }
 
         Spacer(modifier = Modifier.height(32.dp))
         // 儲存
         Button_Plan(
+            modifier = Modifier.width(200.dp),
             onClick = {
                 // 檢查日期和卡路里是否有輸入
                 val isValidDate =
                     savedSelectedStartDateMillis != null && savedSelectedEndDateMillis != null
                 val isValidCalories = inputCalories > 0
+                val total = calculatedCarbPercent + calculatedProteinPercent + calculatedFatPercent
+                val isValidGoals =
+                    calculatedCarbPercent >= 0f && calculatedProteinPercent >= 0f && calculatedFatPercent >= 0f && total == 100f
 
-                if (isValidDate && isValidCalories) {
-                    showCofirm = true
+                if (isValidDate && isValidCalories && isValidGoals) {
+                    showConfirm = true
                 } else {
                     val errorMessage = when {
                         !isValidDate -> context.getString(R.string.invalidDateTime)
                         !isValidCalories -> context.getString(R.string.invalidCaloriesGoal)
+                        !isValidGoals -> context.getString(R.string.invalidNutritionGoal)
                         else -> "未知錯誤"
                     }
                     scope.launch {
@@ -361,14 +366,19 @@ private fun DietSettingsContent(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             } else {
-                Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.save),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
 
         // 點擊儲存後顯示確認對話
-        if (showCofirm) {
+        if (showConfirm) {
             CustomAlertDialog(
-                onDismissRequest = { showCofirm = false },
+                onDismissRequest = { showConfirm = false },
                 title = {
                     Text(
                         text = stringResource(R.string.savePlan_alert_title),
@@ -382,18 +392,17 @@ private fun DietSettingsContent(
                     )
                 },
                 onConfirm = {
-                    // 檢查營養目標和計畫類別ID轉換正確
-                    val goals = NutritionGoal.getGoals(title)
+                    // 檢查計畫類別ID轉換正確
                     val categoryId = CategoryID.getCateId(title)
 
-                    if (goals == null || categoryId == null) {
+                    if (categoryId == null) {
                         scope.launch {
                             snackBarHostState.showSnackbar(
                                 "無效計畫名稱",
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        showCofirm = false
+                        showConfirm = false
                         return@CustomAlertDialog
                     }
 
@@ -404,9 +413,9 @@ private fun DietSettingsContent(
                         endDateTime = savedSelectedEndDateMillis,
                         categoryId = categoryId,
                         finishstate = 0,
-                        fatgoal = goals.first,
-                        carbongoal = goals.second,
-                        proteingoal = goals.third,
+                        fatgoal = calculatedFatPercent,
+                        carbongoal = calculatedCarbPercent,
+                        proteingoal = calculatedProteinPercent,
                         Caloriesgoal = inputCalories.toFloat()
                     )
 
@@ -418,7 +427,7 @@ private fun DietSettingsContent(
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        showCofirm = false
+                        showConfirm = false
                         return@CustomAlertDialog
                     }
 
@@ -434,7 +443,7 @@ private fun DietSettingsContent(
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        showCofirm = false
+                        showConfirm = false
                         return@CustomAlertDialog // 阻止繼續執行
                     }
 
@@ -444,13 +453,13 @@ private fun DietSettingsContent(
                         endDateTime = endDate,
                         categoryId = categoryId,
                         finishstate = 0,
-                        fatgoal = (goals.first) * 100,
-                        carbongoal = (goals.second) * 100,
-                        proteingoal = (goals.third) * 100,
+                        fatgoal = calculatedFatPercent,
+                        carbongoal = calculatedCarbPercent,
+                        proteingoal = calculatedProteinPercent,
                         Caloriesgoal = inputCalories.toFloat()
                     )
                     onSaveClick(addPlanData)
-                    showCofirm = false
+                    showConfirm = false
                 }
             )
         }
@@ -460,11 +469,11 @@ private fun DietSettingsContent(
 
 // 週期下拉式選單
 @Composable
-private fun PeriodDropdownSection(onDateRangeSelected: (DateRangeTitle) -> Unit, title: String) {
+private fun PeriodDropdown(onDateRangeSelected: (DateRangeTitle) -> Unit, title: String) {
     var currentSelect by remember { mutableStateOf<DateRangeTitle?>(DateRangeTitle.entries.firstOrNull()) }
-    Column (
+    Column(
         modifier = Modifier.fillMaxWidth()
-    ){
+    ) {
         Title(modifier = Modifier.align(Alignment.Start), title = title)
 
         CreateDropDownMenu(
@@ -493,6 +502,7 @@ private fun DateSelector(
             fontWeight = FontWeight.SemiBold
         )
         Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -521,7 +531,9 @@ private fun DateSelector(
 // 圖表
 @Composable
 private fun NutritionChartSection(
-    @StringRes planTitle: Int,
+    carbGoal: Float,
+    proteinGoal: Float,
+    fatGoal: Float,
     carbGramText: Float,
     proteinGramText: Float,
     fatGramText: Float
@@ -529,9 +541,9 @@ private fun NutritionChartSection(
 
     val nutritioninfo = remember(carbGramText, proteinGramText, fatGramText) {
         listOf(
-            MacroInfo("碳水化合物", carbGramText, Color(0xFF304FFE)), // 藍色
-            MacroInfo("蛋白質", proteinGramText, Color(0xFFD50000)),  // 紅色
-            MacroInfo("脂肪", fatGramText, Color(0xFF00C853)) // 綠色
+            MacroInfo("碳水化合物", carbGramText, Color(0xFF304FFE), goal = carbGoal), // 藍色
+            MacroInfo("蛋白質", proteinGramText, Color(0xFFD50000), goal = proteinGoal),  // 紅色
+            MacroInfo("脂肪", fatGramText, Color(0xFF03A144), goal = fatGoal) // 綠色
         )
     }
 
@@ -564,7 +576,7 @@ private fun NutritionChartSection(
             contentAlignment = Alignment.Center
         ) {
             DonutChart(
-                planTitle = planTitle,
+                data = nutritioninfo.map { ChartData(it.goal ?: 0f, it.color) },
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -579,23 +591,26 @@ private fun CalorieInputSection(
     calorie: Int,
     onSetCalorie: (Int) -> Unit
 ) {
-    Column (
-        modifier = Modifier.fillMaxWidth()
-    ){
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
 
         Title(modifier = Modifier.align(Alignment.Start), title = title)
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             Text(
                 text = stringResource(R.string.calories),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )
-            OutlinedTextField(
+
+            OutlinedTextField_Plan(
                 value = calorie.toString(),
                 onValueChange = { newValue ->
                     val newCalorie = newValue.toIntOrNull() ?: 0  //不能為負
@@ -603,20 +618,10 @@ private fun CalorieInputSection(
                     onSetCalorie(newCalorie)
                 },
                 placeholder = { Text(stringResource(R.string.examCalorie)) },
-                modifier = Modifier.weight(1f),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    // 背景色
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
-                    // 邊框顏色
-                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                )
+                keyboardType = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.width(120.dp)
             )
+
             Text(text = "大卡", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -624,34 +629,131 @@ private fun CalorieInputSection(
 
 // 營養說明
 @Composable
-private fun NutritionDetailSection(
-    name: String,
-    percentage: Int,
-    grams: Float,
-    title: String,
-    details: String
+fun NutritionSliderSection(
+    inputCalories: Int,
+    currentFatGram: Float,
+    currentCarbGram: Float,
+    currentProteinGram: Float,
+    currentCarbPercent: Float,
+    currentProteinPercent: Float,
+    currentFatPercent: Float,
+    onSetGram: (fatGram: Float, carbGram: Float, proteinGram: Float) -> Unit,
+    onSetGoal: (fatPercent: Float, carbPercent: Float, proteinPercent: Float) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()
-        .padding(bottom = 5.dp)) {
-        val combineText =
-            "$name $percentage% (" + String.format(Locale.US, "%.2f", grams) + "公克)"
+    var carbPercent by remember { mutableFloatStateOf(currentCarbPercent) }
+    var proteinPercent by remember { mutableFloatStateOf(currentProteinPercent) }
+    var fatPercent by remember { mutableFloatStateOf(currentFatPercent) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
         Title(
-            title = combineText,
-            style = MaterialTheme.typography.titleMedium,
+            title = stringResource(R.string.nutrition_calculator),
+            modifier = Modifier.align(Alignment.Start)
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = details,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
-        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceBright)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+
+                NutritionSlider(
+                    label = stringResource(R.string.carb),
+                    percent = carbPercent,
+                    gram = currentCarbGram,
+                    themeColor = Color(0xFF304FFE)
+                ) { value ->
+                    calculateNutrition(
+                        nutritionType = NutritionType.CARBOHYDRATE,
+                        calories = inputCalories,
+                        changedValue = value,
+                        carbPercent = carbPercent,
+                        fatPercent = fatPercent,
+                        proteinPercent = proteinPercent,
+                        onsetGoal = { fat, carb, pro ->
+                            carbPercent = carb
+                            proteinPercent = pro
+                            fatPercent = fat
+                            Log.d(
+                                "AddCustomPlan",
+                                "calculateNutrition onSetGoal called: F=$fat, C=$carb, P=$pro"
+                            )
+                            onSetGoal(fat, carb, pro)
+                        }
+                    ) { fat, carb, pro ->
+                        onSetGram(fat, carb, pro)
+                    }
+                }
+
+                NutritionSlider(
+                    label = stringResource(R.string.protein),
+                    percent = proteinPercent,
+                    gram = currentProteinGram,
+                    themeColor = Color(0xFFD50000),
+                ) { value ->
+                    calculateNutrition(
+                        nutritionType = NutritionType.PROTEIN,
+                        calories = inputCalories,
+                        changedValue = value,
+                        carbPercent = carbPercent,
+                        fatPercent = fatPercent,
+                        proteinPercent = proteinPercent,
+                        onsetGoal = { fat, carb, pro ->
+                            carbPercent = carb
+                            proteinPercent = pro
+                            fatPercent = fat
+                            onSetGoal(fat, carb, pro)
+                        }
+                    ) { fat, carb, pro ->
+                        onSetGram(fat, carb, pro)
+                    }
+                }
+
+                NutritionSlider(
+                    label = stringResource(R.string.fat),
+                    percent = fatPercent,
+                    gram = currentFatGram,
+                    themeColor = Color(0xFF03A144),
+                ) { value ->
+                    calculateNutrition(
+                        nutritionType = NutritionType.FAT,
+                        calories = inputCalories,
+                        changedValue = value,
+                        carbPercent = carbPercent,
+                        fatPercent = fatPercent,
+                        proteinPercent = proteinPercent,
+                        onsetGoal = { fat, carb, pro ->
+                            Log.d(
+                                "AddCustomPlan",
+                                "calculateNutrition onSetGoal called: F=$fat, C=$carb, P=$pro"
+                            )
+                            carbPercent = carb
+                            proteinPercent = pro
+                            fatPercent = fat
+                            onSetGoal(fat, carb, pro)
+                        }
+                    ) { fat, carb, pro ->
+                        Log.d(
+                            "AddCustomPlan",
+                            "calculateNutrition onSetGram called: F=$fat, C=$carb, P=$pro"
+                        )
+                        onSetGram(fat, carb, pro)
+                    }
+                }
+            }
+        }
     }
+
 }
 
 

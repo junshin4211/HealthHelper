@@ -58,6 +58,7 @@ import com.example.healthhelper.planpage.ui.components.CreateDropDownMenu
 import com.example.healthhelper.planpage.ui.components.CustomAlertDialog
 import com.example.healthhelper.planpage.ui.components.DateRangePickerDialog
 import com.example.healthhelper.planpage.ui.components.DonutChart
+import com.example.healthhelper.planpage.ui.components.OutlinedTextField_Plan
 import com.example.healthhelper.planpage.ui.components.Title
 import com.example.healthhelper.planpage.ui.viewmodel.AddPlanUiState
 import com.example.healthhelper.planpage.ui.viewmodel.AddPlanViewModel
@@ -86,13 +87,13 @@ fun AddPlan(
     LaunchedEffect(uiState) {
         when (val state = uiState) {
             is AddPlanUiState.Success -> {
-                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
-                viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
-                navController.popBackStack() // 導航回去
                 snackBarHostState.showSnackbar(
                     "計劃已成功儲存！",
                     duration = SnackbarDuration.Short
                 )
+                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
+                viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
+                navController.popBackStack() // 導航回去
             }
 
             is AddPlanUiState.Error -> {
@@ -191,9 +192,6 @@ private fun DietSettingsContent(
 
         val currentUserId = UserManager.getUser().userId // userId
 
-        // 沒選擇日期
-        val defaultChooseText = stringResource(R.string.noChoose)
-
         // 開始結束日期文字顯示
         var selectedStartDate by remember { mutableStateOf("") }
         var selectedEndDate by remember { mutableStateOf("") }
@@ -206,7 +204,7 @@ private fun DietSettingsContent(
         var showDateRangePicker by remember { mutableStateOf(false) }
 
         // 顯示確認Dialog
-        var showCofirm by remember { mutableStateOf(false) }
+        var showConfirm by remember { mutableStateOf(false) }
 
         var inputCalories by remember { mutableIntStateOf(1500) } // Caloriegoal
 
@@ -224,8 +222,8 @@ private fun DietSettingsContent(
             savedSelectedEndDateMillis = endMillis
 
             selectedStartDate =
-                startMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
-            selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: defaultChooseText
+                startMillis?.let { formatMillisToDateString(it) } ?: ""
+            selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: ""
         }
 
         // 當 inputCalories 或 currentPlanType 改變時，重新計算克數
@@ -251,7 +249,7 @@ private fun DietSettingsContent(
 
         Spacer(modifier = Modifier.height(8.dp))
         // 週期選單
-        PeriodDropdownSection(
+        PeriodDropdown(
             title = stringResource(R.string.set_plan_time_title),
             onDateRangeSelected = { title ->
                 val datePair = calculateDateMillisRange(title)
@@ -332,6 +330,7 @@ private fun DietSettingsContent(
         Spacer(modifier = Modifier.height(32.dp))
         // 儲存
         Button_Plan(
+            modifier = Modifier.width(200.dp),
             onClick = {
                 // 檢查日期和卡路里是否有輸入
                 val isValidDate =
@@ -339,7 +338,7 @@ private fun DietSettingsContent(
                 val isValidCalories = inputCalories > 0
 
                 if (isValidDate && isValidCalories) {
-                    showCofirm = true
+                    showConfirm = true
                 } else {
                     val errorMessage = when {
                         !isValidDate -> context.getString(R.string.invalidDateTime)
@@ -361,14 +360,17 @@ private fun DietSettingsContent(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             } else {
-                Text(stringResource(R.string.save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.save),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary)
             }
         }
 
         // 點擊儲存後顯示確認對話
-        if (showCofirm) {
+        if (showConfirm) {
             CustomAlertDialog(
-                onDismissRequest = { showCofirm = false },
+                onDismissRequest = { showConfirm = false },
                 title = {
                     Text(
                         text = stringResource(R.string.savePlan_alert_title),
@@ -393,9 +395,13 @@ private fun DietSettingsContent(
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        showCofirm = false
+                        showConfirm = false
                         return@CustomAlertDialog
                     }
+
+                    val outCarbPercent = (goals.second) * 100f
+                    val outProteinPercent = (goals.third) * 100f
+                    val outFatPercent = (goals.first) * 100f
 
                     // 檢查全部資料
                     val isValid = validationPlanMessage(
@@ -404,9 +410,9 @@ private fun DietSettingsContent(
                         endDateTime = savedSelectedEndDateMillis,
                         categoryId = categoryId,
                         finishstate = 0,
-                        fatgoal = goals.first,
-                        carbongoal = goals.second,
-                        proteingoal = goals.third,
+                        fatgoal = outFatPercent,
+                        carbongoal = outCarbPercent,
+                        proteingoal = outProteinPercent,
                         Caloriesgoal = inputCalories.toFloat()
                     )
 
@@ -418,7 +424,7 @@ private fun DietSettingsContent(
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        showCofirm = false
+                        showConfirm = false
                         return@CustomAlertDialog
                     }
 
@@ -434,7 +440,7 @@ private fun DietSettingsContent(
                                 duration = SnackbarDuration.Short
                             )
                         }
-                        showCofirm = false
+                        showConfirm = false
                         return@CustomAlertDialog // 阻止繼續執行
                     }
 
@@ -444,13 +450,13 @@ private fun DietSettingsContent(
                         endDateTime = endDate,
                         categoryId = categoryId,
                         finishstate = 0,
-                        fatgoal = (goals.first) * 100,
-                        carbongoal = (goals.second) * 100,
-                        proteingoal = (goals.third) * 100,
+                        fatgoal = outFatPercent,
+                        carbongoal = outCarbPercent,
+                        proteingoal = outProteinPercent,
                         Caloriesgoal = inputCalories.toFloat()
                     )
                     onSaveClick(addPlanData)
-                    showCofirm = false
+                    showConfirm = false
                 }
             )
         }
@@ -460,7 +466,7 @@ private fun DietSettingsContent(
 
 // 週期下拉式選單
 @Composable
-private fun PeriodDropdownSection(onDateRangeSelected: (DateRangeTitle) -> Unit, title: String) {
+private fun PeriodDropdown(onDateRangeSelected: (DateRangeTitle) -> Unit, title: String) {
     var currentSelect by remember { mutableStateOf<DateRangeTitle?>(DateRangeTitle.entries.firstOrNull()) }
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -531,7 +537,7 @@ private fun NutritionChartSection(
         listOf(
             MacroInfo("碳水化合物", carbGramText, Color(0xFF304FFE)), // 藍色
             MacroInfo("蛋白質", proteinGramText, Color(0xFFD50000)),  // 紅色
-            MacroInfo("脂肪", fatGramText, Color(0xFF00C853)) // 綠色
+            MacroInfo("脂肪", fatGramText, Color(0xFF03A144)) // 綠色
         )
     }
 
@@ -595,7 +601,7 @@ private fun CalorieInputSection(
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
             )
-            OutlinedTextField(
+            OutlinedTextField_Plan(
                 value = calorie.toString(),
                 onValueChange = { newValue ->
                     val newCalorie = newValue.toIntOrNull() ?: 0  //不能為負
@@ -603,19 +609,8 @@ private fun CalorieInputSection(
                     onSetCalorie(newCalorie)
                 },
                 placeholder = { Text(stringResource(R.string.examCalorie)) },
-                modifier = Modifier.weight(1f),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    // 背景色
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
-                    // 邊框顏色
-                    unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                )
+                keyboardType = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
             )
             Text(text = "大卡", style = MaterialTheme.typography.bodyLarge)
         }

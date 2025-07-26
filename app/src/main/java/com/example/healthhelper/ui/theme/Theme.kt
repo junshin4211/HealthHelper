@@ -21,6 +21,7 @@ private val AppOrange = Color(0xFFF39C12)
 private val AppLightBackground = Color(0xFFFFFBEF)
 private val AppDarkText = Color(0xFF333333)
 private val AppOrangeText = Color(0xFFD35400) // 用於卡片中的橘色文字，增加對比
+private val AppLightOrange = Color(0xFFEFB594)
 
 private val DarkColorScheme = darkColorScheme(
     primary = AppOrange,           // 主要顏色，用於 TopBar, 主要按鈕等
@@ -28,7 +29,8 @@ private val DarkColorScheme = darkColorScheme(
     background = AppLightBackground, // 畫面背景色
     onBackground = AppDarkText,    // 在背景上的文字顏色
     surface = Color.White,         // 卡片、Surface 的背景色
-    onSurface = AppDarkText,       // 在 Surface 上的文字顏色
+    onSurface = AppDarkText, // 在 Surface 上的文字顏色
+    surfaceBright = AppLightOrange,
     secondary = AppOrangeText,     // 次要顏色，用於卡片中的文字
     onSecondary = Color.White
 )
@@ -41,6 +43,7 @@ private val LightColorScheme = lightColorScheme(
     onBackground = AppDarkText,    // 在背景上的文字顏色
     surface = Color.White,         // 卡片、Surface 的背景色
     onSurface = AppDarkText,       // 在 Surface 上的文字顏色
+    surfaceBright = AppLightOrange,
     secondary = AppOrangeText,     // 次要顏色，用於卡片中的文字
     onSecondary = Color.White
 )

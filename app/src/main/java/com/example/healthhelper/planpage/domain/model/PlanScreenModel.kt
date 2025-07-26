@@ -10,7 +10,7 @@ import com.example.healthhelper.R
 data class ChartData(val value: Float, val color: Color)
 
 // 圖表旁的圖例數據模型
-data class MacroInfo(val name: String, val grams: Float, val color: Color)
+data class MacroInfo(val name: String, val grams: Float, val color: Color, val goal: Float? = null)
 
 // 假設您已經有這些枚舉
 enum class DietPlanType(@StringRes val displayNameRes: Int) {

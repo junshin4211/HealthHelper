@@ -18,8 +18,8 @@ gsonParent = "2.11.0"
 playServicesLocation = "21.3.0"
 accompanistPermissions = "0.36.0"
 
-    material3 = "1.4.0-alpha02"
-    uiTooling = "1.8.0-alpha04"
+material3 = "1.4.0-alpha02"
+
 charty = "2.0.0-alpha01"
 
 
@@ -52,7 +52,6 @@ androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", versi
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }

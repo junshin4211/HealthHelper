@@ -298,5 +298,6 @@
     <string name="back">返回</string>
     <string name="planImage">計劃圖片</string>
     <string name="checkIcon">完成圖標</string>
+    <string name="nutrition_calculator">營養比例</string>
     <!-- ... 其他字符串 ... -->
 </resources>
