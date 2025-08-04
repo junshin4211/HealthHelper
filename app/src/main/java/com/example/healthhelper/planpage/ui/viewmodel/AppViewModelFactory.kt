@@ -20,6 +20,10 @@ class AppViewModelFactory(
                 AddPlanViewModel(planRepository) as T
             }
 
+            modelClass.isAssignableFrom(ManagePlanViewModel::class.java) -> {
+                ManagePlanViewModel(planRepository) as T
+            }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }

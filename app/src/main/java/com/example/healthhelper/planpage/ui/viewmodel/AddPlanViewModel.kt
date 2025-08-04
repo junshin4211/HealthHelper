@@ -3,7 +3,7 @@ package com.example.healthhelper.planpage.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.healthhelper.planpage.data.PlanRepository
-import com.example.healthhelper.planpage.data.Result
+import com.example.healthhelper.planpage.data.Result as ApiResult
 import com.example.healthhelper.planpage.data.model.AddPlanModel
 import com.example.healthhelper.planpage.domain.usecase.formatMillisToISO
 import com.example.healthhelper.planpage.ui.viewmodel.AddPlanUiState.*
@@ -67,18 +67,18 @@ class AddPlanViewModel(
             }
 
             when(val result = planRepository.addPlan(addPlanData)){
-                is Result.Success -> {
+                is ApiResult.Success -> {
                     if (result.data.result){
                         _addPlanState.value = Success
                     }else{
                         _addPlanState.value = Error(result.data.errMsg ?: "新增計劃失敗，但未收到後端錯誤訊息")
                     }
                 }
-                is Result.Error -> {
+                is ApiResult.Error -> {
                     _addPlanState.value = Error(result.message ?: "Unknown error")
                 }
 
-                is Result.Loading -> {
+                is ApiResult.Loading -> {
                     _addPlanState.value = Loading
                 }
             }

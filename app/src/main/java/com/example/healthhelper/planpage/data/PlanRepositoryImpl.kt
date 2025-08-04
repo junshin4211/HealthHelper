@@ -3,6 +3,7 @@ package com.example.healthhelper.planpage.data
 import android.util.Log
 import com.example.healthhelper.planpage.data.Result
 import com.example.healthhelper.planpage.data.model.AddPlanModel
+import com.example.healthhelper.planpage.data.model.DeletePlanModel
 import com.example.healthhelper.planpage.data.model.GenericApiResponse
 import com.example.healthhelper.planpage.data.model.PlanModel
 import com.example.healthhelper.planpage.data.remote.PlanApiService
@@ -22,6 +23,11 @@ class PlanRepositoryImpl(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : PlanRepository {
     private val tag = "tag_PlanRepo"
+
+    // --- 緩存相關 ---
+    private var cachedUserPlans: List<PlanModel>? = null
+    private var lastFetchTimestamp: Long = 0L
+    private val expireTimeSet: Long = 5 * 60 * 1000
 
     override fun observeUserPlans(userId: Int): Flow<ApiResult<List<PlanModel>>> = flow {
         emit(ApiResult.Loading) // 開始時發送載入狀態
@@ -70,21 +76,46 @@ class PlanRepositoryImpl(
     }.flowOn(ioDispatcher)
 
     // 一次性獲取函式的實現
-    override suspend fun fetchUserPlans(userId: Int): ApiResult<List<PlanModel>> {
+    override suspend fun fetchUserPlans(userId: Int, getRefresh: Boolean): ApiResult<List<PlanModel>> {
         return withContext(ioDispatcher) {
+            ApiResult.Loading
+
+            val currentTime = System.currentTimeMillis()
+
+            if (!getRefresh && cachedUserPlans != null && currentTime - lastFetchTimestamp < expireTimeSet) {
+                Log.d(tag, "從緩存獲取數據")
+                return@withContext ApiResult.Success(cachedUserPlans!!)
+            }
+
             try {
                 val request = UserId(userId) // 包裝 userId
                 val response = planApiService.getPlansByUserId(request)
-                val plans = response.body()
-                if(plans != null){
-                    ApiResult.Success(plans)
+                val apiResponse = response.body()
+                if(response.isSuccessful){
+                    if(apiResponse != null){
+                        // 更新緩存
+                        synchronized(this@PlanRepositoryImpl) { // 使用 PlanRepositoryImpl 實例作為鎖對象
+                            cachedUserPlans = apiResponse
+                            lastFetchTimestamp = currentTime // 使用當前請求的時間戳
+                        }
+                        ApiResult.Success(apiResponse)
+                    }else{
+                        synchronized(this@PlanRepositoryImpl) { // 使用 PlanRepositoryImpl 實例作為鎖對象
+                            cachedUserPlans = emptyList()
+                            lastFetchTimestamp = currentTime // 使用當前請求的時間戳
+                        }
+                        ApiResult.Error(Exception("Http 請求成功 但Body為空"),"取得空計畫")
+                    }
                 }else{
-                    ApiResult.Error(Exception("Response body was null despite success"), "No data received.")
+                    // HTTP 請求本身失敗 (例如 4xx, 5xx 錯誤)
+                    val errorMessage = "計劃取得失敗: HTTP ${response.code()}"
+                    Log.d(tag,errorMessage)
+                    ApiResult.Error(Exception(errorMessage),errorMessage)
                 }
             } catch (e: IOException) {
-                ApiResult.Error(e, "Network error fetching user plans.")
+                ApiResult.Error(e, "網路連線異常")
             } catch (e: Exception) {
-                ApiResult.Error(e, "Failed to fetch user plans: ${e.message}")
+                ApiResult.Error(e, "發生未知錯誤: ${e.message}")
             }
         }
     }
@@ -92,7 +123,7 @@ class PlanRepositoryImpl(
     override suspend fun addPlan(addPlanData: AddPlanModel): Result<GenericApiResponse> {
         return withContext(ioDispatcher){
             try {
-                Result.Loading
+                ApiResult.Loading
                 val response = planApiService.createPlan(addPlanData)
                 if(response.isSuccessful){
                     val apiResponse = response.body()
@@ -100,29 +131,77 @@ class PlanRepositoryImpl(
                         if (apiResponse.result){
                             // Http 請求成功(200)
                             Log.d(tag,"新增計畫成功: $apiResponse")
-                            Result.Success(apiResponse)
+                            ApiResult.Success(apiResponse)
                         }else{
                             // Http 請求成功,但是後端返回的 result 為 false
                             val errorMessage = apiResponse.errMsg ?: "未知錯誤"
                             Log.d(tag,"新增計畫失敗: $errorMessage")
-                            Result.Error(Exception("新增計畫失敗"),errorMessage)
+                            ApiResult.Error(Exception("新增計畫失敗"),errorMessage)
                         }
                     }else{
                         Log.d(tag,"Http 請求成功 但Body為空")
-                        Result.Error(Exception("Http 請求成功 但Body為空"),"伺服器回應無效")
+                        ApiResult.Error(Exception("Http 請求成功 但Body為空"),"伺服器回應無效")
                     }
                 }else{
                     // HTTP 請求本身失敗 (例如 4xx, 5xx 錯誤)
                     val errorMessage = "創建計劃失敗: HTTP ${response.code()}"
                     Log.d(tag,errorMessage)
-                    Result.Error(Exception(errorMessage),errorMessage)
+                    ApiResult.Error(Exception(errorMessage),errorMessage)
                 }
             }catch (e:IOException){
                 Log.d(tag,"網路連線異常: ${e.message}")
-                Result.Error(e,"網路連線異常")
+                ApiResult.Error(e,"網路連線異常")
             }catch (e: Exception) { // 捕獲其他所有類型的異常，例如序列化異常
                 Log.e(tag, "新增計畫失敗 (未知錯誤): ${e.message}", e)
-                Result.Error(e, "發生未知錯誤: ${e.message}") // <--- 返回 Result.Error
+                ApiResult.Error(e, "發生未知錯誤: ${e.message}") // <--- 返回 Result.Error
+            }
+        }
+    }
+
+    override suspend fun deletePlan(deletePlanData: DeletePlanModel): ApiResult<GenericApiResponse> {
+        return withContext(ioDispatcher){
+            try {
+                ApiResult.Loading
+                val response = planApiService.deletePlan(deletePlanData)
+                if(response.isSuccessful){
+                    val apiResponse = response.body()
+                    if(apiResponse != null){
+                        if (apiResponse.result){
+                            // Http 請求成功(200)
+                            Log.d(tag,"刪除計畫成功: $apiResponse")
+                            ApiResult.Success(apiResponse)
+                        }else{
+                            // Http 請求成功,但是後端返回的 result 為 false
+                            val errorMessage = apiResponse.errMsg ?: "未知錯誤"
+                            Log.d(tag,"刪除計畫失敗: $errorMessage")
+                            ApiResult.Error(Exception("刪除計畫失敗"),errorMessage)
+                        }
+                    }else{
+                        Log.d(tag,"Http 請求成功 但Body為空")
+                        ApiResult.Error(Exception("Http 請求成功 但Body為空"),"伺服器回應無效")
+                    }
+                }else{
+                    // HTTP 請求本身失敗 (例如 4xx, 5xx 錯誤)
+                    val errorMessage = "刪除計劃失敗: HTTP ${response.code()}"
+                    Log.d(tag,errorMessage)
+                    ApiResult.Error(Exception(errorMessage),errorMessage)
+                }
+            }catch (e:IOException){
+                Log.d(tag,"網路連線異常: ${e.message}")
+                ApiResult.Error(e,"網路連線異常")
+            }catch (e: Exception) { // 捕獲其他所有類型的異常，例如序列化異常
+                Log.e(tag, "刪除計畫失敗 (未知錯誤): ${e.message}", e)
+                ApiResult.Error(e, "發生未知錯誤: ${e.message}") // <--- 返回 Result.Error
+            }
+        }
+    }
+
+    override suspend fun invalidateCache() {
+        withContext(ioDispatcher) {
+            synchronized(this@PlanRepositoryImpl) {
+                cachedUserPlans = null
+                lastFetchTimestamp = 0L
+                Log.d(tag, "Plans cache invalidated.")
             }
         }
     }

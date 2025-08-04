@@ -1,6 +1,8 @@
 package com.example.healthhelper.planpage.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,24 +27,19 @@ import com.himanshoe.charty.util.dpToPx
 @Composable
 fun LoadingIndicator() {
     HealthHelperTheme {
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.5f)
-        ) {paddingValues ->
-            Column (
-                modifier = Modifier.padding(paddingValues)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ){
-                CircularProgressIndicator(
-                    modifier = Modifier.scale(3.0f),
-                    // indicator的顏色
-                    color = MaterialTheme.colorScheme.primary,
-                    // indicator後面的軌道顏色
-                    trackColor = Color.LightGray,
-                )
-            }
-
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .background(Color.Transparent),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.scale(2.0f),
+                // indicator的顏色
+                color = MaterialTheme.colorScheme.primary,
+                // indicator後面的軌道顏色
+                trackColor = Color.LightGray,
+            )
         }
     }
 

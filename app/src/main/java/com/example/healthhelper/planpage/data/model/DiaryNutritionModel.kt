@@ -17,7 +17,10 @@ data class DiaryNutritionModel(
     val totalCalories: Float
 ) {
     override fun equals(other: Any?): Boolean {
-        return this.diaryId == (other as DiaryNutritionModel).diaryId
+        if (this === other) return true // 同一個實例
+        if (other !is DiaryNutritionModel) return false // 類型不同，或者 other 是 null
+
+        return diaryId == other.diaryId
     }
 
     override fun hashCode(): Int {

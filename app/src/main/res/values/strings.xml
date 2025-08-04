@@ -299,5 +299,8 @@
     <string name="planImage">計劃圖片</string>
     <string name="checkIcon">完成圖標</string>
     <string name="nutrition_calculator">營養比例</string>
+    <string name="delete_plan_alert_title">確定刪除</string>
+    <string name="delete_plan_alert_text">確定刪除計畫嗎?</string>
+    <string name="edit_button">編輯按鈕</string>
     <!-- ... 其他字符串 ... -->
 </resources>

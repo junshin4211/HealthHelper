@@ -16,7 +16,10 @@ data class AddPlanModel(
     val Caloriesgoal: Float
 ){
     override fun equals(other: Any?): Boolean {
-        return this.userId == (other as PlanSpecificModel).userDietPlanId
+        if (this === other) return true // 同一個實例
+        if (other !is AddPlanModel) return false // 類型不同，或者 other 是 null
+
+        return userId == other.userId
     }
     override fun hashCode(): Int {
         return userId.hashCode()
@@ -26,5 +29,5 @@ data class AddPlanModel(
 @Serializable
 data class GenericApiResponse(
     val result: Boolean,
-    val errMsg: String? = null // 在 Kotlin 中，如果 JSON 中該字段為 null 或缺失，會正確映射為 null
+    val errMsg: String? = null
 )

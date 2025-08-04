@@ -17,7 +17,10 @@ data class PlanModel(
     val Caloriesgoal: Float
 ) {
     override fun equals(other: Any?): Boolean {
-        return this.userDietPlanId == (other as PlanSpecificModel).userDietPlanId
+        if (this === other) return true // 同一個實例
+        if (other !is PlanModel) return false // 類型不同，或者 other 是 null
+
+        return userDietPlanId == other.userDietPlanId
     }
     override fun hashCode(): Int {
         return userDietPlanId.hashCode()

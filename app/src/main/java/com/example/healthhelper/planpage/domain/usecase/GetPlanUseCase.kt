@@ -20,13 +20,16 @@ fun filterAndSortPlan(
     val tag = "filterAndSortPlan"
     Log.d(tag, "$isFinish")
     return if (!isFinish) {
-         val list = planList.filter { it.finishstate == 0 }.sortedByDescending { it.startDateTime }
+         val list = planList.filter { it.finishstate == 0 }.sortedBy { it.startDateTime }
         Log.d(tag, "分類未完成計畫: $list")
         list
     } else {
-         val list = planList.filterNot { it.finishstate == 0 }.sortedByDescending { it.startDateTime }
+        val list = planList.filter { it.finishstate == 1 }
+        val listWithGoal = planList.filter { it.finishstate == 2 }
+
+        val completedList = (list + listWithGoal).sortedBy { it.startDateTime }
         Log.d(tag, "分類已完成計畫: $list")
-        list
+        completedList
     }
 }
 

@@ -92,8 +92,11 @@ fun AddCustomPlan(
                     "計劃已成功儲存！",
                     duration = SnackbarDuration.Short
                 )
-                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
+
                 viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
+
+                navController.previousBackStackEntry?.savedStateHandle?.set("plan_added", true) // 設定關鍵字,讓主頁知道planlist有更新
+
                 navController.popBackStack() // 導航回去
             }
 
@@ -102,7 +105,7 @@ fun AddCustomPlan(
                     "錯誤: ${state.message}",
                     duration = SnackbarDuration.Short
                 )
-                Log.e("AddPlanScreen", "Plan creation error from ViewModel: ${state.message}")
+
                 viewModel.refreshAddPlanState()
             }
 
@@ -134,7 +137,6 @@ fun AddCustomPlan(
                 title = title,
                 snackBarHostState = snackBarHostState,
                 isSaving = uiState is AddPlanUiState.Loading,
-                uiState = uiState,
                 onSaveClick = { addPlanData ->
                     viewModel.submitPlan(addPlanData)
                 }
@@ -143,13 +145,14 @@ fun AddCustomPlan(
     }
 }
 
+//topbar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddPlanTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
     TopAppBar(
         title = {
-            Text(
-                text = stringResource(title) + stringResource(R.string.plan),
+            Title(
+                title = stringResource(title) + stringResource(R.string.plan),
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -172,12 +175,12 @@ private fun AddPlanTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
     )
 }
 
+// 新增頁面主頁內容
 @Composable
 private fun DietSettingsContent(
     modifier: Modifier = Modifier,
     @StringRes title: Int,
     snackBarHostState: SnackbarHostState,
-    uiState: AddPlanUiState,
     isSaving: Boolean,
     onSaveClick: (AddPlanModel) -> Unit
 ) {
@@ -228,23 +231,6 @@ private fun DietSettingsContent(
                 startMillis?.let { formatMillisToDateString(it) } ?: ""
             selectedEndDate = endMillis?.let { formatMillisToDateString(it) } ?: ""
         }
-
-//        // 當 inputCalories 或 currentPlanType 改變時，重新計算克數
-//        LaunchedEffect(inputCalories, title) {
-//            Log.d(
-//                "DietSettingsContent",
-//                "Recalculating grams for calories: $inputCalories, plan: ${title}"
-//            )
-//            calculateNutritionGrams(
-//                calories = inputCalories.toFloat(),
-//                plan = title, // 傳遞計劃的資源ID
-//                onSetNutritionGram = { fatGrams, carbGrams, proteinGrams ->
-//                    calculatedFatGram = fatGrams
-//                    calculatedCarbGram = carbGrams
-//                    calculatedProteinGram = proteinGrams
-//                }
-//            )
-//        }
 
         Spacer(modifier = Modifier.height(8.dp))
         // 週期選單
@@ -649,10 +635,12 @@ fun NutritionSliderSection(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
+        // 營養目標標題
         Title(
             title = stringResource(R.string.nutrition_calculator),
             modifier = Modifier.align(Alignment.Start)
         )
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -673,6 +661,7 @@ fun NutritionSliderSection(
                     gram = currentCarbGram,
                     themeColor = Color(0xFF304FFE)
                 ) { value ->
+                    // 計算營養比例
                     calculateNutrition(
                         nutritionType = NutritionType.CARBOHYDRATE,
                         calories = inputCalories,
@@ -684,10 +673,7 @@ fun NutritionSliderSection(
                             carbPercent = carb
                             proteinPercent = pro
                             fatPercent = fat
-                            Log.d(
-                                "AddCustomPlan",
-                                "calculateNutrition onSetGoal called: F=$fat, C=$carb, P=$pro"
-                            )
+
                             onSetGoal(fat, carb, pro)
                         }
                     ) { fat, carb, pro ->
@@ -701,6 +687,7 @@ fun NutritionSliderSection(
                     gram = currentProteinGram,
                     themeColor = Color(0xFFD50000),
                 ) { value ->
+                    // 計算營養比例
                     calculateNutrition(
                         nutritionType = NutritionType.PROTEIN,
                         calories = inputCalories,
@@ -725,6 +712,7 @@ fun NutritionSliderSection(
                     gram = currentFatGram,
                     themeColor = Color(0xFF03A144),
                 ) { value ->
+                    // 計算營養比例
                     calculateNutrition(
                         nutritionType = NutritionType.FAT,
                         calories = inputCalories,

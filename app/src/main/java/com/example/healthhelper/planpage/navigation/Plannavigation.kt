@@ -34,7 +34,12 @@ sealed class Screen(val route: String) {
             return "add_custom_plan/$categoryId"
         }
     }
-    object ManagePlan : Screen("manage_plan")
+    object ManagePlan : Screen("manage_plan/{planType}") {
+
+        fun createRoute(planType: Int): String {
+            return "manage_plan/$planType"
+        }
+    }
     object PlanDetail : Screen("plan_detail")
 }
 
@@ -84,9 +89,15 @@ fun PlanNav(
         }
 
         //to the manage plan page
-        composable(route = Screen.ManagePlan.route) {
+        composable(
+            route = Screen.ManagePlan.route,
+            arguments = listOf(navArgument("planType") { type = NavType.IntType })
+        ) {
+            val planType = backStackEntry?.arguments?.getInt("planType") ?: R.string.no_plantext
+
             ManagePlan(
-                navcontroller = navController,
+                navController = navController,
+                planType = planType,
             )
         }
 

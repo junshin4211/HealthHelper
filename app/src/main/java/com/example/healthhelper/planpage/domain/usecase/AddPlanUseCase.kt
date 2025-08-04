@@ -7,9 +7,11 @@ import com.example.healthhelper.planpage.domain.model.DateRangeTitle
 import com.example.healthhelper.planpage.domain.model.NutritionType
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.Locale
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
@@ -32,6 +34,26 @@ fun formatMillisToISO(millis: Long?): String? {
     return Instant.ofEpochMilli(millis)
         .atZone(zoneId)
         .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+}
+
+fun formatDateString(dateString: String): String? {
+    return try {
+
+        Log.d("AddPlanUseCase","input dateString: $dateString")
+        val inputFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy, h:mm:ss a",
+            Locale.ENGLISH)
+
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd",
+            Locale.ENGLISH)
+
+        val localDateTime = LocalDateTime.parse(dateString, inputFormatter)
+
+        Log.d("AddPlanUseCase","parse out localDateTime: ${localDateTime.format(outputFormatter)}")
+        localDateTime.format(outputFormatter)
+    } catch (e: Exception) {
+        Log.d("AddPlanUseCase","Parse Error: ${e.message}")
+        null
+    }
 }
 
 /** 根據 DateRangeTitle 轉換成天數

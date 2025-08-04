@@ -2,6 +2,7 @@ package com.example.healthhelper.planpage.ui
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -40,6 +41,7 @@ import com.example.healthhelper.planpage.data.Result
 import com.example.healthhelper.planpage.data.model.PlanModel
 import com.example.healthhelper.planpage.data.remote.DependencyProvider
 import com.example.healthhelper.planpage.domain.model.DietPlanType
+import com.example.healthhelper.planpage.domain.model.PlanCategory
 import com.example.healthhelper.planpage.domain.usecase.filterAndSortPlan
 import com.example.healthhelper.planpage.domain.usecase.transformDate
 import com.example.healthhelper.planpage.navigation.Screen
@@ -68,6 +70,18 @@ fun PlanMain(
             // 取得 使用者Plan計畫
             val planState by viewModel.planMainState.collectAsStateWithLifecycle()
 
+            // 透過navController監聽是否有更新
+            val currentBackStackEntry = navController.currentBackStackEntry
+
+            LaunchedEffect(currentBackStackEntry) {
+                val planAdded = currentBackStackEntry?.savedStateHandle?.remove<Boolean>("plan_added")
+                val planDeleted = currentBackStackEntry?.savedStateHandle?.remove<Boolean>("plan_delete")
+
+                if (planAdded == true || planDeleted == true) {
+                    viewModel.refreshUserPlans()
+                }
+            }
+
             //判斷是否取得資料
             when (val state = planState) {
                 is Result.Loading -> {
@@ -76,6 +90,7 @@ fun PlanMain(
 
                 is Result.Success -> {
                     val planList = state.data
+
                     PlanContent(
                         modifier = Modifier.padding(paddingValues),
                         navController = navController,
@@ -131,7 +146,7 @@ fun PlanContent(
 
         HorizontalDivider(thickness = 2.dp)
 
-        PlanSection(title = stringResource(R.string.myPlan), navController = navController) {
+        PlanSection(title = PlanCategory.MyPlans.title, navController = navController) {
             PlanCard(
                 navController = navController,
                 planList = planList,
@@ -148,7 +163,7 @@ fun PlanContent(
 
         HorizontalDivider(thickness = 2.dp)
 
-        PlanSection(title = stringResource(R.string.completedPlan), navController = navController) {
+        PlanSection(title = PlanCategory.CompletedPlans.title, navController = navController) {
             PlanCard(
                 navController = navController,
                 planList = planList,
@@ -241,13 +256,16 @@ fun FilterItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
         Icon(
             painter = painter,
             contentDescription = stringResource(label.displayNameRes),
             tint = MaterialTheme.colorScheme.primary, // 使用主題顏色
             modifier = Modifier.size(28.dp)
         )
+
         Spacer(modifier = Modifier.height(4.dp))
+
         Text(
             text = stringResource(label.displayNameRes),
             color = MaterialTheme.colorScheme.primary,
@@ -259,7 +277,7 @@ fun FilterItem(
 // 主頁計畫顯示區
 @Composable
 fun PlanSection(
-    title: String,
+    @StringRes title: Int,
     navController: NavHostController,
     content: @Composable () -> Unit
 ) {
@@ -269,18 +287,17 @@ fun PlanSection(
             .padding(start = 16.dp, end = 16.dp, top = 8.dp)
     ) {
 
-        Title(title = title)
+        Title(title = stringResource(title))
 
         Spacer(modifier = Modifier.height(8.dp))
 
-
-        content() // 你的 PlanCard 等內容
+        content() //  PlanCard 內容
 
         Row(
             modifier = Modifier
                 .align(alignment = Alignment.End)
                 .padding(top = 5.dp, bottom = 5.dp)
-                .clickable { navController.navigate(Screen.ManagePlan.route) },
+                .clickable { navController.navigate(Screen.ManagePlan.createRoute(title)) },
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -314,9 +331,9 @@ fun PlanCard(
     onSetPlan: (image: Int, name: String, date: String) -> Unit,
 ) {
 
+    // 監聽計畫列表更新
     LaunchedEffect(planList, isFinish) {
 
-        Log.d("PlanMain", "LaunchedEffect triggered due to planList change.")
         if (planList.isEmpty()) {
             onSetPlan(R.drawable.customimg, "尚無任何無計畫", "2999/99/99")
         } else {
@@ -334,7 +351,7 @@ fun PlanCard(
                 "錯誤日期"
             }
 
-            val imageRes = when (getFirstPlan.categoryId) {
+            val imageRes = when (getFirstPlan.categoryId) { // 根據計劃不同圖片不同
                 1 -> R.drawable.highproteinimg
                 2 -> R.drawable.lowcarbimg
                 3 -> R.drawable.ketoneimg
@@ -361,6 +378,7 @@ fun PlanCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column {
+            // 上排資訊
             Box {
                 Image(
                     painter = painterResource(id = imageDisplay),
@@ -383,6 +401,7 @@ fun PlanCard(
                     )
                 }
             }
+            // 下排文字顯示
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -393,7 +412,7 @@ fun PlanCard(
 
                 Text(
                     text = nameDisplay,
-                    color = MaterialTheme.colorScheme.secondary, // 使用主題次要顏色
+                    color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )

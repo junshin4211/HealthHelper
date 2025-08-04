@@ -12,7 +12,19 @@ data class ChartData(val value: Float, val color: Color)
 // 圖表旁的圖例數據模型
 data class MacroInfo(val name: String, val grams: Float, val color: Color, val goal: Float? = null)
 
-// 假設您已經有這些枚舉
+
+enum class PlanCategory(@StringRes val title: Int){
+    MyPlans(title = R.string.myPlan),
+    CompletedPlans(R.string.completedPlan);
+
+    companion object {
+        fun fromResId(title: Int): PlanCategory? {
+            return PlanCategory.entries.find { it.title == title }
+        }
+    }
+}
+
+//
 enum class DietPlanType(@StringRes val displayNameRes: Int) {
     HIGH_PROTEIN(R.string.highProtein),
     LOW_CARB_HYDRATE(R.string.lowCarbHydrate),
@@ -27,7 +39,7 @@ enum class DietPlanType(@StringRes val displayNameRes: Int) {
     }
 }
 
-enum class NutritionType(@StringRes val displayNameRes: Int) { // 為宏指令也添加顯示名稱資源
+enum class NutritionType(@StringRes val displayNameRes: Int) {
     CARBOHYDRATE(R.string.carb), // 需要在 strings.xml 中定義
     PROTEIN(R.string.protein),
     FAT(R.string.fat)

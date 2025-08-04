@@ -91,8 +91,11 @@ fun AddPlan(
                     "計劃已成功儲存！",
                     duration = SnackbarDuration.Short
                 )
-                Log.i("AddPlanScreen", "Plan creation success from ViewModel.")
+
                 viewModel.refreshAddPlanState() // 重置狀態，避免重複顯示
+
+                navController.previousBackStackEntry?.savedStateHandle?.set("plan_added", true) // 設定關鍵字,讓主頁知道planlist有更新
+
                 navController.popBackStack() // 導航回去
             }
 
@@ -101,7 +104,7 @@ fun AddPlan(
                     "錯誤: ${state.message}",
                     duration = SnackbarDuration.Short
                 )
-                Log.e("AddPlanScreen", "Plan creation error from ViewModel: ${state.message}")
+
                 viewModel.refreshAddPlanState()
             }
 
@@ -142,13 +145,14 @@ fun AddPlan(
     }
 }
 
+// topBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddPlanTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
     TopAppBar(
         title = {
-            Text(
-                text = stringResource(title) + stringResource(R.string.plan),
+            Title(
+                title = stringResource(title) + stringResource(R.string.plan),
                 fontWeight = FontWeight.Bold,
                 fontSize = 30.sp,
                 color = MaterialTheme.colorScheme.primary
@@ -171,6 +175,7 @@ private fun AddPlanTopBar(onBackClick: () -> Unit, @StringRes title: Int) {
     )
 }
 
+// 新增頁面主要內容
 @Composable
 private fun DietSettingsContent(
     modifier: Modifier = Modifier,
@@ -190,7 +195,7 @@ private fun DietSettingsContent(
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
 
-        val currentUserId = UserManager.getUser().userId // userId
+        val currentUserId = DependencyProvider.getUserId // userId
 
         // 開始結束日期文字顯示
         var selectedStartDate by remember { mutableStateOf("") }
@@ -200,7 +205,7 @@ private fun DietSettingsContent(
         var savedSelectedStartDateMillis by remember { mutableStateOf<Long?>(null) } // startDateTime
         var savedSelectedEndDateMillis by remember { mutableStateOf<Long?>(null) } // endDateTime
 
-        // 顯示日期選擇
+        // 顯示日期選擇Dialog與否
         var showDateRangePicker by remember { mutableStateOf(false) }
 
         // 顯示確認Dialog
