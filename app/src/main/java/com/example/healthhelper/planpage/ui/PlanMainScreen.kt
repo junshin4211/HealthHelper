@@ -127,11 +127,13 @@ fun PlanContent(
     var onGoingPlanImage by remember { mutableIntStateOf(R.drawable.customimg) }
     var onGoingPlanName by remember { mutableStateOf("") }
     var onGoingPlanDate by remember { mutableStateOf("") }
+    var onGoingPlanId by remember { mutableIntStateOf(-1) }
 
     // 已完成計畫參數
     var completedPlanImage by remember { mutableIntStateOf(R.drawable.customimg) }
     var completedPlanName by remember { mutableStateOf("") }
     var completedPlanDate by remember { mutableStateOf("") }
+    var completedPlanId by remember { mutableIntStateOf(-1) }
 
     //setting bottom bar visibility
     tabViewModel.setTabVisibility(true)
@@ -154,10 +156,12 @@ fun PlanContent(
                 nameDisplay = onGoingPlanName,
                 dateDisplay = onGoingPlanDate,
                 isFinish = false,
-                onSetPlan = { image, name, date ->
+                userDietPlanId = onGoingPlanId,
+                onSetPlan = { image, name, date, dietPlanId ->
                     onGoingPlanImage = image
-                    onGoingPlanName = name
+                    onGoingPlanName = "${name}計畫"
                     onGoingPlanDate = date
+                    onGoingPlanId = dietPlanId
                 })
         }
 
@@ -171,10 +175,12 @@ fun PlanContent(
                 nameDisplay = completedPlanName,
                 dateDisplay = completedPlanDate,
                 isFinish = true,
-                onSetPlan = { image, name, date ->
+                userDietPlanId = completedPlanId,
+                onSetPlan = { image, name, date, dietPlanId ->
                     completedPlanImage = image
-                    completedPlanName = name
+                    completedPlanName = "${name}計畫"
                     completedPlanDate = date
+                    completedPlanId = dietPlanId
                 })
         }
     }
@@ -328,28 +334,22 @@ fun PlanCard(
     imageDisplay: Int,
     nameDisplay: String,
     dateDisplay: String,
-    onSetPlan: (image: Int, name: String, date: String) -> Unit,
+    userDietPlanId: Int,
+    onSetPlan: (image: Int, name: String, date: String, dietPlanId: Int) -> Unit,
 ) {
+    var categoryName: String = ""
 
     // 監聽計畫列表更新
     LaunchedEffect(planList, isFinish) {
 
         if (planList.isEmpty()) {
-            onSetPlan(R.drawable.customimg, "尚無任何無計畫", "2999/99/99")
+            onSetPlan(R.drawable.customimg, "尚無任何", "2999/99/99", -1)
         } else {
             val getFirstPlan = filterAndSortPlan(planList, isFinish).first() // 計劃列表按日期排序並取得第一個計劃顯示
+            categoryName = getFirstPlan.categoryName
 
-            val startDate = try {
-                transformDate(getFirstPlan.startDateTime) // 將日期轉換格式
-            } catch (e: Exception) {
-                "錯誤日期"
-            }
-
-            val endDate = try {
-                transformDate(getFirstPlan.endDateTime)
-            } catch (e: Exception) {
-                "錯誤日期"
-            }
+            val startDate = runCatching { transformDate(getFirstPlan.startDateTime) }.getOrDefault("錯誤日期")
+            val endDate = runCatching { transformDate(getFirstPlan.endDateTime) }.getOrDefault("錯誤日期")
 
             val imageRes = when (getFirstPlan.categoryId) { // 根據計劃不同圖片不同
                 1 -> R.drawable.highproteinimg
@@ -360,7 +360,7 @@ fun PlanCard(
             }
             Log.d("PlanMain", "firstPlan: $getFirstPlan finishstate: ${getFirstPlan.finishstate}")
 
-            onSetPlan(imageRes, "${getFirstPlan.categoryName}計畫", "$startDate ~ $endDate")
+            onSetPlan(imageRes, categoryName, "$startDate ~ $endDate", getFirstPlan.userDietPlanId)
         }
     }
 
@@ -369,8 +369,8 @@ fun PlanCard(
             .fillMaxWidth()
             .clickable {
                 // 只有在實際有計畫時才導航，或者導航到一個可以處理空狀態的詳細頁面
-                if (nameDisplay != "尚無任何計畫" && !nameDisplay.contains("尚無")) { // 根據你的默認消息調整
-                    navController.navigate(Screen.PlanDetail.route) // 你可能需要傳遞計劃ID
+                if (planList.isNotEmpty() || userDietPlanId >= 0) { // 根據你的默認消息調整
+                    navController.navigate(Screen.PlanDetail.createRoute(userDietPlanId, categoryName)) // 你可能需要傳遞計劃ID
                 }
             },
         shape = RoundedCornerShape(12.dp),

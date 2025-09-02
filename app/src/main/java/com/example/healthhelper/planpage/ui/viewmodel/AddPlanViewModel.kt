@@ -38,7 +38,7 @@ class AddPlanViewModel(
                 return@launch
             }
             if (addPlanData.categoryId <= 0 ){
-                _addPlanState.value = Error("計畫ID錯誤")
+                _addPlanState.value = Error("計畫分類ID錯誤")
                 return@launch
             }
             if(addPlanData.finishstate != 0){
@@ -66,7 +66,9 @@ class AddPlanViewModel(
                 return@launch
             }
 
-            when(val result = planRepository.addPlan(addPlanData)){
+            val result = planRepository.addPlan(addPlanData)
+
+            when(result){
                 is ApiResult.Success -> {
                     if (result.data.result){
                         _addPlanState.value = Success

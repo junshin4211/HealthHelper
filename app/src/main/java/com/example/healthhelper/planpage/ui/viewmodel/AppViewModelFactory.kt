@@ -3,10 +3,11 @@ package com.example.healthhelper.planpage.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.healthhelper.planpage.data.PlanRepository
+import com.example.healthhelper.planpage.data.remote.DependencyProvider
 import com.example.healthhelper.signuplogin.UserManager
 
 class AppViewModelFactory(
-    private val planRepository: PlanRepository,
+    private val planRepository: PlanRepository = DependencyProvider.planRepository,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -22,6 +23,10 @@ class AppViewModelFactory(
 
             modelClass.isAssignableFrom(ManagePlanViewModel::class.java) -> {
                 ManagePlanViewModel(planRepository) as T
+            }
+
+            modelClass.isAssignableFrom(PlanDetailViewModel::class.java) -> {
+                PlanDetailViewModel(planRepository) as T
             }
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,8 +43,36 @@ fun LoadingIndicator() {
             )
         }
     }
+}
 
+@Composable
+fun LoadingIndicator(
+    modifier: Modifier = Modifier,
+    text: String = ""
+) {
+    HealthHelperTheme {
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .background(Color.Transparent),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 16.dp) // 添加底部間距
+            )
 
+            CircularProgressIndicator(
+                modifier = modifier.scale(2.0f),
+                // indicator的顏色
+                color = MaterialTheme.colorScheme.primary,
+                // indicator後面的軌道顏色
+                trackColor = Color.LightGray,
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)

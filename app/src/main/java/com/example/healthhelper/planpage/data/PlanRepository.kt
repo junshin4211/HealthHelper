@@ -2,8 +2,11 @@ package com.example.healthhelper.planpage.data // 與您專案中的路徑一致
 
 import com.example.healthhelper.planpage.data.model.AddPlanModel
 import com.example.healthhelper.planpage.data.model.DeletePlanModel
+import com.example.healthhelper.planpage.data.model.DiaryNutritionModel
 import com.example.healthhelper.planpage.data.model.GenericApiResponse
 import com.example.healthhelper.planpage.data.model.PlanModel
+import com.example.healthhelper.planpage.data.remote.RequestDiaryBody
+import com.example.healthhelper.planpage.data.remote.RequestPlanBody
 import kotlinx.coroutines.flow.Flow
 import com.example.healthhelper.planpage.data.Result as ApiResult // 使用別名
 
@@ -18,8 +21,11 @@ interface PlanRepository {
 
     suspend fun deletePlan(deletePlanData: DeletePlanModel): ApiResult<GenericApiResponse>
 
+    suspend fun fetchSinglePlan(queryPlanData: RequestPlanBody, getRefresh: Boolean): ApiResult<PlanModel>
+
+    suspend fun fetchDiaryList(requestDiaryBody: RequestDiaryBody): ApiResult<List<DiaryNutritionModel>>
+
     suspend fun invalidateCache()
 
-    // TODO... 其他 Repository interface方法
 }
 

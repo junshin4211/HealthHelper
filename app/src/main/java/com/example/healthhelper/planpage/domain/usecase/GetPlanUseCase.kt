@@ -1,13 +1,9 @@
 package com.example.healthhelper.planpage.domain.usecase
 
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.healthhelper.planpage.data.model.PlanModel
-import com.example.healthhelper.planpage.domain.model.DateRangeTitle
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
@@ -38,9 +34,9 @@ fun <T, R> T.dateFormat(transform: (T) -> R): R {
     return transform(this)
 }
 
-fun transformDate(dateString: String):String{
-    val formattedDate = dateString.dateFormat { inputStr ->
-        // 這裡的轉換邏輯與 formatSpecificDateString 內部類似
+fun transformDate(dateTimeString: String):String{
+    val formattedDate = dateTimeString.dateFormat { inputStr ->
+
         val inputFormatter = DateTimeFormatter.ofPattern("MMM d, uuuu, h:mm:ss a",
             Locale.ENGLISH)
         val outputFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd",
@@ -49,7 +45,23 @@ fun transformDate(dateString: String):String{
             val localDateTime = LocalDateTime.parse(inputStr, inputFormatter)
             localDateTime.format(outputFormatter)
         } catch (e: DateTimeParseException) {
-            "Invalid Date" // 或者返回 null，則 R 類型需要是 String?
+            "Invalid DateTime" // 或者返回 null，則 R 類型需要是 String?
+        }
+    }
+    return formattedDate
+}
+
+fun transformDateTimeToDate(dateTimeString: String): String? {
+    val formattedDate = dateTimeString.dateFormat{ inputStr ->
+        val inputFormatter = DateTimeFormatter.ofPattern("MMM d, uuuu, h:mm:ss a",
+            Locale.ENGLISH)
+        val outputFormatter = DateTimeFormatter.ISO_LOCAL_DATE // "yyyy-MM-dd"
+
+        try {
+            val localDate = LocalDate.parse(inputStr, inputFormatter)
+            localDate.format(outputFormatter)
+        }catch (e: DateTimeParseException){
+            null
         }
     }
     return formattedDate

@@ -302,5 +302,6 @@
     <string name="delete_plan_alert_title">確定刪除</string>
     <string name="delete_plan_alert_text">確定刪除計畫嗎?</string>
     <string name="edit_button">編輯按鈕</string>
+    <string name="load_again">重新載入</string>
     <!-- ... 其他字符串 ... -->
 </resources>

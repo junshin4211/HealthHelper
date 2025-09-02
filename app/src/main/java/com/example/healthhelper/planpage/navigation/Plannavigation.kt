@@ -40,7 +40,11 @@ sealed class Screen(val route: String) {
             return "manage_plan/$planType"
         }
     }
-    object PlanDetail : Screen("plan_detail")
+    object PlanDetail : Screen("plan_detail/{userDietPlanId}/{categoryName}") {
+        fun createRoute(userDietPlanId: Int, categoryName: String): String {
+            return "plan_detail/$userDietPlanId/$categoryName"
+        }
+    }
 }
 
 @Composable
@@ -102,10 +106,24 @@ fun PlanNav(
         }
 
         //to the plan detail page
-        composable(route = Screen.PlanDetail.route) {
-            PlanDetail(
-                navcontroller = navController,
-            )
+        composable(
+            route = Screen.PlanDetail.route,
+            arguments = listOf(
+                navArgument("userDietPlanId") { type = NavType.IntType },
+                navArgument("categoryName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val planId = backStackEntry.arguments?.getInt("userDietPlanId")
+            val categoryName = backStackEntry.arguments?.getString("categoryName")
+            if (planId != null && categoryName != null && categoryName.isNotEmpty()) {
+                // 確保 planId 和 categoryName 不為 null
+                PlanDetail(
+                    userDietPlanId = planId,
+                    categoryName = categoryName,
+                    navController = navController
+                )
+            } else {
+                // 處理 planId 為 null 的情況，例如導航回上一頁或顯示錯誤
+            }
         }
     }
 }

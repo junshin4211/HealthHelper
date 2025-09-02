@@ -61,7 +61,10 @@ import com.example.healthhelper.planpage.ui.usecase.FinishState
 import com.example.healthhelper.planpage.domain.model.PlanCategory
 import com.example.healthhelper.planpage.domain.usecase.filterAndSortPlan
 import com.example.healthhelper.planpage.domain.usecase.formatDateString
+import com.example.healthhelper.planpage.navigation.Screen
 import com.example.healthhelper.planpage.ui.components.CustomAlertDialog
+import com.example.healthhelper.planpage.ui.components.EmptyState
+import com.example.healthhelper.planpage.ui.components.ErrorState
 import com.example.healthhelper.planpage.ui.components.LoadingIndicator
 import com.example.healthhelper.planpage.ui.components.Title
 import com.example.healthhelper.planpage.ui.viewmodel.AppViewModelFactory
@@ -114,11 +117,11 @@ fun ManagePlan(
                 // 刪除失敗
                 snackBarHostState.showSnackbar(
                     message = state.message,
-                    duration = SnackbarDuration.Long // 錯誤信息可以顯示久一點
+                    duration = SnackbarDuration.Long
                 )
 
                 // 失敗後也重置 deletePlanState 到初始狀態
-                viewModel.resetDeletePlanState() // 你需要在 ViewModel 中添加這個方法
+                viewModel.resetDeletePlanState()
             }
 
             is ManagePlanUiState.Loading -> {
@@ -155,6 +158,7 @@ fun ManagePlan(
 
                     ManagePlanContent(
                         modifier = Modifier.padding(paddingValues),
+                        navController = navController,
                         snackBarHostState = snackBarHostState,
                         planType = planType,
                         isDeleteMode = isDeleteMode,
@@ -224,6 +228,7 @@ fun ManageTopBar(
 @Composable
 fun ManagePlanContent(
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     snackBarHostState: SnackbarHostState,
     @StringRes planType: Int,
     isDeleteMode: Boolean,
@@ -274,7 +279,11 @@ fun ManagePlanContent(
                             userDeletePlan = plan
                             showConfirm = true
                         },
-                        onPlanClick = { /* TODO: Handle plan click, e.g., navigate to plan details */ }
+                        onPlanClick = { plan ->
+                            navController.navigate(
+                                Screen.PlanDetail.createRoute(plan.userDietPlanId,plan.categoryName)
+                            )
+                        }
                     )
                 }
 
@@ -288,7 +297,11 @@ fun ManagePlanContent(
                             userDeletePlan = plan
                             showConfirm = true
                         },
-                        onPlanClick = { /* TODO: Handle plan click, e.g., navigate to plan details */ }
+                        onPlanClick = { plan ->
+                            navController.navigate(
+                                Screen.PlanDetail.createRoute(plan.userDietPlanId, plan.categoryName)
+                            )
+                        }
                     )
                 }
             }
@@ -493,29 +506,6 @@ fun PlanItemCard(
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
-        }
-    }
-}
-
-
-@Composable
-fun EmptyState(message: String, modifier: Modifier = Modifier) {
-    Box( /* ... */) {
-        Text(message, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurfaceVariant) // M3
-    }
-}
-
-@Composable
-fun ErrorState(message: String, onRetry: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Error: $message", color = MaterialTheme.colorScheme.error) // M3
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onRetry) { // M3 Button
-            Text("Retry")
         }
     }
 }

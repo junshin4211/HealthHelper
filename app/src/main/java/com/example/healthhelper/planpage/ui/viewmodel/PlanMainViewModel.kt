@@ -14,7 +14,6 @@ import com.example.healthhelper.planpage.data.Result as ApiResult // 使用別�
 class PlanMainViewModel(
     private val planRepository: PlanRepository,
 ) : ViewModel() {
-
     private val currentUserId = DependencyProvider.getUserId
     private val _planMainState = MutableStateFlow<ApiResult<List<PlanModel>>>(ApiResult.Loading)
     val planMainState: StateFlow<ApiResult<List<PlanModel>>> = _planMainState.asStateFlow()
@@ -29,7 +28,10 @@ class PlanMainViewModel(
             _planMainState.value = ApiResult.Loading
         }
         viewModelScope.launch {
-            when(val result = planRepository.fetchUserPlans(currentUserId,getRefresh)){
+
+            val result = planRepository.fetchUserPlans(currentUserId,getRefresh)
+
+            when(result){
                 is ApiResult.Success -> _planMainState.value = ApiResult.Success(result.data)
                 is ApiResult.Error -> _planMainState.value = ApiResult.Error(result.exception, result.message ?: "Unknown error")
                 is ApiResult.Loading -> {}
